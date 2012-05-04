@@ -16,7 +16,7 @@ RCQP_REGISTRY_DEFAULT_PATH="-DREGISTRY_DEFAULT_PATH=\"@prefix@/share/cwb/registr
 FLEX_PRG=@LEX@
 BISON_PRG=@YACC@
 
-PKG_CFLAGS=@CFLAGS@ @RCQP_PCRE_CFLAGS@ @RCQP_GLIB_CFLAGS@ ${RCQP_REGISTRY_DEFAULT_PATH}
+PKG_CFLAGS=@CFLAGS@ @RCQP_PCRE_CFLAGS@ @RCQP_GLIB_CFLAGS@ ${RCQP_REGISTRY_DEFAULT_PATH} -I$(PWD)/cwb/cl -I$(PWD)/cwb/cqp
 
 
 # "-Dexit(x)=rcqp_receive_error(x)" -D"fprintf(x,y,...)=rcqpPrintf(y,__VA_ARGS__)" -include "makeRCompatible.h"
@@ -37,6 +37,8 @@ PKG_LIBS=@LDFLAGS@ @LIBS@ @RCQP_PCRE_LFLAGS@ @RCQP_GLIB_LFLAGS@
 
 ##OBJECTS = ${RCQP_C_OBJ} ${RCQP_STATLIB} 
 OBJECTS = ${RCQP_C_OBJ} ${CWB_BISON_OBJ} ${CWB_FLEX_OBJ} ${CWB_C_OBJ}
+
+
 
 # Source files
 # ============
@@ -85,10 +87,16 @@ CQI_C_OBJ = $(CQI_C_SRC:.c=.o)
 
 CL_C_SRC = cwb/cl/globals.c cwb/cl/macros.c cwb/cl/list.c cwb/cl/lexhash.c cwb/cl/bitfields.c \
 	cwb/cl/storage.c cwb/cl/fileutils.c cwb/cl/special-chars.c cwb/cl/regopt.c cwb/cl/corpus.c \
-	cwb/cl/attributes.c cwb/cl/makecomps.c cwb/cl/cdaccess.c cwb/cl/bitio.c cwb/cl/endian.c \
+	cwb/cl/attributes.c cwb/cl/makecomps.c cwb/cl/cdaccess.c cwb/cl/bitio.c cwb/cl/cl_endian.c \
 	cwb/cl/compression.c cwb/cl/binsert.c cwb/cl/class-mapping.c
 CL_C_H = $(CL_C_SRC:.c=.h)
 CL_C_OBJ = $(CL_C_SRC:.c=.o)
+
+# cwb/utils directory
+# -------------------
+#
+UTILS_C_SRC = # utils/cwb-encode.c 
+UTILS_C_OBJ = $(UTILS_C_SRC:.c=.o)
 
 CL_FLEX_SRC = cwb/cl/registry.l
 CL_FLEX_C = $(CL_FLEX_SRC:.l=.yy.c)
@@ -103,11 +111,9 @@ CL_BISON_OBJ = $(CL_BISON_C:.c=.o)
 CL_FLEX_FLAGS=-Pcreg
 CL_BISON_FLAGS=-p creg -v
 
-
-CWB_C_OBJ = ${CQP_C_OBJ} ${CQI_C_OBJ} ${CL_C_OBJ}
+CWB_C_OBJ = ${CQP_C_OBJ} ${CQI_C_OBJ} ${CL_C_OBJ} ${UTILS_C_OBJ}
 CWB_FLEX_OBJ = ${CQP_FLEX_OBJ} ${CL_FLEX_OBJ}
 CWB_BISON_OBJ = ${CQP_BISON_OBJ} ${CL_BISON_OBJ}
- 
 
 # Sweave files
 RCQP_VIGNETTE_RNW = rcqp.Rnw
@@ -153,7 +159,7 @@ parsers: ${CQP_FLEX_C} ${CQP_BISON_C} ${CL_FLEX_C} ${CL_BISON_C}
 
 
 clean:
-	rm -f *.o *.so src/Makevars
+	rm -f *.o *.so Makevars
 	rm -f ../config.log ../config.status
 	if test -e ../autom4te.cache; then \
 		rm -rf ../autom4te.cache/*; \

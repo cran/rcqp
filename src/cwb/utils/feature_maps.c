@@ -134,16 +134,16 @@ create_feature_maps(char **config,
   
   nw1= cl_max_id(w_attr1);
   if (nw1 <= 0) {
-    fprintf(stderr, "ERROR: can't access lexicon of source corpus\n");
-    exit(1);
+   Rprintf( "ERROR: can't access lexicon of source corpus\n");
+    rcqp_receive_error(1);
   }
   nw2= cl_max_id(w_attr2);
   if (nw2 <= 0) {
-    fprintf(stderr, "ERROR: can't access lexicon of target corpus\n");
-    exit(1);
+   Rprintf( "ERROR: can't access lexicon of target corpus\n");
+    rcqp_receive_error(1);
   }
   
-  printf("LEXICON SIZE: %d / %d\n", nw1, nw2);
+ Rprintf("LEXICON SIZE: %d / %d\n", nw1, nw2);
 
   fcount1 = (unsigned int*) calloc(nw1+1,sizeof(unsigned int));
   fcount2 = (unsigned int*) calloc(nw2+1,sizeof(unsigned int));
@@ -164,14 +164,14 @@ create_feature_maps(char **config,
           int n_shared=0;
             
           if(sscanf(config[config_pointer],"%2s:%d:%f %s",command,&weight,&threshold,dummy)!=3) {
-            fprintf(stderr,"ERROR: wrong # of args: %s\n",config[config_pointer]);
-            fprintf(stderr,"Usage: -S:<weight>:<threshold>\n");
-            fprintf(stderr,"  Shared words with freq. ratios f1/(f1+f2) and f2/(f1+f2) >= <threshold>.\n");
-            exit(1);
+           Rprintf("ERROR: wrong # of args: %s\n",config[config_pointer]);
+           Rprintf("Usage: -S:<weight>:<threshold>\n");
+           Rprintf("  Shared words with freq. ratios f1/(f1+f2) and f2/(f1+f2) >= <threshold>.\n");
+            rcqp_receive_error(1);
           }
           else {
-            printf("FEATURE: Shared words, threshold=%4.1f%c, weight=%d ... ",threshold * 100, '\%', weight);
-            fflush(stdout);
+           Rprintf("FEATURE: Shared words, threshold=%4.1f%c, weight=%d ... ",threshold * 100, '\%', weight);
+            rcqp_flush();
             for (i1=0; i1 < nw1; i1++) {
               f1 = cl_id2freq(w_attr1, i1);
               i2 = cl_str2id(w_attr2, cl_id2str(w_attr1, i1));
@@ -185,7 +185,7 @@ create_feature_maps(char **config,
                 }
               }
             }
-            printf("[%d]\n",n_shared);
+           Rprintf("[%d]\n",n_shared);
           }
           break;
         }
@@ -196,21 +196,21 @@ create_feature_maps(char **config,
           int n;
           
           if (sscanf(config[config_pointer],"%1s%d:%d %s",command,&n,&weight,dummy)!=3) {
-            fprintf(stderr,"ERROR: wrong # of args: %s\n",config[config_pointer]);
-            fprintf(stderr,"Usage: -<n>:<weight>  (n = 1..4)\n");
-            fprintf(stderr,"  Shared <n>-grams (single characters, bigrams, trigrams, 4-grams).\n");
-            exit(1);
+           Rprintf("ERROR: wrong # of args: %s\n",config[config_pointer]);
+           Rprintf("Usage: -<n>:<weight>  (n = 1..4)\n");
+           Rprintf("  Shared <n>-grams (single characters, bigrams, trigrams, 4-grams).\n");
+            rcqp_receive_error(1);
           }
           else if(n <= 0 || n>4) {
             /* this shouldn't happen anyway */
-            fprintf(stderr,"ERROR: cannot handle %d-grams: %s\n",n,config[config_pointer]);
-            exit(1);
+           Rprintf("ERROR: cannot handle %d-grams: %s\n",n,config[config_pointer]);
+            rcqp_receive_error(1);
           }
           else {
             int i,f,l;
 
-            printf("FEATURE: %d-grams, weight=%d ... ", n, weight);
-            fflush(stdout);
+           Rprintf("FEATURE: %d-grams, weight=%d ... ", n, weight);
+            rcqp_flush();
 
             for(i=0; i<nw1; i++) {
               l = cl_id2strlen(w_attr1, i);
@@ -224,7 +224,7 @@ create_feature_maps(char **config,
             for(i=0;i<n;i++)
               f*=char_map_range;
             r->n_features+=f;           
-            printf("[%d]\n", f);
+           Rprintf("[%d]\n", f);
           }
           break;
         }
@@ -236,22 +236,22 @@ create_feature_maps(char **config,
           int nw,nl=0,i1,i2,n_matched=0;
 
           if(sscanf(config[config_pointer],"%2s:%d:%s %s",command,&weight,filename,dummy)!=3) {
-            fprintf(stderr, "ERROR: wrong # of args: %s\n",config[config_pointer]);
-            fprintf(stderr, "Usage: -W:<weight>:<filename>\n");
-            fprintf(stderr, "  Word list (read from file <filename>).\n");
-            exit(1);
+           Rprintf( "ERROR: wrong # of args: %s\n",config[config_pointer]);
+           Rprintf( "Usage: -W:<weight>:<filename>\n");
+           Rprintf( "  Word list (read from file <filename>).\n");
+            rcqp_receive_error(1);
           }
           else if(!(wordlist=fopen(filename,"r"))) {
-            fprintf(stderr,"ERROR: Cannot read word list file %s.\n",
+           Rprintf("ERROR: Cannot read word list file %s.\n",
                     filename);
-            exit(-1);
+            rcqp_receive_error(-1);
           }
           else {
-            printf("FEATURE: word list %s, weight=%d ... ", filename, weight);
-            fflush(stdout);
+           Rprintf("FEATURE: word list %s, weight=%d ... ", filename, weight);
+            rcqp_flush();
             while((nw=fscanf(wordlist,"%s %s",word1,word2))>0) {
               nl++;
-              if (nw!=2) fprintf(stderr,"WARNING: Line %d in word list '%s' contains %d words, ignored.\n",
+              if (nw!=2)Rprintf("WARNING: Line %d in word list '%s' contains %d words, ignored.\n",
                                  nl,filename,nw);
               else {
                 if((i1=cl_str2id(w_attr1,word1))>=0
@@ -264,43 +264,43 @@ create_feature_maps(char **config,
               }
             }
             fclose(wordlist);
-            printf("[%d]\n", n_matched);
+           Rprintf("[%d]\n", n_matched);
           }         
           break;
         }
         case 'C': 
           if(sscanf(config[config_pointer],"%2s:%d %s",command,&weight,dummy)!=2) {
-            fprintf(stderr, "ERROR: wrong # of args: %s\n",config[config_pointer]);
-            fprintf(stderr, "Usage: -C:<weight>\n");
-            fprintf(stderr, "  Character count [primary feature].\n");
-            exit(1);
+           Rprintf( "ERROR: wrong # of args: %s\n",config[config_pointer]);
+           Rprintf( "Usage: -C:<weight>\n");
+           Rprintf( "  Character count [primary feature].\n");
+            rcqp_receive_error(1);
           }
           else {
             /* primary feature -> don't create additional features */
             /* first entry in a token's feature list is character count */ 
             for (i=0; i<nw1; i++) fcount1[i]++;
             for (i=0; i<nw2; i++) fcount2[i]++;
-            printf("FEATURE: character count, weight=%d ... [1]\n", weight);
+           Rprintf("FEATURE: character count, weight=%d ... [1]\n", weight);
           }
           break;
-        default: fprintf(stderr,"ERROR: unknown feature: %s\n",config[config_pointer]);
-          exit(1);
+        default:Rprintf("ERROR: unknown feature: %s\n",config[config_pointer]);
+          rcqp_receive_error(1);
           break;
         }
       }
       else {
-        fprintf(stderr,"ERROR: feature parse error: %s\n", config[config_pointer]);
-        exit(1);
+       Rprintf("ERROR: feature parse error: %s\n", config[config_pointer]);
+        rcqp_receive_error(1);
       }
     }
   }
 
-  printf("[%d features allocated]\n",r->n_features);
+ Rprintf("[%d features allocated]\n",r->n_features);
 
   for(i=1; i<=nw1;i++) fcount1[i]+=fcount1[i-1];
   for(i=1; i<=nw2;i++) fcount2[i]+=fcount2[i-1];
-  printf("[%d entries in source text feature map]\n", fcount1[nw1]);
-  printf("[%d entries in target text feature map]\n", fcount2[nw2]);
+ Rprintf("[%d entries in source text feature map]\n", fcount1[nw1]);
+ Rprintf("[%d entries in target text feature map]\n", fcount2[nw2]);
 
 
   fs1=(int*)malloc(sizeof(int)*fcount1[nw1]); assert(fs1);
@@ -331,7 +331,7 @@ create_feature_maps(char **config,
           
           if(sscanf(config[config_pointer],"%2s:%d:%f %s",command,&weight,&threshold,dummy)!=3);
           else {
-            printf("PASS 2: Processing shared words (th=%4.1f%c).\n", threshold * 100, '\%');
+           Rprintf("PASS 2: Processing shared words (th=%4.1f%c).\n", threshold * 100, '\%');
             for(i1=0; i1<nw1;i1++) {
               f1=cl_id2freq(w_attr1,i1);
               i2=cl_str2id(w_attr2, cl_id2str(w_attr1, i1));
@@ -359,7 +359,7 @@ create_feature_maps(char **config,
             int i,f,ng,l;
             unsigned char *s;
 
-            printf("PASS 2: Processing %d-grams.\n",n);
+           Rprintf("PASS 2: Processing %d-grams.\n",n);
 
             f=1;
             for(i=0;i<n;i++)
@@ -404,9 +404,9 @@ create_feature_maps(char **config,
           int nw,nl=0,i1,i2;
 
           if(sscanf(config[config_pointer],"%2s:%d:%s %s",command,&weight,filename,dummy)!=3);
-          else if(!(wordlist=fopen(filename,"r"))) exit(-1);
+          else if(!(wordlist=fopen(filename,"r"))) rcqp_receive_error(-1);
           else {
-            printf("PASS 2: Processing word list %s\n",filename);
+           Rprintf("PASS 2: Processing word list %s\n",filename);
             while((nw=fscanf(wordlist,"%s %s",word1,word2))>0) {
               nl++;
               if (nw!=2) { /* skip */ }
@@ -425,9 +425,9 @@ create_feature_maps(char **config,
         }
         case 'C': 
           if (sscanf(config[config_pointer],"%2s:%d %s",command,&weight,dummy) == 2) {
-            printf("PASS 2: Setting character count weight.\n");
+           Rprintf("PASS 2: Setting character count weight.\n");
             if (r->fweight[0] != 0) {
-              fprintf(stderr, "WARNING: Character count weight redefined (new value is %d)\n", weight);
+             Rprintf( "WARNING: Character count weight redefined (new value is %d)\n", weight);
             }
             /* primary feature */
             r->fweight[0] = weight;
@@ -439,7 +439,7 @@ create_feature_maps(char **config,
     }
   }
 
-  printf("PASS 2: Creating character counts.\n");
+ Rprintf("PASS 2: Creating character counts.\n");
   for(i=0; i<nw1; i++) {
     *(--r->w2f1[i]) = cl_id2strlen(w_attr1, i);
   }
@@ -447,12 +447,12 @@ create_feature_maps(char **config,
     *(--r->w2f2[i]) = cl_id2strlen(w_attr2, i);
   }
 
-  printf("[checking pointers]\n");
+ Rprintf("[checking pointers]\n");
 
   need_to_abort=0;
   for(i=1;i<nw1;i++) {
     if(r->w2f1[i+1]-r->w2f1[i]!=fcount1[i]-fcount1[i-1]) {
-      fprintf(stderr,"ERROR: fcount1[%d]=%d r->w2f1[%d]-r->w2f1[%d]=%ld w=``%s''\n",
+     Rprintf("ERROR: fcount1[%d]=%d r->w2f1[%d]-r->w2f1[%d]=%ld w=``%s''\n",
               i,fcount1[i]-fcount1[i-1], i+1, i,(long int)(r->w2f1[i+1]-r->w2f1[i]),
               cl_id2str(w_attr1,i));
       need_to_abort=1;
@@ -461,14 +461,14 @@ create_feature_maps(char **config,
 
   for(i=1;i<nw2;i++) {
     if(r->w2f2[i+1]-r->w2f2[i]!=fcount2[i]-fcount2[i-1]) {
-      fprintf(stderr,"ERROR: fcount2[%d]=%d r->w2f2[%d]-r->w2f2[%d]=%ld w=``%s''\n",
+     Rprintf("ERROR: fcount2[%d]=%d r->w2f2[%d]-r->w2f2[%d]=%ld w=``%s''\n",
               i,fcount2[i]-fcount2[i-1], i+1, i,(long int)(r->w2f2[i+1]-r->w2f2[i]),
               cl_id2str(w_attr2,i));
       need_to_abort=1;
     }
   }
 
-  if(need_to_abort) exit(-1);
+  if(need_to_abort) rcqp_receive_error(-1);
 
   free(fcount1);
   free(fcount2);
@@ -620,14 +620,14 @@ check_fvectors(FMS fms)
     n++;
     for(i=0; i<fms->n_features; i++)
       if(agenda->fcount[i]!=0) {
-        fprintf(stderr,"WARNING: non-zero count detected\n");
+       Rprintf("WARNING: non-zero count detected\n");
         return;
       }
 
     agenda=agenda->next;
   }
   
-  printf("[check_fvectors: All %d feature vectors empty]\n",n);
+ Rprintf("[check_fvectors: All %d feature vectors empty]\n",n);
 }
 
 
@@ -655,10 +655,10 @@ show_features(FMS fms, int which, char* word)
   
   id=get_id_of_string(att, word);
 
-  printf("FEATURES of '%s', id=%d :\n", word, id);
-  printf("+ len=%2d  weight=%3d\n", *w2f[id], fms->fweight[0]);
+ Rprintf("FEATURES of '%s', id=%d :\n", word, id);
+ Rprintf("+ len=%2d  weight=%3d\n", *w2f[id], fms->fweight[0]);
   for(f=w2f[id]+1; f<w2f[id+1];f++)
-    printf("+ %6d  weight=%3d\n",*f,fms->fweight[*f]);
+   Rprintf("+ %6d  weight=%3d\n",*f,fms->fweight[*f]);
   
 }
 
@@ -712,7 +712,7 @@ best_path(FMS fms,
           int f2,
           int l2,
           int beam_width,       /* beam search */
-          int verbose,          /* print progress info on stdout ? */
+          int verbose,          /* print progress info on NULL ? */
           /* output */
           int *steps,
           int **out1,
@@ -804,13 +804,13 @@ best_path(FMS fms,
     } /* end of x coordinate loop (diagonal parametrisation) */
     /* new x_max is predicted to be the same as x_max determined for current diagonal */
     if (verbose) { 
-      printf("BEST_PATH: scanning diagonal #%d of %d [max sim = %d]        \r",
+     Rprintf("BEST_PATH: scanning diagonal #%d of %d [max sim = %d]        \r",
              id, idmax, q_max);
-      fflush(stdout);
+      rcqp_flush();
     }
   } /* end of diagonal loop */
   /* end of DP loop */
-  if (verbose) printf("\n");
+  if (verbose)Rprintf("\n");
   
   /* read best path from DP array (backward) */
   ix = x_ranges; 

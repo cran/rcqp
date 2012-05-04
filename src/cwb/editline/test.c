@@ -46,14 +46,14 @@ int main()
 
   while ((line = readline("editline> ")) != NULL)
     {
-      printf("Input was '%s'\n", line);
+     Rprintf("Input was '%s'\n", line);
       add_history(line);
       free(line);
     }
 
   write_history("TEST_HISTORY");
 
-  putchar('\n');
+  Rprintf("%d", '\n');
   
   return 0;
 }

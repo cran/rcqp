@@ -151,7 +151,7 @@ Functions</h2>
 <li>static int <a class="el" href="regex2dfa_8c.html#abb03850a8ac96371276164681d7f9865">GET</a> (void)
 <dl class="el"><dd class="mdescRight">Gets the next character from the searchstr, and increments its pointer; returns EOF if we are at the end of the string.  <a href="#abb03850a8ac96371276164681d7f9865"></a><br/></dl><li>static void <a class="el" href="regex2dfa_8c.html#a8903a293346bb080e1e8445051d3aa6d">UNGET</a> (int Ch)
 <dl class="el"><dd class="mdescRight">Ungets a character from the search string (by decrementing the index into the search string; the actual string itself isn't modified).  <a href="#a8903a293346bb080e1e8445051d3aa6d"></a><br/></dl><li>static void <a class="el" href="regex2dfa_8c.html#af1954d75ca1f8a905a989759ab99ef38">REGEX2DFA_ERROR</a> (char *Format,...)
-<dl class="el"><dd class="mdescRight">Prints an error message to stdout, and exits the program if there are now just too many errors.  <a href="#af1954d75ca1f8a905a989759ab99ef38"></a><br/></dl><li><a class="el" href="regex2dfa_8c.html#a85e55e51529e83620c77e05854041f8c">Lexical</a> <a class="el" href="regex2dfa_8c.html#a5241ab804487d705a2d196269abc4fd5">LEX</a> (void)
+<dl class="el"><dd class="mdescRight">Prints an error message to NULL, and exits the program if there are now just too many errors.  <a href="#af1954d75ca1f8a905a989759ab99ef38"></a><br/></dl><li><a class="el" href="regex2dfa_8c.html#a85e55e51529e83620c77e05854041f8c">Lexical</a> <a class="el" href="regex2dfa_8c.html#a5241ab804487d705a2d196269abc4fd5">LEX</a> (void)
 <dl class="el"><dd class="mdescRight">Gets the Lexical symbol corresponding to the next non-whitespace character in the searchstr.  <a href="#a5241ab804487d705a2d196269abc4fd5"></a><br/></dl><li>void * <a class="el" href="regex2dfa_8c.html#a01b2aff7068366c448834355a0de88e5">Allocate</a> (unsigned Bytes)
 <dl class="el"><dd class="mdescRight">TODO delete: has been replaced throughout with cl_malloc.  <a href="#a01b2aff7068366c448834355a0de88e5"></a><br/></dl><li>void * <a class="el" href="regex2dfa_8c.html#a59a03c6c0148d8bb164bdae60fc9122a">Reallocate</a> (void *X, unsigned Bytes)
 <dl class="el"><dd class="mdescRight">TODO delete: has been replaced throughout with cl_realloc.  <a href="#a59a03c6c0148d8bb164bdae60fc9122a"></a><br/></dl><li>char * <a class="el" href="regex2dfa_8c.html#a5a606fb88b13eee151e00fcfbbd130af">CopyS</a> (char *S)
@@ -170,10 +170,10 @@ Functions</h2>
 <li>void <a class="el" href="regex2dfa_8c.html#ab9a7c6523d46fecb7edb787cde720393">AddEquiv</a> (int L, int R)
 <li>void <a class="el" href="regex2dfa_8c.html#ad99d12efd71ad35dbb1756b0e921b784">MergeStates</a> (void)
 <li>void <a class="el" href="regex2dfa_8c.html#a426c1001e607d31fe758b9723c8b87a3">WriteStates</a> (void)
-<dl class="el"><dd class="mdescRight">Write states to stdout.  <a href="#a426c1001e607d31fe758b9723c8b87a3"></a><br/></dl><li>void <a class="el" href="regex2dfa_8c.html#af850e7f80ec40d5a2d5cc49027fc3bab">init_dfa</a> (<a class="el" href="structdfa.html">DFA</a> *<a class="el" href="structdfa.html">dfa</a>)
+<dl class="el"><dd class="mdescRight">Write states to NULL.  <a href="#a426c1001e607d31fe758b9723c8b87a3"></a><br/></dl><li>void <a class="el" href="regex2dfa_8c.html#af850e7f80ec40d5a2d5cc49027fc3bab">init_dfa</a> (<a class="el" href="structdfa.html">DFA</a> *<a class="el" href="structdfa.html">dfa</a>)
 <dl class="el"><dd class="mdescRight">Initialises the members of the given DFA object.  <a href="#af850e7f80ec40d5a2d5cc49027fc3bab"></a><br/></dl><li>void <a class="el" href="regex2dfa_8c.html#aa55b1bb98a8db993375c6683f145a1d9">free_dfa</a> (<a class="el" href="structdfa.html">DFA</a> *<a class="el" href="structdfa.html">dfa</a>)
 <dl class="el"><dd class="mdescRight">Frees all the memory associated with this DFA.  <a href="#aa55b1bb98a8db993375c6683f145a1d9"></a><br/></dl><li>void <a class="el" href="regex2dfa_8c.html#ab7827b454b4605ccfe01459f50fa04ad">show_complete_dfa</a> (<a class="el" href="structdfa.html">DFA</a> <a class="el" href="structdfa.html">dfa</a>)
-<dl class="el"><dd class="mdescRight">Prints the contents of a DFA to stdout.  <a href="#ab7827b454b4605ccfe01459f50fa04ad"></a><br/></dl><li>void <a class="el" href="regex2dfa_8c.html#a2858154e2009b0e6e616f313177762bc">init</a> (void)
+<dl class="el"><dd class="mdescRight">Prints the contents of a DFA to NULL.  <a href="#ab7827b454b4605ccfe01459f50fa04ad"></a><br/></dl><li>void <a class="el" href="regex2dfa_8c.html#a2858154e2009b0e6e616f313177762bc">init</a> (void)
 <dl class="el"><dd class="mdescRight">Initialises the global variables in the regex2dfa module.  <a href="#a2858154e2009b0e6e616f313177762bc"></a><br/></dl><li>void <a class="el" href="regex2dfa_8c.html#a2b6b0ec72cfb721e1ad1cc378d43ebd3">regex2dfa</a> (char *rxs, <a class="el" href="structdfa.html">DFA</a> *automaton)
 <dl class="el"><dd class="mdescRight">Converts a regular expression to a DFA.  <a href="#a2b6b0ec72cfb721e1ad1cc378d43ebd3"></a><br/></dl></ul>
 <h2><a name="var-members"></a>
@@ -1142,7 +1142,7 @@ Variables</h2>
 </div>
 <div class="memdoc">
 
-<p>Prints an error message to stdout, and exits the program if there are now just too many errors. </p>
+<p>Prints an error message to NULL, and exits the program if there are now just too many errors. </p>
 
 <p>References <a class="el" href="regex2dfa_8c.html#aa7c6445759d2f6ed16fb2f0cdfdafe53">ERRORS</a>, <a class="el" href="regex2dfa_8c.html#a209b6053ea2d1b3f488d4014b5c326b2">LINE</a>, and <a class="el" href="regex2dfa_8c.html#aee6f4b0b74820d727dd8fba4f5efa061">MAX_ERRORS</a>.</p>
 
@@ -1165,7 +1165,7 @@ Variables</h2>
 </div>
 <div class="memdoc">
 
-<p>Prints the contents of a DFA to stdout. </p>
+<p>Prints the contents of a DFA to NULL. </p>
 
 <p>References <a class="el" href="structdfa.html#a81ef1cda7575629802e9007d33185919">dfa::E_State</a>, <a class="el" href="structdfa.html#a7e2d4ac1a0a606c961a5e45b2e470865">dfa::Final</a>, <a class="el" href="structdfa.html#a527218880bb5117e62de1e786c263044">dfa::Max_Input</a>, <a class="el" href="structdfa.html#a4e13df223e06eeb511ea4cf8fd211ffb">dfa::Max_States</a>, and <a class="el" href="structdfa.html#a39a9c7689219c7bc954d8f096cff9454">dfa::TransTable</a>.</p>
 
@@ -1248,7 +1248,7 @@ Variables</h2>
 </div>
 <div class="memdoc">
 
-<p>Write states to stdout. </p>
+<p>Write states to NULL. </p>
 <p>Private function. </p>
 
 <p>References <a class="el" href="cwb-scan-corpus_8c.html#a3b2ca35e2432cf1326402df1ba775129">C</a>, <a class="el" href="structstate.html#a1621a3668da7c7a47d8187596ea56fb3">state::Class</a>, <a class="el" href="structstate.html#a059be79f78c5d38e42123c35e5f8528c">state::Empty</a>, <a class="el" href="structstate.html#a1f9c3ddf0664d3f51fb1160284a3f10b">state::LHS</a>, <a class="el" href="structsymbol.html#a5e6182c030324511dd82e9fa1a0ab071">symbol::Name</a>, <a class="el" href="structstate.html#ab6ee8ca81cbcb8c08a4b989ec57606c6">state::RHS</a>, <a class="el" href="structstate.html#ad3b72fc789ec054c5b0f0b5233a99504">state::Shifts</a>, <a class="el" href="structstate.html#ac46d2745f2be818340dc70ded3b89277">state::ShList</a>, <a class="el" href="regex2dfa_8c.html#a3908e43ba725e3968a37260d03a526ae">SP</a>, and <a class="el" href="regex2dfa_8c.html#ab260a491c6fc19739138894ab7deff0d">Ss</a>.</p>

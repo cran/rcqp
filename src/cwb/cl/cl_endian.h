@@ -23,8 +23,8 @@
 */
    
 
-#ifndef _ENDIAN_H_
-#define _ENDIAN_H_
+#ifndef CL_ENDIAN_H
+#define CL_ENDIAN_H
 
 
 /* The CWB uses _network_ byte order for 32-bit integers stored in its platform-independent disk files.
@@ -67,4 +67,4 @@
 
 int cl_bswap32(int x);
 
-#endif /* _ENDIAN_H_ */
+#endif /* CL_ENDIAN_H */

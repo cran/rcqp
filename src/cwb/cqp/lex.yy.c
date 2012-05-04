@@ -1498,7 +1498,7 @@ YY_DECL
 			yyin = stdin;
 
 		if ( ! yyout )
-			yyout = stdout;
+			yyout = NULL;
 
 		if ( ! YY_CURRENT_BUFFER ) {
 			yyensure_buffer_stack ();
@@ -2988,7 +2988,7 @@ YY_BUFFER_STATE yy_scan_bytes  (yyconst char * yybytes, int  _yybytes_len )
 static void yy_fatal_error (yyconst char* msg )
 {
     	(void) fprintf( stderr, "%s\n", msg );
-	exit( YY_EXIT_FAILURE );
+	rcqp_receive_error( YY_EXIT_FAILURE );
 }
 
 /* Redefine yyless() so it works in section 3 code. */
@@ -3109,7 +3109,7 @@ static int yy_init_globals (void)
 /* Defined in main.c */
 #ifdef YY_STDINIT
     yyin = stdin;
-    yyout = stdout;
+    yyout = NULL;
 #else
     yyin = (FILE *) 0;
     yyout = (FILE *) 0;

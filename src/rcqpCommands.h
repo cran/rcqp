@@ -1,10 +1,11 @@
-// ===========================================================================
-// File: "rcqpCommands.h"
-//                        Created: 2012-01-13 18:49:02
-//              Last modification: 2012-01-19 12:05:06
-// Authors: Bernard Desgraupes <bernard.desgraupes@u-paris10.fr>
-//          Sylvain Loiseau <sylvain.loiseau@univ-paris13.fr>
-// ===========================================================================
+/* ===========================================================================
+ * File: "rcqpCommands.h"
+ *                        Created: 2012-01-13 18:49:02
+ *              Last modification: 2012-01-19 12:05:06
+ * Authors: Bernard Desgraupes <bernard.desgraupes@u-paris10.fr>
+ *          Sylvain Loiseau <sylvain.loiseau@univ-paris13.fr>
+ * ===========================================================================
+ */
 
 
 #ifndef	RCQP_COMMANDS_H
@@ -13,8 +14,9 @@
 
 
 
-// Prototypes
-// ----------
+/* Prototypes
+ * ----------
+ */
 
 SEXP rcqpCmd_attribute_size(SEXP inAttribute);
 SEXP rcqpCmd_attributes(SEXP inCorpus, SEXP inType);
@@ -39,7 +41,7 @@ SEXP rcqpCmd_lexicon_size(SEXP inAttribute);
 SEXP rcqpCmd_list_corpora();
 SEXP rcqpCmd_list_subcorpora(SEXP inCorpus);
 SEXP rcqpCmd_properties(SEXP inCorpus);
-//SEXP rcqpCmd_cqp(SEXP inQuery);
+/*SEXP rcqpCmd_cqp(SEXP inQuery); */
 SEXP rcqpCmd_query(SEXP inMother, SEXP inChild, SEXP inQuery);
 SEXP rcqpCmd_regex2id(SEXP inAttribute, SEXP inRegex);
 SEXP rcqpCmd_str2id(SEXP inAttribute, SEXP inStrs);
@@ -50,5 +52,5 @@ SEXP rcqpCmd_subcorpus_size(SEXP inSubcorpus);
 
 
 
-#endif  // RCQP_COMMANDS_H
+#endif  /* RCQP_COMMANDS_H */
 

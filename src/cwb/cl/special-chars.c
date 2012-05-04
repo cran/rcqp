@@ -1645,7 +1645,7 @@ maptable_init_both(unsigned char *maptable,
   for (i = 0; i < 256; i++) {
     maptable[i] = nocasetable[nodiactable[i]];
     if (maptable[i] != nodiactable[nocasetable[i]]) {
-      fprintf(stderr, "CL: tables inconsistent for #%d -> #%d\n", i, maptable[i]);
+     Rprintf( "CL: tables inconsistent for #%d -> #%d\n", i, maptable[i]);
     }
   }
 }
@@ -1676,7 +1676,7 @@ cl_string_maptable(CorpusCharset charset, int flags)
   int idiac = (flags & IGNORE_DIAC) != 0;
 
   if (charset == utf8) {
-    fprintf(stderr, "CL: major error, cl_string_maptable called with invalid charset (UTF8).\n"
+   Rprintf( "CL: major error, cl_string_maptable called with invalid charset (UTF8).\n"
                     "    Mapping tables for ASCII have been supplied, but this means any \n"
                     "    characters outside the ASCII range will NOT be correct!\n");
     charset = ascii;
@@ -1920,7 +1920,7 @@ cl_string_validate_encoding(char *s, CorpusCharset charset, int repair)
     break;
 
   default: /* unknown_charset, etc. */
-    fprintf(stderr, "CL: Error, unrecognised CorpusCharset in cl_string_validate_encoding.\n");
+   Rprintf( "CL: Error, unrecognised CorpusCharset in cl_string_validate_encoding.\n");
     return 0;
 
   } /* end switch */
@@ -2251,7 +2251,7 @@ cl_string_canonical(char *s, CorpusCharset charset, int flags)
     /* UTF8 accent folding */
     if (idiac) {
       if (NULL == (string = g_utf8_normalize((gchar *)s, -1, G_NORMALIZE_NFD)) ) {
-        fprintf(stderr, "CL: major error, invalid UTF8 string passed to cl_string_canonical...\n");
+       Rprintf( "CL: major error, invalid UTF8 string passed to cl_string_canonical...\n");
         return;
       }
 
@@ -2273,7 +2273,7 @@ cl_string_canonical(char *s, CorpusCharset charset, int flags)
     /* UTF8 precomposing -- always happens */
     /* precomposed = g_utf8_normalize(string, -1, G_NORMALIZE_NFC); */ /* -- duplicate call to g_utf8_normalize() removed */
     if (NULL == (precomposed = g_utf8_normalize(string, -1, G_NORMALIZE_NFC)) ) {
-      fprintf(stderr, "CL: major error, invalid UTF8 string passed to cl_string_canonical...\n");
+     Rprintf( "CL: major error, invalid UTF8 string passed to cl_string_canonical...\n");
       return;
     }
 

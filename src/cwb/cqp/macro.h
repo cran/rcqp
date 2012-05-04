@@ -62,11 +62,11 @@ void macro_iterator_new(void);	                      /* start new iterator */
 char *macro_iterator_next(char *prefix, int *nargs);  /* returns next macro name (matching prefix if specified), and number of arguments; NULL at end of list */
 char *macro_iterator_next_prototype(char *prefix);    /* returns next macro (matching prefix if specified), as a formatted prototype (malloc'ed) */
 
-/* list all defined macros on stdout; 
+/* list all defined macros on NULL; 
  * if <prefix> is not NULL, list only macros beginning with <prefix> */
 void list_macros(char *prefix);
 
-/* print definition of macro on stdout */
+/* print definition of macro on NULL */
 void print_macro_definition(char *name, int args);
 
 /* print macro hash statistics on stderr (called by CQP if MacroDebug is activated) */

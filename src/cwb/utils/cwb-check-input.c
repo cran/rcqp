@@ -87,10 +87,10 @@ char *progname = NULL;
 void
 cwbci_file_write_abort(void)
 {
-  fprintf(stderr, "Error writing to output file <%s>, program aborts.\n", output_file);
+ Rprintf( "Error writing to output file <%s>, program aborts.\n", output_file);
   fclose(output_fd);
   fclose(input_fd);
-  exit(1);
+  rcqp_receive_error(1);
 }
 
 /**
@@ -172,14 +172,14 @@ cwbci_report_error_fixable(char *msg)
 {
   errors_detected++;
   if (print_fixable_errors)
-    fprintf(stderr, "%s (at line %d)\n", msg, line_no);
+   Rprintf( "%s (at line %d)\n", msg, line_no);
 }
 void
 cwbci_report_error_unfixable(char *msg)
 {
   errors_detected++;
   if (print_unfixable_errors)
-    fprintf(stderr, "%s(at line %d)\n", msg, line_no);
+   Rprintf( "%s(at line %d)\n", msg, line_no);
 }
 
 
@@ -324,52 +324,52 @@ cwbci_check_line(char *line)
 void
 cwbci_usage(void)
 {
-  fprintf(stderr, "\n");
-  fprintf(stderr, "Usage:  %s -f <file> [options]\n\n", progname);
-  fprintf(stderr, "Reads verticalised text from an input file with -f option and checks its\n");
-  fprintf(stderr, "formatting. The following problems may be checked for, depending on what\n");
-  fprintf(stderr, "options have been set:\n");
-  fprintf(stderr, "  Character encoding - always checked.\n");
-  fprintf(stderr, "  Use of Windows-style linebreaks - always checked. (R)\n");
-  fprintf(stderr, "  Consistent number of p-attributes in each line - always checked.\n");
-  fprintf(stderr, "  Whitespace at start / end of line - checked if -B is set. (R)\n");
-  fprintf(stderr, "  Misplaced closing attribute on an XML line - always checked.\n");
-  fprintf(stderr, "  S-attribute (XML) perfect nesting - checked if -n is set.\n");
-  fprintf(stderr, "\n");
-  fprintf(stderr, "(R) = can be fixed when running in repair mode.\n");
-  fprintf(stderr, "\n");
-  fprintf(stderr, "All error messages go to STDERR.\n");
-  fprintf(stderr, "\n");
-  fprintf(stderr, "If an output file is specified, problems will be fixed if possible; if not\n");
-  fprintf(stderr, "possible, checking will be stopped. Problems that can be fixed will not be\n");
-  fprintf(stderr, "reported, except if -v has been set.\n");
-  fprintf(stderr, "\n");
-  fprintf(stderr, "If no output file is specified, all problems will be reported, unless -q\n");
-  fprintf(stderr, "has been set.\n");
-  fprintf(stderr, "\n");
-  fprintf(stderr, "These two modes are, respectively, \"repair mode\" and \"check mode\". In\n");
-  fprintf(stderr, "either mode, when the program finishes, a count of errors will be reported.\n");
-  fprintf(stderr, "\n");
-  fprintf(stderr, "Note: it is entirely possible for the detection of one error on a line to block\n");
-  fprintf(stderr, "the identification of other errors - so always run this program more than once.\n");
-  fprintf(stderr, "\n");
-  fprintf(stderr, "Options:\n");
-  fprintf(stderr, "  -f <file> read input from <file>\n");
-  fprintf(stderr, "  -o <file> write repaired output to <file>\n");
-  fprintf(stderr, "  -c <charset> specify corpus character set (instead of the default ascii)\n");
-  fprintf(stderr, "     * valid charsets: ascii ; latin1 to latin9 ; utf8\n");
-  fprintf(stderr, "     * NB: cwb-check-input does NOT default to latin1, unlike cwb-encode!\n");
-  fprintf(stderr, "  -B        check for leading/trailing blanks on input lines and p-atts\n");
-  fprintf(stderr, "  -n        check for perfect nesting of XML elements\n");
-  fprintf(stderr, "  -s        check for empty lines in input \n");
-  fprintf(stderr, "  -w        do extra checks for CQPweb compatibility \n");
-  fprintf(stderr, "  -x        XML-aware (ignore <!.. and <?..)\n");
-  fprintf(stderr, "  -v        verbose (show warnings for fixable problems in repair mode)\n");
-  fprintf(stderr, "  -q        quiet (suppresses all warnings in either mode)\n");
-  fprintf(stderr, "  -h        show this help page\n\n");
+ Rprintf( "\n");
+ Rprintf( "Usage:  %s -f <file> [options]\n\n", progname);
+ Rprintf( "Reads verticalised text from an input file with -f option and checks its\n");
+ Rprintf( "formatting. The following problems may be checked for, depending on what\n");
+ Rprintf( "options have been set:\n");
+ Rprintf( "  Character encoding - always checked.\n");
+ Rprintf( "  Use of Windows-style linebreaks - always checked. (R)\n");
+ Rprintf( "  Consistent number of p-attributes in each line - always checked.\n");
+ Rprintf( "  Whitespace at start / end of line - checked if -B is set. (R)\n");
+ Rprintf( "  Misplaced closing attribute on an XML line - always checked.\n");
+ Rprintf( "  S-attribute (XML) perfect nesting - checked if -n is set.\n");
+ Rprintf( "\n");
+ Rprintf( "(R) = can be fixed when running in repair mode.\n");
+ Rprintf( "\n");
+ Rprintf( "All error messages go to STDERR.\n");
+ Rprintf( "\n");
+ Rprintf( "If an output file is specified, problems will be fixed if possible; if not\n");
+ Rprintf( "possible, checking will be stopped. Problems that can be fixed will not be\n");
+ Rprintf( "reported, except if -v has been set.\n");
+ Rprintf( "\n");
+ Rprintf( "If no output file is specified, all problems will be reported, unless -q\n");
+ Rprintf( "has been set.\n");
+ Rprintf( "\n");
+ Rprintf( "These two modes are, respectively, \"repair mode\" and \"check mode\". In\n");
+ Rprintf( "either mode, when the program finishes, a count of errors will be reported.\n");
+ Rprintf( "\n");
+ Rprintf( "Note: it is entirely possible for the detection of one error on a line to block\n");
+ Rprintf( "the identification of other errors - so always run this program more than once.\n");
+ Rprintf( "\n");
+ Rprintf( "Options:\n");
+ Rprintf( "  -f <file> read input from <file>\n");
+ Rprintf( "  -o <file> write repaired output to <file>\n");
+ Rprintf( "  -c <charset> specify corpus character set (instead of the default ascii)\n");
+ Rprintf( "     * valid charsets: ascii ; latin1 to latin9 ; utf8\n");
+ Rprintf( "     * NB: cwb-check-input does NOT default to latin1, unlike cwb-encode!\n");
+ Rprintf( "  -B        check for leading/trailing blanks on input lines and p-atts\n");
+ Rprintf( "  -n        check for perfect nesting of XML elements\n");
+ Rprintf( "  -s        check for empty lines in input \n");
+ Rprintf( "  -w        do extra checks for CQPweb compatibility \n");
+ Rprintf( "  -x        XML-aware (ignore <!.. and <?..)\n");
+ Rprintf( "  -v        verbose (show warnings for fixable problems in repair mode)\n");
+ Rprintf( "  -q        quiet (suppresses all warnings in either mode)\n");
+ Rprintf( "  -h        show this help page\n\n");
   /* commented out for now cos I can't work out how to get it to compile like the others do */
-/*  fprintf(stderr, "Part of the IMS Open Corpus Workbench v" VERSION "\n\n");*/
-  exit(2);
+/* Rprintf( "Part of the IMS Open Corpus Workbench v" VERSION "\n\n");*/
+  rcqp_receive_error(2);
 }
 
 
@@ -410,7 +410,7 @@ cwbci_parse_options(int argc, char **argv)
     case 'c':
       charset_label = cl_charset_name_canonical(optarg);
       if (charset_label == NULL)
-        fprintf(stderr, "Invalid character set specified with the -c flag! Program aborts.\n");
+       Rprintf( "Invalid character set specified with the -c flag! Program aborts.\n");
       break;
 
     /* -B: strip leading and trailing blanks from lines */
@@ -453,7 +453,7 @@ cwbci_parse_options(int argc, char **argv)
 
   /* checks on compulsory options */
   if (!input_file) {
-    fprintf(stderr, "You MUST specify a file with the -f flag! Program aborts.\n");
+   Rprintf( "You MUST specify a file with the -f flag! Program aborts.\n");
   }
 
   /* deductions to be made from the options... */
@@ -503,14 +503,14 @@ main(int argc, char **argv)
 
   /* open the input file */
   if ((input_fd = fopen(input_file, "rb")) == NULL) {
-    fprintf(stderr, "Can't open input file <%s>.", input_file);
-    exit(1);
+   Rprintf( "Can't open input file <%s>.", input_file);
+    rcqp_receive_error(1);
   }
   /* open the output file */
   if (output_file) {
     if ((output_fd = fopen(input_file, "w")) == NULL) {
-      fprintf(stderr, "Can't open output file <%s>.", output_file);
-      exit(1);
+     Rprintf( "Can't open output file <%s>.", output_file);
+      rcqp_receive_error(1);
     }
   }
 
@@ -539,7 +539,7 @@ main(int argc, char **argv)
     fclose(output_fd);
 
   /* the final report */
-  fprintf(stderr, "%s detected %d errors in %s\n\n", progname, errors_detected, input_file);
+ Rprintf( "%s detected %d errors in %s\n\n", progname, errors_detected, input_file);
 
   cl_free(input_file);
   cl_free(output_file);
@@ -548,5 +548,5 @@ main(int argc, char **argv)
     cl_delete_string_list(hierarchy);
   }
 
-  exit(0);
+  rcqp_receive_error(0);
 }

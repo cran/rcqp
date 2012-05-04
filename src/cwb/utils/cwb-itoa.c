@@ -20,7 +20,7 @@
 #include <sys/types.h>
 
 /* byte order handling taken from Corpus Library */
-#include "../cl/endian.h"
+#include "../cl/cl_endian.h"
 #include "../cl/cl.h"
 
 /* LONG and SHORT modes removed. Mon Mar 23 19:25:35 MET 1998 (evert) */
@@ -50,7 +50,7 @@ process_fd(FILE *fd)
       i = ntohl(buf[k]);        /* convert from CWB to internal format */
       if (little_endian) 
         i = cl_bswap32(i);      /* explicit conversion */
-      fprintf(stdout, "%d\n", i);
+     Rprintf( "%d\n", i);
     }
   } while (N == CL_MAX_LINE_LENGTH);
 }
@@ -85,21 +85,21 @@ main(int argc, char **argv)
         break;
       case 'h':
       default:
-        fprintf(stderr, "\n");
-        fprintf(stderr, "Usage:  %s [options] [file]\n", argv[0]);
-        fprintf(stderr, "Reads 32bit integers in network format from CWB binary data file <file>\n");
-        fprintf(stderr, "or from standard input and prints the values as ASCII numbers on standard\n");
-        fprintf(stderr, "output (one number per line).\n");
-        fprintf(stderr, "Options:\n");
-        fprintf(stderr, "  -n  read integers in network format [default]\n");
-        fprintf(stderr, "  -l  read integers in little endian format\n");
-        fprintf(stderr, "Part of the IMS Open Corpus Workbench v" VERSION "\n\n");
-        exit(1);
+       Rprintf( "\n");
+       Rprintf( "Usage:  %s [options] [file]\n", argv[0]);
+       Rprintf( "Reads 32bit integers in network format from CWB binary data file <file>\n");
+       Rprintf( "or from standard input and prints the values as ASCII numbers on standard\n");
+       Rprintf( "output (one number per line).\n");
+       Rprintf( "Options:\n");
+       Rprintf( "  -n  read integers in network format [default]\n");
+       Rprintf( "  -l  read integers in little endian format\n");
+       Rprintf( "Part of the IMS Open Corpus Workbench v" VERSION "\n\n");
+        rcqp_receive_error(1);
       }
     }
     else if ((fd = fopen(argv[i], "rb")) == NULL) {
-      fprintf(stderr, "%s: Couldn't open %s\n", progname, argv[i]);
-      exit(1);
+     Rprintf( "%s: Couldn't open %s\n", progname, argv[i]);
+      rcqp_receive_error(1);
     }
   }
 

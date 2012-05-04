@@ -6,13 +6,13 @@
 char **
 completion_func(char *text, int start, int end) {
     int i;
-    printf("\nCOMPLETE '%s'\n", text);
+   Rprintf("\nCOMPLETE '%s'\n", text);
     for (i=-10; i<start; i++)
-	printf(" ");
-    printf("^");
+Rprintf(" ");
+   Rprintf("^");
     for (i=start+1; i<end; i++)
-	printf(" ");
-    printf("^\n");
+Rprintf(" ");
+   Rprintf("^\n");
     return NULL;		/* means: no completions found, try default */
     /* otherwise: return allocated, NULL-terminated list of allocated strings */
 }
@@ -30,14 +30,14 @@ int main()
 
   while ((line = readline("editline> ")) != NULL)
     {
-      printf("Input was '%s'\n", line);
+     Rprintf("Input was '%s'\n", line);
       add_history(line);
       free(line);
     }
 
   write_history("TEST_HISTORY");
 
-  putchar('\n');
+  Rprintf("%d", '\n');
   
   return 0;
 }

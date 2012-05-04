@@ -26,7 +26,7 @@ extern int      chdir();
 extern int      free();
 extern int      strncmp();
 extern int      system();
-extern void     exit();
+extern void     rcqp_receive_error();
 extern char     *getenv();
 #endif  /* !defined(HAVE_STDLIB) */
 
@@ -75,6 +75,6 @@ main(ac, av)
     }
 
     write_history("TEST_SH_HISTORY");
-    exit(0);
+    rcqp_receive_error(0);
     /* NOTREACHED */
 }

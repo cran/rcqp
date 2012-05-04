@@ -149,7 +149,7 @@ cl_new_regex(char *regex, int flags, CorpusCharset charset)
   /* compile regular expression with PCRE library function */
   if (charset == utf8) {
     if (cl_debug)
-      fprintf(stderr, "CL: enabling PCRE's UTF8 mode for regex %s\n", anchored_regex);
+     Rprintf( "CL: enabling PCRE's UTF8 mode for regex %s\n", anchored_regex);
     /* note we assume all strings have been checked upon input (i.e. indexing or by the parser) */
     options_for_pcre = PCRE_UTF8|PCRE_NO_UTF8_CHECK;
     /* we do our own case folding, so we don't need the PCRE_CASELESS flag */
@@ -157,7 +157,7 @@ cl_new_regex(char *regex, int flags, CorpusCharset charset)
   rx->needle = pcre_compile(anchored_regex, options_for_pcre, &errstring_for_pcre, &erroffset_for_pcre, NULL);
   if (rx->needle == NULL) {
     strcpy(cl_regex_error, errstring_for_pcre);
-    fprintf(stderr, "CL: Regex Compile Error: %s\n", cl_regex_error);
+   Rprintf( "CL: Regex Compile Error: %s\n", cl_regex_error);
     cl_free(rx);
     cl_free(preprocessed_regex);
     cl_free(anchored_regex);
@@ -165,7 +165,7 @@ cl_new_regex(char *regex, int flags, CorpusCharset charset)
     return NULL;
   }
   else if (cl_debug)
-    fprintf(stderr, "CL: Regex compiled successfully using PCRE library\n");
+   Rprintf( "CL: Regex compiled successfully using PCRE library\n");
 
   /* always use pcre_study because nearly all our regexes are going to be used lots of times;
    * note that according to man pcre, the optimisation methods are different to those used by
@@ -174,12 +174,12 @@ cl_new_regex(char *regex, int flags, CorpusCharset charset)
   if (errstring_for_pcre != NULL) {
     rx->extra = NULL;
     if (cl_debug)
-      fprintf(stderr, "CL: calling pcre_study failed with message...\n   %s\n", errstring_for_pcre);
+     Rprintf( "CL: calling pcre_study failed with message...\n   %s\n", errstring_for_pcre);
     /* note that failure of pcre_study is not a critical error, we can just continue without
        the extra info */
   }
   if (cl_debug && rx->extra)
-    fprintf(stderr, "CL: calling pcre_study produced useful information...\n");
+   Rprintf( "CL: calling pcre_study produced useful information...\n");
 
   /* allocate string buffer for cl_regex_match() function if flags are present */
   if (flags)
@@ -303,7 +303,7 @@ cl_regex_match(CL_Regex rx, char *str)
                        ovector, 30);
     if (result < PCRE_ERROR_NOMATCH && cl_debug)
       /* note, "no match" is a PCRE "error", but all actual errors are lower numbers */
-      fprintf(stderr, "CL: Regex Execute Error no. %d (see `man pcreapi` for error codes)\n", result);
+     Rprintf( "CL: Regex Execute Error no. %d (see `man pcreapi` for error codes)\n", result);
   }
 
 
@@ -311,7 +311,7 @@ cl_regex_match(CL_Regex rx, char *str)
   /* debugging code used before version 2.2.b94, modified to pcre return values & re-enabled in 3.2.b3 */
   /* check for critical error: optimiser didn't accept candidate, but regex matched */
   if ((result > 0) && !grain_match)
-    fprintf(stderr, "CL ERROR: regex optimiser did not accept '%s' although it should have!\n", haystack);
+   Rprintf( "CL ERROR: regex optimiser did not accept '%s' although it should have!\n", haystack);
 #endif
 
   return (result > 0); /* return true if regular expression matched */
@@ -755,14 +755,14 @@ make_jump_table(void)
       cl_regopt_jumptable[ch] = jump;
     }
     if (cl_debug) { /* in debug mode, print out the entire jumptable */
-      fprintf(stderr, "CL: cl_regopt_jumptable for Boyer-Moore search is\n");
+     Rprintf( "CL: cl_regopt_jumptable for Boyer-Moore search is\n");
       for (k = 0; k < 256; k += 16) {
-        fprintf(stderr, "CL: ");
+       Rprintf( "CL: ");
         for (j = 0; j < 15; j++) {
           ch = k + j;
-          fprintf(stderr, "|%2d %c ", cl_regopt_jumptable[ch], ch);
+         Rprintf( "|%2d %c ", cl_regopt_jumptable[ch], ch);
         }
-        fprintf(stderr, "\n");
+       Rprintf( "\n");
       }
     }
   }
@@ -788,7 +788,7 @@ regopt_data_copy_to_regex_object(CL_Regex rx)
   for (i = 0; i < rx->grains; i++)
     rx->grain[i] = cl_strdup(cl_regopt_grain[i]);
   if (cl_debug)
-    fprintf(stderr, "CL: using %d grain(s) for optimised regex matching\n", rx->grains);
+   Rprintf( "CL: using %d grain(s) for optimised regex matching\n", rx->grains);
 }
 
 
@@ -819,7 +819,7 @@ cl_regopt_analyse(char *regex)
 
   mark = regex;
   if (cl_debug) {
-    fprintf(stderr, "CL: cl_regopt_analyse('%s')\n", regex);
+   Rprintf( "CL: cl_regopt_analyse('%s')\n", regex);
   }
   cl_regopt_grains = 0;
   cl_regopt_grain_len = 0;
@@ -908,17 +908,17 @@ cl_regopt_analyse(char *regex)
     if (*mark == '\0') {
       ok = (cl_regopt_grains > 0) ? 1 : 0;
       if (cl_debug && ok) {
-        fprintf(stderr, "CL: Regex optimised, %d grain(s) of length %d\n",
+       Rprintf( "CL: Regex optimised, %d grain(s) of length %d\n",
             cl_regopt_grains, cl_regopt_grain_len);
-        fprintf(stderr, "CL: grain set is");
+       Rprintf( "CL: grain set is");
         for (i = 0; i < cl_regopt_grains; i++) {
-          fprintf(stderr, " [%s]", cl_regopt_grain[i]);
+         Rprintf( " [%s]", cl_regopt_grain[i]);
         }
         if (cl_regopt_anchor_start)
-          fprintf(stderr, " (anchored at beginning of string)");
+         Rprintf( " (anchored at beginning of string)");
         if (cl_regopt_anchor_end)
-          fprintf(stderr, " (anchored at end of string)");
-        fprintf(stderr, "\n");
+         Rprintf( " (anchored at end of string)");
+       Rprintf( "\n");
       }
       if (ok)
         make_jump_table(); /* compute jump table for Boyer-Moore search */
@@ -958,7 +958,7 @@ cl_regopt_count_reset(void)
  *   if (cl_regex_match(rx, haystacks[i]))
  *     hits++;
  *
- * fprintf(stderr,
+ *Rprintf(
  *         "Found %d matches; avoided regex matching %d times out of %d trials",
  *         hits, cl_regopt_count_get(), n );
  *

@@ -106,46 +106,46 @@ align_usage(void)
 {
   int i;
 
-  fprintf(stderr, "\n");
-  fprintf(stderr, "Aligns two CWB-encoded corpora.\n");
-  fprintf(stderr, "\n");
-  fprintf(stderr, "Usage: %s [options] <source> <target> <s-attrib> [<config>]\n", progname);
-  fprintf(stderr, "  <source>    source corpus identifier\n");
-  fprintf(stderr, "  <target>    target corpus identifier\n");
-  fprintf(stderr, "  <s-attrib>  s-attribute used as alignment grid\n");
-  fprintf(stderr, "              (must exist in both source AND target corpus)\n");
-  fprintf(stderr, "Options:\n");
-  fprintf(stderr, "  -P <p-att> use positional attribute <p-att> for alignment [word]\n");
-  fprintf(stderr, "  -S <s-att> pre-alignment (corresponding regions of the s-attribute are\n");
-  fprintf(stderr, "             pre-aligned; regions must appear in identical order!)\n");
-  fprintf(stderr, "  -V <s-att> pre-alignment with ID matching (identical annotation strings)\n");
-  fprintf(stderr, "  -o <file>  write alignment output to file <file>      [out.align]\n");
-  fprintf(stderr, "  -s <x>     set 2:2 alignment split factor to <x>      [1.2]\n");
-  fprintf(stderr, "  -w <n>     use best path search beam of width <n>     [50]\n");
-  fprintf(stderr, "  -r <reg>   use registry directory <reg>\n");
-  fprintf(stderr, "  -v         verbose\n");
-  fprintf(stderr, "  -h         this help page\n\n");
-  fprintf(stderr, "Configuration flags:\n");
-  fprintf(stderr, "  -C:<w>     size of alignment region (in characters)\n");
-  fprintf(stderr, "  -S:<w>:<t> shared words, i.e. identical tokens in source/target corpus\n");
-  fprintf(stderr, "             [to avoid false friends, frequency ratios f1/(f1+f2) and\n");
-  fprintf(stderr, "              f2/(f1+f2) must be greater than threshold <t>]\n");
-  fprintf(stderr, "  -1:<w>     charcters shared by source and target region\n");
-  fprintf(stderr, "  -2:<w>     bigrams     ~    ~    ~     ~    ~      ~   \n");
-  fprintf(stderr, "  -3:<w>     trigrams    ~    ~    ~     ~    ~      ~   \n");
-  fprintf(stderr, "  -4:<w>     4-grams     ~    ~    ~     ~    ~      ~   \n");
-  fprintf(stderr, "             [N-gram features are similar to orthographic cognates]\n");
-  fprintf(stderr, "  -W:<w>:<f> list of translation equivalents (read from file <f>)\n");
-  fprintf(stderr, "             [format: <source word> SPC <target word>]\n");
-  fprintf(stderr, "[each flag defines a set of features with weight <w> per feature]\n");
-  fprintf(stderr, "\n");
-  fprintf(stderr, "Default configuration:\n");
-  fprintf(stderr, "  ");
+ Rprintf( "\n");
+ Rprintf( "Aligns two CWB-encoded corpora.\n");
+ Rprintf( "\n");
+ Rprintf( "Usage: %s [options] <source> <target> <s-attrib> [<config>]\n", progname);
+ Rprintf( "  <source>    source corpus identifier\n");
+ Rprintf( "  <target>    target corpus identifier\n");
+ Rprintf( "  <s-attrib>  s-attribute used as alignment grid\n");
+ Rprintf( "              (must exist in both source AND target corpus)\n");
+ Rprintf( "Options:\n");
+ Rprintf( "  -P <p-att> use positional attribute <p-att> for alignment [word]\n");
+ Rprintf( "  -S <s-att> pre-alignment (corresponding regions of the s-attribute are\n");
+ Rprintf( "             pre-aligned; regions must appear in identical order!)\n");
+ Rprintf( "  -V <s-att> pre-alignment with ID matching (identical annotation strings)\n");
+ Rprintf( "  -o <file>  write alignment output to file <file>      [out.align]\n");
+ Rprintf( "  -s <x>     set 2:2 alignment split factor to <x>      [1.2]\n");
+ Rprintf( "  -w <n>     use best path search beam of width <n>     [50]\n");
+ Rprintf( "  -r <reg>   use registry directory <reg>\n");
+ Rprintf( "  -v         verbose\n");
+ Rprintf( "  -h         this help page\n\n");
+ Rprintf( "Configuration flags:\n");
+ Rprintf( "  -C:<w>     size of alignment region (in characters)\n");
+ Rprintf( "  -S:<w>:<t> shared words, i.e. identical tokens in source/target corpus\n");
+ Rprintf( "             [to avoid false friends, frequency ratios f1/(f1+f2) and\n");
+ Rprintf( "              f2/(f1+f2) must be greater than threshold <t>]\n");
+ Rprintf( "  -1:<w>     charcters shared by source and target region\n");
+ Rprintf( "  -2:<w>     bigrams     ~    ~    ~     ~    ~      ~   \n");
+ Rprintf( "  -3:<w>     trigrams    ~    ~    ~     ~    ~      ~   \n");
+ Rprintf( "  -4:<w>     4-grams     ~    ~    ~     ~    ~      ~   \n");
+ Rprintf( "             [N-gram features are similar to orthographic cognates]\n");
+ Rprintf( "  -W:<w>:<f> list of translation equivalents (read from file <f>)\n");
+ Rprintf( "             [format: <source word> SPC <target word>]\n");
+ Rprintf( "[each flag defines a set of features with weight <w> per feature]\n");
+ Rprintf( "\n");
+ Rprintf( "Default configuration:\n");
+ Rprintf( "  ");
   for (i = 0; i < DEFAULT_CONFIG_LINES; i++)
-    fprintf(stderr, "%s ", default_config[i]);
-  fprintf(stderr, "\n\n");
-  fprintf(stderr, "Part of the IMS Open Corpus Workbench v" VERSION "\n\n");
-  exit(1);
+   Rprintf( "%s ", default_config[i]);
+ Rprintf( "\n\n");
+ Rprintf( "Part of the IMS Open Corpus Workbench v" VERSION "\n\n");
+  rcqp_receive_error(1);
 }
 
 /**
@@ -218,8 +218,8 @@ align_parse_args(int ac, char *av[], int min_args)
       if (registry_directory == NULL)
         registry_directory = optarg;
       else {
-        fprintf(stderr, "%s: -r option used twice\n", progname);
-        exit(2);
+       Rprintf( "%s: -r option used twice\n", progname);
+        rcqp_receive_error(2);
       }
       break;
       /* -h : help page = usage */
@@ -369,105 +369,105 @@ main(int argc, char *argv[]) {
 
   /* open corpora and attributes */
   if (!(corpus1 = cl_new_corpus(registry_directory, corpus1_name))) {
-    fprintf(stderr, "%s: can't open corpus %s\n", progname, corpus1_name);
-    exit(1);
+   Rprintf( "%s: can't open corpus %s\n", progname, corpus1_name);
+    rcqp_receive_error(1);
   }
   if (!(corpus2 = cl_new_corpus(registry_directory, corpus2_name))) {
-    fprintf(stderr, "%s: can't open corpus %s\n", progname, corpus2_name);
-    exit(1);
+   Rprintf( "%s: can't open corpus %s\n", progname, corpus2_name);
+    rcqp_receive_error(1);
   }
   if (!(word1 = cl_new_attribute(corpus1, word_name, ATT_POS))) {
-    fprintf(stderr, "%s: can't open p-attribute %s.%s\n",
+   Rprintf( "%s: can't open p-attribute %s.%s\n",
             progname, corpus1_name, word_name);
-    exit(1);
+    rcqp_receive_error(1);
   }
   if (!(word2 = cl_new_attribute(corpus2, word_name, ATT_POS))) {
-    fprintf(stderr, "%s: can't open p-attribute %s.%s\n",
+   Rprintf( "%s: can't open p-attribute %s.%s\n",
             progname, corpus2_name, word_name);
-    exit(1);
+    rcqp_receive_error(1);
   }
   if (!(s1 = cl_new_attribute(corpus1, s_name, ATT_STRUC))) {
-    fprintf(stderr, "%s: can't open s-attribute %s.%s\n",
+   Rprintf( "%s: can't open s-attribute %s.%s\n",
             progname, corpus1_name, s_name);
-    exit(1);
+    rcqp_receive_error(1);
   }
   if (!(s2 = cl_new_attribute(corpus2, s_name, ATT_STRUC))) {
-    fprintf(stderr, "%s: can't open s-attribute %s.%s\n",
+   Rprintf( "%s: can't open s-attribute %s.%s\n",
             progname, corpus2_name, s_name);
-    exit(1);
+    rcqp_receive_error(1);
   }
 
   /* get size of corpora (and check for data access errors) */
   ws1 = cl_max_cpos(word1);
   if (ws1 <= 0) {
-    fprintf(stderr, "%s: data access error (%s.%s)\n",
+   Rprintf( "%s: data access error (%s.%s)\n",
             progname, corpus1_name, word_name);
-    exit(1);
+    rcqp_receive_error(1);
   }
   ws2 = cl_max_cpos(word2);
   if (ws2 <= 0) {
-    fprintf(stderr, "%s: data access error (%s.%s)\n",
+   Rprintf( "%s: data access error (%s.%s)\n",
             progname, corpus2_name, word_name);
-    exit(1);
+    rcqp_receive_error(1);
   }
   size1 = cl_max_struc(s1);
   if (size1 <= 0) {
-    fprintf(stderr, "%s: data access error (%s.%s)\n",
+   Rprintf( "%s: data access error (%s.%s)\n",
             progname, corpus1_name, s_name);
-    exit(1);
+    rcqp_receive_error(1);
   }
   size2 = cl_max_struc(s2);
   if (size2 <= 0) {
-    fprintf(stderr, "%s: data access error (%s.%s)\n",
+   Rprintf( "%s: data access error (%s.%s)\n",
             progname, corpus2_name, s_name);
-    exit(1);
+    rcqp_receive_error(1);
   }
-  printf("OPENING %s [%d tokens, %d <%s> regions]\n",
+ Rprintf("OPENING %s [%d tokens, %d <%s> regions]\n",
          corpus1_name, ws1, size1, s_name);
-  printf("OPENING %s [%d tokens, %d <%s> regions]\n",
+ Rprintf("OPENING %s [%d tokens, %d <%s> regions]\n",
          corpus2_name, ws2, size2, s_name);
 
   /* open pre-alignment attributes if requested */
   if (*prealign_name != '\0') {
     if (!(prealign1 = cl_new_attribute(corpus1, prealign_name, ATT_STRUC))) {
-      fprintf(stderr, "%s: can't open s-attribute %s.%s\n",
+     Rprintf( "%s: can't open s-attribute %s.%s\n",
               progname, corpus1_name, prealign_name);
-      exit(1);
+      rcqp_receive_error(1);
     }
     if (!(prealign2 = cl_new_attribute(corpus2, prealign_name, ATT_STRUC))) {
-      fprintf(stderr, "%s: can't open s-attribute %s.%s\n",
+     Rprintf( "%s: can't open s-attribute %s.%s\n",
               progname, corpus2_name, prealign_name);
-      exit(1);
+      rcqp_receive_error(1);
     }
     pre1 = cl_max_struc(prealign1);
     if (pre1 <= 0) {
-      fprintf(stderr, "%s: data access error (%s.%s)\n",
+     Rprintf( "%s: data access error (%s.%s)\n",
               progname, corpus1_name, prealign_name);
-      exit(1);
+      rcqp_receive_error(1);
     }
     pre2 = cl_max_struc(prealign2);
     if (pre2 <= 0) {
-      fprintf(stderr, "%s: data access error (%s.%s)\n",
+     Rprintf( "%s: data access error (%s.%s)\n",
               progname, corpus2_name, prealign_name);
-      exit(1);
+      rcqp_receive_error(1);
     }
-    printf("OPENING prealignment [%s.%s: %d regions, %s.%s: %d regions]\n",
+   Rprintf("OPENING prealignment [%s.%s: %d regions, %s.%s: %d regions]\n",
            corpus1_name, prealign_name, pre1, corpus2_name, prealign_name, pre2);
     if (prealign_has_values) {
       /* -V: check if pre-alignment attributes really have annotations */
       if (! (cl_struc_values(prealign1) && cl_struc_values(prealign2))) {
-        fprintf(stderr, "%s: -V option requires s-attribute with annotations!\n",
+       Rprintf( "%s: -V option requires s-attribute with annotations!\n",
                 progname);
-        exit(1);
+        rcqp_receive_error(1);
       }
     }
     else {
       /* -S: consistency check. there must be as many source regions as target regions */
       if (pre1 != pre2) {
-        fprintf(stderr, "%s: -S switch used with inconsistent prealignment\n", progname);
-        fprintf(stderr, "%s: (%d <%s> regions in %s vs. %d <%s> regions in %s)\n",
+       Rprintf( "%s: -S switch used with inconsistent prealignment\n", progname);
+       Rprintf( "%s: (%d <%s> regions in %s vs. %d <%s> regions in %s)\n",
                 progname, pre1, prealign_name, corpus1_name, pre2, prealign_name, corpus2_name);
-        exit(1);
+        rcqp_receive_error(1);
       }
     }
   }
@@ -484,8 +484,8 @@ main(int argc, char *argv[]) {
     of = popen(pipe_cmd, "w");
     if (of == NULL) {
       perror(pipe_cmd);
-      fprintf(stderr, "%s: can't write compressed file %s\n", progname, outfile_name);
-      exit(1);
+     Rprintf( "%s: can't write compressed file %s\n", progname, outfile_name);
+      rcqp_receive_error(1);
     }
     of_is_pipe = 1;
     cl_free(pipe_cmd);
@@ -494,8 +494,8 @@ main(int argc, char *argv[]) {
     of = fopen(outfile_name, "w");
     if (of == NULL) {
       perror(outfile_name);
-      fprintf(stderr, "%s: can't write file %s\n", progname, outfile_name);
-      exit(1);
+     Rprintf( "%s: can't write file %s\n", progname, outfile_name);
+      rcqp_receive_error(1);
     }
   }
 
@@ -505,7 +505,7 @@ main(int argc, char *argv[]) {
   /* DO THE ALIGNMENT */
   if (prealign1 == NULL) {
     /* neither -S nor -V used: just do a global alignment */
-    printf("Running global alignment, please be patient ...\n");
+   Rprintf("Running global alignment, please be patient ...\n");
     steps = align_do_alignment(fms, 0, size1 - 1, 0, size2 - 1, of);
   } /* end of global alignment */
 
@@ -525,9 +525,9 @@ main(int argc, char *argv[]) {
           (0 > (f2 = cl_cpos2struc(s2, start2))) ||
           (0 > (l2 = cl_cpos2struc(s2, end2)))
           ) {
-        fprintf(stderr, "%s: ERROR <%s> regions do not form a partitioning of <%s> region!\n",
+       Rprintf( "%s: ERROR <%s> regions do not form a partitioning of <%s> region!\n",
                 progname, s_name, prealign_name);
-        exit(1);
+        rcqp_receive_error(1);
       }
       /* check that the <s> structures do not extend beyond the pre-alignment boundaries;
          otherwise the resulting alignment file will be invalid */
@@ -541,12 +541,12 @@ main(int argc, char *argv[]) {
           (0 > cl_struc2cpos(s2, l2, &start, &end)) ||
           (end != end2)
           ) {
-        fprintf(stderr, "%s: ERROR <%s> regions do not form a partitioning of <%s> region!\n",
+       Rprintf( "%s: ERROR <%s> regions do not form a partitioning of <%s> region!\n",
                 progname, s_name, prealign_name);
-        exit(1);
+        rcqp_receive_error(1);
       }
 
-      printf("Aligning <%s> region #%d = [%d, %d] x [%d, %d]\n",
+     Rprintf("Aligning <%s> region #%d = [%d, %d] x [%d, %d]\n",
              prealign_name, i, f1, l1, f2, l2);
       steps += align_do_alignment(fms, f1, l1, f2, l2, of);
     }
@@ -562,7 +562,7 @@ main(int argc, char *argv[]) {
     int i;
 
     /* read pre-alignment annotations into lexhash */
-    printf("Caching pre-alignment IDs (%s.%s)\n", corpus1_name, prealign_name);
+   Rprintf("Caching pre-alignment IDs (%s.%s)\n", corpus1_name, prealign_name);
     for (i = 0; i < pre2; i++) {
       value = cl_struc2str(prealign2, i);
       entry = cl_lexhash_add(lh, value);
@@ -576,7 +576,7 @@ main(int argc, char *argv[]) {
       entry = cl_lexhash_find(lh, value);
       if (entry == NULL) {
         /* no match found */
-        printf("[Skipping source region <%s %s>]\n",
+       Rprintf("[Skipping source region <%s %s>]\n",
                prealign_name, value);
       }
       else {
@@ -589,12 +589,12 @@ main(int argc, char *argv[]) {
             (0 > (f2 = cl_cpos2struc(s2, start))) ||
             (0 > (l2 = cl_cpos2struc(s2, end)))
             ) {
-          fprintf(stderr, "%s: ERROR <%s> regions do not form a partitioning of <%s> region!\n",
+         Rprintf( "%s: ERROR <%s> regions do not form a partitioning of <%s> region!\n",
                   progname, s_name, prealign_name);
-          exit(1);
+          rcqp_receive_error(1);
         }
 
-        printf("Aligning <%s %s> regions = [%d, %d] x [%d, %d]\n",
+       Rprintf("Aligning <%s %s> regions = [%d, %d] x [%d, %d]\n",
                prealign_name, value, f1, l1, f2, l2);
         steps += align_do_alignment(fms, f1, l1, f2, l2, of);
         j++;                    /* go to next target region */
@@ -603,7 +603,7 @@ main(int argc, char *argv[]) {
 
     cl_delete_lexhash(lh);
   } /* end of -V type alignment */
-  printf("Alignment complete. [created %d alignment regions]\n", steps);
+ Rprintf("Alignment complete. [created %d alignment regions]\n", steps);
 
 
   /* close output file */

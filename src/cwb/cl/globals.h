@@ -147,7 +147,7 @@ extern size_t cl_memory_limit;
 #define TODO {(void)fprintf(stderr,"TODO point reached: file \"%s\", line %d\n", \
 			    __FILE__,  \
 			    __LINE__); \
-			    exit(1);}
+			    rcqp_receive_error(1);}
 
 
 #endif

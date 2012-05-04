@@ -184,7 +184,7 @@ call_predefined_function(int bf_id,
   result->type = ATTAT_NONE;
 
   if (nr_args != builtin_function[bf_id].nr_args) {
-    fprintf(stderr, "Predefined function %s got %d args, takes %d (mismatch)\n",
+   Rprintf( "Predefined function %s got %d args, takes %d (mismatch)\n",
             builtin_function[bf_id].name, nr_args, builtin_function[bf_id].nr_args);
     return False;
   }
@@ -518,7 +518,7 @@ call_predefined_function(int bf_id,
     break;
     
   default:
-    fprintf(stderr, "%s, line %d: Illegal bf_id\n", __FILE__, __LINE__);
+   Rprintf( "%s, line %d: Illegal bf_id\n", __FILE__, __LINE__);
     break;
   }
 

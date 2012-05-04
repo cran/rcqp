@@ -275,7 +275,7 @@ Variables</h2>
 <b>Value:</b><div class="fragment"><pre class="fragment">{(void)fprintf(stderr,<span class="stringliteral">&quot;TODO point reached: file \&quot;%s\&quot;, line %d\n&quot;</span>, \
           __FILE__, \
           __LINE__); \
-          exit(1);}
+          rcqp_receive_error(1);}
 </pre></div>
 <p>Macro which exits the program when a "to do" point is hit. </p>
 

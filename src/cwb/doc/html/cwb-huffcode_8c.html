@@ -74,7 +74,7 @@ Variables</h2>
 <ul>
 <li>int <a class="el" href="cwb-huffcode_8c.html#ad4490a56cd36bf476e48a3ff4d9e6697">do_protocol</a> = 0
 <dl class="el"><dd class="mdescRight">Level of progress-info (inc compression protocol) message output: 0 = none.  <a href="#ad4490a56cd36bf476e48a3ff4d9e6697"></a><br/></dl><li>FILE * <a class="el" href="cwb-huffcode_8c.html#a112a95bc4630a18f6dff6dd739f64e7c">protocol</a>
-<dl class="el"><dd class="mdescRight">File handle for this program's progress-info output: always stdout.  <a href="#a112a95bc4630a18f6dff6dd739f64e7c"></a><br/></dl><li>char * <a class="el" href="cwb-huffcode_8c.html#ab9e1449fd00c98428516f0b41eddcb10">progname</a>
+<dl class="el"><dd class="mdescRight">File handle for this program's progress-info output: always NULL.  <a href="#a112a95bc4630a18f6dff6dd739f64e7c"></a><br/></dl><li>char * <a class="el" href="cwb-huffcode_8c.html#ab9e1449fd00c98428516f0b41eddcb10">progname</a>
 <li><a class="el" href="struct_t_corpus.html">Corpus</a> * <a class="el" href="cwb-huffcode_8c.html#aca3a1fb765418f9b9b1d74051aa88667">corpus</a>
 <li>char * <a class="el" href="cwb-huffcode_8c.html#a0360462590048e1a217c595d8ec3ad5b">corpus_id</a> = NULL
 <li>int <a class="el" href="cwb-huffcode_8c.html#ac3e1795766a80ec63b157951b4b9a7d4">debug</a> = 0
@@ -252,7 +252,7 @@ Variables</h2>
 <div class="memdoc">
 
 <p>Dumps the specified heap of memory to the program output stream. </p>
-<dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="cwb-huffcode_8c.html#a112a95bc4630a18f6dff6dd739f64e7c" title="File handle for this program&#39;s progress-info output: always stdout.">protocol</a> </dd></dl>
+<dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="cwb-huffcode_8c.html#a112a95bc4630a18f6dff6dd739f64e7c" title="File handle for this program&#39;s progress-info output: always NULL.">protocol</a> </dd></dl>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table class="params">
     <tr><td class="paramname">heap</td><td>Location of the heap to dump. </td></tr>
@@ -379,7 +379,7 @@ Variables</h2>
 <div class="memdoc">
 
 <p>Prints a description of the specified heap of memory to the program output stream. </p>
-<dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="cwb-huffcode_8c.html#a112a95bc4630a18f6dff6dd739f64e7c" title="File handle for this program&#39;s progress-info output: always stdout.">protocol</a> </dd></dl>
+<dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="cwb-huffcode_8c.html#a112a95bc4630a18f6dff6dd739f64e7c" title="File handle for this program&#39;s progress-info output: always NULL.">protocol</a> </dd></dl>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table class="params">
     <tr><td class="paramname">heap</td><td>Location of the heap to print. </td></tr>
@@ -603,7 +603,7 @@ Variables</h2>
 </div>
 <div class="memdoc">
 
-<p>File handle for this program's progress-info output: always stdout. </p>
+<p>File handle for this program's progress-info output: always NULL. </p>
 
 <p>Referenced by <a class="el" href="cwb-huffcode_8c.html#a80203248d1441475e98106bf8f8ea6ec">compute_code_lengths()</a>, <a class="el" href="cwb-huffcode_8c.html#aa5b0f382c2a477ae4fc0c0c3e356f0ce">dump_heap()</a>, <a class="el" href="cwb-huffcode_8c.html#a3c04138a5bfe5d72780bb7e82a18e627">main()</a>, and <a class="el" href="cwb-huffcode_8c.html#ad1d3a3e60fd9aae2b569eff6b39fe8c9">print_heap()</a>.</p>
 

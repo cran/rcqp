@@ -61,8 +61,8 @@ Functions</h2>
 <ul>
 <li>void <a class="el" href="matchlist_8c.html#adcf5e03e33505f67f3af93af20003cea">init_matchlist</a> (<a class="el" href="struct___matchlist.html">Matchlist</a> *matchlist)
 <dl class="el"><dd class="mdescRight">Initialise the memebrs of the given Matchlist object.  <a href="#adcf5e03e33505f67f3af93af20003cea"></a><br/></dl><li>void <a class="el" href="matchlist_8c.html#a4d136c3893f86c4693ded2f8f1756f15">show_matchlist</a> (<a class="el" href="struct___matchlist.html">Matchlist</a> matchlist)
-<dl class="el"><dd class="mdescRight">Prints the entire contents of a Matchlist to stdout.  <a href="#a4d136c3893f86c4693ded2f8f1756f15"></a><br/></dl><li>void <a class="el" href="matchlist_8c.html#a926180b42e5f8594158e50b7361b22f4">show_matchlist_firstelements</a> (<a class="el" href="struct___matchlist.html">Matchlist</a> matchlist)
-<dl class="el"><dd class="mdescRight">Prints the first few elements of a matchlist to stdout.  <a href="#a926180b42e5f8594158e50b7361b22f4"></a><br/></dl><li>void <a class="el" href="matchlist_8c.html#a794e90c60dc18409402211b8be91c0a4">free_matchlist</a> (<a class="el" href="struct___matchlist.html">Matchlist</a> *matchlist)
+<dl class="el"><dd class="mdescRight">Prints the entire contents of a Matchlist to NULL.  <a href="#a4d136c3893f86c4693ded2f8f1756f15"></a><br/></dl><li>void <a class="el" href="matchlist_8c.html#a926180b42e5f8594158e50b7361b22f4">show_matchlist_firstelements</a> (<a class="el" href="struct___matchlist.html">Matchlist</a> matchlist)
+<dl class="el"><dd class="mdescRight">Prints the first few elements of a matchlist to NULL.  <a href="#a926180b42e5f8594158e50b7361b22f4"></a><br/></dl><li>void <a class="el" href="matchlist_8c.html#a794e90c60dc18409402211b8be91c0a4">free_matchlist</a> (<a class="el" href="struct___matchlist.html">Matchlist</a> *matchlist)
 <dl class="el"><dd class="mdescRight">Frees all the memory used within a matchlist, and re-initialises all its variables.  <a href="#a794e90c60dc18409402211b8be91c0a4"></a><br/></dl><li>int <a class="el" href="matchlist_8c.html#aceac8bbec1e489f033a2bee302b1b193">Setop</a> (<a class="el" href="struct___matchlist.html">Matchlist</a> *list1, <a class="el" href="matchlist_8h.html#ab76e3f5deb829618f591eb6e92fb5a28">MLSetOp</a> operation, <a class="el" href="struct___matchlist.html">Matchlist</a> *list2)
 <dl class="el"><dd class="mdescRight">Perform "operation" on the two match lists (can be initial).  <a href="#aceac8bbec1e489f033a2bee302b1b193"></a><br/></dl></ul>
 <hr/><h2>Function Documentation</h2>
@@ -170,7 +170,7 @@ Functions</h2>
 </div>
 <div class="memdoc">
 
-<p>Prints the entire contents of a Matchlist to stdout. </p>
+<p>Prints the entire contents of a Matchlist to NULL. </p>
 
 <p>References <a class="el" href="struct___matchlist.html#a5fccd2713eeb2915db0d8484e2b9bd77">_Matchlist::end</a>, <a class="el" href="struct___matchlist.html#aee496ef583f57a209998af42057fb4d9">_Matchlist::is_inverted</a>, <a class="el" href="struct___matchlist.html#ad54a35243a6782fc034de0eed398eeaf">_Matchlist::start</a>, <a class="el" href="struct___matchlist.html#a148f69d27122888cf958f4aa979bbe95">_Matchlist::tabsize</a>, and <a class="el" href="struct___matchlist.html#a3b2128b6a9aa23f1462b93176bad3596">_Matchlist::target_positions</a>.</p>
 
@@ -193,7 +193,7 @@ Functions</h2>
 </div>
 <div class="memdoc">
 
-<p>Prints the first few elements of a matchlist to stdout. </p>
+<p>Prints the first few elements of a matchlist to NULL. </p>
 <p>"First few" equals up to 1000.</p>
 <p>Only the start positions are printed. </p>
 

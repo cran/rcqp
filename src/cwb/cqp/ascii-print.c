@@ -239,7 +239,7 @@ get_screen_escapes(void)
 
   /* Linux terminfo bug? fix: tigetstr("sgr0") returns an extra ^O (\x0f) character appended to the escape sequence
      (this may be some code used internally by the ncurses library).
-     Since we printf() the escape sequences directly, we have to remove the extra character or 'less -R' will get confused. */
+     Since weRprintf() the escape sequences directly, we have to remove the extra character or 'less -R' will get confused. */
   l = strlen(sc_all_out);
   if ((l > 0) && (sc_all_out[l-1] == '\x0f')) {
     sc_all_out = cl_strdup(sc_all_out);
@@ -320,7 +320,7 @@ get_typeface_escape(char typeface)
   case 's': return sc_s_in;
   case 'n': return sc_all_out;        /* also switches off colour */
   default:
-    fprintf(stderr, "Internal error: unknown typeface '%c'.\n", typeface);
+   Rprintf( "Internal error: unknown typeface '%c'.\n", typeface);
     return "";
   }
 }
@@ -342,7 +342,7 @@ get_colour_escape(char colour, int foreground) {
       case 'p': return "\x1B[0;35m";
       case 'c': return "\x1B[0;36m";
       default:
-        fprintf(stderr, "Internal error: unknown colour '%c'.\n", colour);
+       Rprintf( "Internal error: unknown colour '%c'.\n", colour);
         return "\x1B[0m";
       }
     }
@@ -355,7 +355,7 @@ get_colour_escape(char colour, int foreground) {
       case 'p': return "\x1B[0;45m";
       case 'c': return "\x1B[0;46m";
       default:
-        fprintf(stderr, "Internal error: unknown colour '%c'.\n", colour);
+       Rprintf( "Internal error: unknown colour '%c'.\n", colour);
         return "\x1B[0m";
       }
     }

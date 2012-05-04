@@ -30,7 +30,7 @@
  * redirecting output to a file or pipe.
  */
 struct Redir {
-  char *name;     /**< file name for redirection; if NULL, stdout is used */
+  char *name;     /**< file name for redirection; if NULL, NULL is used */
   char *mode;     /**< mode for redirection ("w" or "a") */
   FILE *stream;   /**< the actual FILE object to write to. */
   int is_pipe;    /**< true iff this is a pipe rather than a file. */

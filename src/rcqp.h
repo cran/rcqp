@@ -1,12 +1,13 @@
-// ===========================================================================
-// File: "rcqp.h"
-//                        Created: 2012-01-13 18:49:02
-//              Last modification: 2012-01-19 12:12:35
-// Authors: Bernard Desgraupes <bernard.desgraupes@u-paris10.fr>
-//          Sylvain Loiseau <sylvain.loiseau@univ-paris13.fr>
-// (c) Copyright: 2011-2012
-// All rights reserved.
-// ===========================================================================
+/* ===========================================================================
+ * File: "rcqp.h"
+ *                        Created: 2012-01-13 18:49:02
+ *              Last modification: 2012-01-19 12:12:35
+ * Authors: Bernard Desgraupes <bernard.desgraupes@u-paris10.fr>
+ *          Sylvain Loiseau <sylvain.loiseau@univ-paris13.fr>
+ * (c) Copyright: 2011-2012
+ * All rights reserved.
+ * ===========================================================================
+ */
 
 
 #ifndef	RCQP_H
@@ -53,4 +54,4 @@
     vfprintf(stderr, format, ap);																																					°/Users/sylvainloiseau/workspace/rcwb/Current/pkg/rcqp/src-i386/cwb/utils/cwb-encode.c
 */
 
-#endif  // RCQP_H
+#endif  /* RCQP_H */

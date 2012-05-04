@@ -1068,7 +1068,7 @@ STATIC char *rsearch_hist(char *patt, int *lpos,int *cpos)
     {
 	for ( ; (*cpos) >= 0 ; (*cpos)--)
 	{
-/*	    fprintf(stderr,"comparing %d %s %s\n",*lpos,patt,H.Lines[*lpos]+*cpos); */
+/*	   Rprintf("comparing %d %s %s\n",*lpos,patt,H.Lines[*lpos]+*cpos); */
 	    if (strncmp(patt,(char *)H.Lines[*lpos]+*cpos,strlen(patt)) == 0)
 	    {   /* found a match */
 		return (char *)H.Lines[*lpos];
@@ -1361,7 +1361,7 @@ void write_history(EL_CONST char *history_file)
 
     if ((fd = fopen(history_file,"wb")) == NULL)
     {
-	fprintf(stderr,"editline: can't access history file \"%s\"\n",
+Rprintf("editline: can't access history file \"%s\"\n",
 		history_file);
 	return;
     }
@@ -2125,7 +2125,7 @@ void el_bind_key_in_metamap(char c, El_Keymap_Function func)
     /* A new key so have to add it to end */
     if (i == 63)
     {
-	fprintf(stderr,"editline: MetaMap table full, requires increase\n");
+Rprintf("editline: MetaMap table full, requires increase\n");
 	return;
     }
     

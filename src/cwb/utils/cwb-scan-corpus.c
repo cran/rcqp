@@ -101,36 +101,36 @@ int quiet = 0;               /**< if set, don't show progress information on std
 void
 scancorpus_usage(void)
 {
-  fprintf(stderr, "\n");
-  fprintf(stderr, "Usage: cwb-scan-corpus [options] <corpus> <key1> <key2> ... \n\n");
-  fprintf(stderr, "Computes the joint frequency distribution over <key1>, <key2>, ... .\n");
-  fprintf(stderr, "Each key specifier takes the form:\n\n");
-  fprintf(stderr, "    [?]<att>[+<n>][[!]=/<regex>/[cd]]\n\n");
-  fprintf(stderr, "where <att> is a positional or structural attribute, <n> an optional\n");
-  fprintf(stderr, "non-negative offset (number of tokens to the right), and <regex> an optional\n");
-  fprintf(stderr, "regular expression that the key must match ('=') or not match ('!='). The\n");
-  fprintf(stderr, "regex may be followed by 'c' (ignore case) and/or 'd' (ignore diacritics).\n");
-  fprintf(stderr, "The optional '?' sign marks a \"constraint\" key which will not be included\n");
-  fprintf(stderr, "in the resulting frequency distribution. Up to %d keys may be specified in total.\n\n", MAX_N);
-  fprintf(stderr, "The output is a table of the form:\n");
-  fprintf(stderr, "  <f>  TAB  <key1-value>  TAB  <key2-value>  TAB  ... \n\n");
-  fprintf(stderr, "Options:\n");
-  fprintf(stderr, "  -r <dir>  use registry directory <dir>\n");
-  fprintf(stderr, "  -b <n>    use <n> hash buckets [default: 1,000,000]\n");
-  fprintf(stderr, "  -o <file> write frequency table to <file> [default"": standard output]\n");
+ Rprintf( "\n");
+ Rprintf( "Usage: cwb-scan-corpus [options] <corpus> <key1> <key2> ... \n\n");
+ Rprintf( "Computes the joint frequency distribution over <key1>, <key2>, ... .\n");
+ Rprintf( "Each key specifier takes the form:\n\n");
+ Rprintf( "    [?]<att>[+<n>][[!]=/<regex>/[cd]]\n\n");
+ Rprintf( "where <att> is a positional or structural attribute, <n> an optional\n");
+ Rprintf( "non-negative offset (number of tokens to the right), and <regex> an optional\n");
+ Rprintf( "regular expression that the key must match ('=') or not match ('!='). The\n");
+ Rprintf( "regex may be followed by 'c' (ignore case) and/or 'd' (ignore diacritics).\n");
+ Rprintf( "The optional '?' sign marks a \"constraint\" key which will not be included\n");
+ Rprintf( "in the resulting frequency distribution. Up to %d keys may be specified in total.\n\n", MAX_N);
+ Rprintf( "The output is a table of the form:\n");
+ Rprintf( "  <f>  TAB  <key1-value>  TAB  <key2-value>  TAB  ... \n\n");
+ Rprintf( "Options:\n");
+ Rprintf( "  -r <dir>  use registry directory <dir>\n");
+ Rprintf( "  -b <n>    use <n> hash buckets [default: 1,000,000]\n");
+ Rprintf( "  -o <file> write frequency table to <file> [default"": standard output]\n");
                                                             /* 'default:' confuses Emacs C-mode */
-  fprintf(stderr, "            (compressed with gzip if <file> ends in '.gz')\n");
-  fprintf(stderr, "  -f <n>    include only items with frequency >= <n> in result table\n");
-  fprintf(stderr, "  -F <att>  add up frequency values from p-attribute <att>\n");
-  fprintf(stderr, "  -C        clean up data, i.e. accept only \"regular\" words\n");
-  fprintf(stderr, "            (does not apply to constraint keys marked with '?')\n");
-  fprintf(stderr, "  -s <n>    start scanning at corpus position <n>\n");
-  fprintf(stderr, "  -e <n>    stop scanning at corpus position <n>\n");
-  fprintf(stderr, "  -R <file> read list of corpus ranges to scan from <file>\n");
-  fprintf(stderr, "  -q        quiet mode (no progress information on stderr)\n");
-  fprintf(stderr, "  -h        this help page\n\n");
-  fprintf(stderr, "Part of the IMS Open Corpus Workbench v" VERSION "\n\n");
-  exit(1);
+ Rprintf( "            (compressed with gzip if <file> ends in '.gz')\n");
+ Rprintf( "  -f <n>    include only items with frequency >= <n> in result table\n");
+ Rprintf( "  -F <att>  add up frequency values from p-attribute <att>\n");
+ Rprintf( "  -C        clean up data, i.e. accept only \"regular\" words\n");
+ Rprintf( "            (does not apply to constraint keys marked with '?')\n");
+ Rprintf( "  -s <n>    start scanning at corpus position <n>\n");
+ Rprintf( "  -e <n>    stop scanning at corpus position <n>\n");
+ Rprintf( "  -R <file> read list of corpus ranges to scan from <file>\n");
+ Rprintf( "  -q        quiet mode (no progress information on stderr)\n");
+ Rprintf( "  -h        this help page\n\n");
+ Rprintf( "Part of the IMS Open Corpus Workbench v" VERSION "\n\n");
+  rcqp_receive_error(1);
 }
 
 /**
@@ -153,8 +153,8 @@ scancorpus_parse_options(int argc, char *argv[])
       if (reg_dir == NULL)
         reg_dir = optarg;
       else {
-        fprintf(stderr, "Error: -r option used twice.\n");
-        exit(1);
+       Rprintf( "Error: -r option used twice.\n");
+        rcqp_receive_error(1);
       }
       break;
     case 'b':                        /* -b <n> */
@@ -164,8 +164,8 @@ scancorpus_parse_options(int argc, char *argv[])
       if (output_file == NULL)
         output_file = optarg;
       else {
-        fprintf(stderr, "Error: -o option used twice.\n");
-        exit(1);
+       Rprintf( "Error: -o option used twice.\n");
+        rcqp_receive_error(1);
       }
       break;
     case 'f':                        /* -f <n> */
@@ -175,8 +175,8 @@ scancorpus_parse_options(int argc, char *argv[])
       if (frequency_att == NULL)
         frequency_att = optarg;
       else {
-        fprintf(stderr, "Error: -F option used twice.\n");
-        exit(1);
+       Rprintf( "Error: -F option used twice.\n");
+        rcqp_receive_error(1);
       }
       break;
     case 'C':                        /* -C */
@@ -192,8 +192,8 @@ scancorpus_parse_options(int argc, char *argv[])
       if (ranges_file == NULL)
         ranges_file = optarg;
       else {
-        fprintf(stderr, "Error: -R option used twice.\n");
-        exit(1);
+       Rprintf( "Error: -R option used twice.\n");
+        rcqp_receive_error(1);
       }
       break;
     case 'q':
@@ -457,19 +457,19 @@ scancorpus_add_key(char *key)
     }
     *(regex++) = '\0';                /* terminate part of key before regex */
     if (*regex != '/') {
-      fprintf(stderr, "Syntax error in regex part of key '%s'.\n", key);
-      exit(2);
+     Rprintf( "Syntax error in regex part of key '%s'.\n", key);
+      rcqp_receive_error(2);
     }
     regex++;                        /* now <regex> should point to the actual regex part */
     p = strrchr(regex, '/');        /* find end of regex ('/'), and terminate regex string */
     if (p == NULL) {
-      fprintf(stderr, "Syntax error in regex part of key '%s'.\n", key);
-      exit(2);
+     Rprintf( "Syntax error in regex part of key '%s'.\n", key);
+      rcqp_receive_error(2);
     }
     *(p++) = '\0';
     if (strspn(p, "cd") != strlen(p)) {        /* may only have flags after the end-or-regex '/' */
-      fprintf(stderr, "Syntax error in regex part of key '%s' (invalid flags).\n", key);
-      exit(2);
+     Rprintf( "Syntax error in regex part of key '%s' (invalid flags).\n", key);
+      rcqp_receive_error(2);
     }
     if (strchr(p, 'c'))
       flags |= IGNORE_CASE;
@@ -481,8 +481,8 @@ scancorpus_add_key(char *key)
   if (p != NULL) {
     *(p++) = '\0';                /* terminate <att> part */
     if (strspn(p, "0123456789") != strlen(p)) {        /* check that <n> is really a non-negative integer */
-      fprintf(stderr, "Error: non-integer offset in key '%s'.\n", key);
-      exit(2);
+     Rprintf( "Error: non-integer offset in key '%s'.\n", key);
+      rcqp_receive_error(2);
     }
     offset = atoi(p);
   }
@@ -494,9 +494,9 @@ scancorpus_add_key(char *key)
   else if ((att = cl_new_attribute(C, buf, ATT_STRUC)) != NULL)
     is_structural = 1;
   else {
-    fprintf(stderr, "Error: can't open attribute %s.%s\n", corpname, buf);
-    fprintf(stderr, "      (possibly a syntax error in key '%s')\n", key);
-    exit(1);
+   Rprintf( "Error: can't open attribute %s.%s\n", corpname, buf);
+   Rprintf( "      (possibly a syntax error in key '%s')\n", key);
+    rcqp_receive_error(1);
   }
   Hash.att[Hash.N] = att;
   Hash.is_structural[Hash.N] = is_structural;
@@ -509,9 +509,9 @@ scancorpus_add_key(char *key)
   if (regex != NULL) {                /* optional regex constraint */
     Hash.regex[Hash.N] = cl_new_regex(regex, flags, cl_corpus_charset(C)); /* compile regular expression */
     if (Hash.regex[Hash.N] == NULL) {
-      fprintf(stderr, "Error: can't compile regex /%s/\n", regex);
-      fprintf(stderr, "      (possibly a syntax error in key '%s')\n", key);
-      exit(1);
+     Rprintf( "Error: can't compile regex /%s/\n", regex);
+     Rprintf( "      (possibly a syntax error in key '%s')\n", key);
+      rcqp_receive_error(1);
     }
     if (! is_structural) { /* p-attribute: compile regex into list of matching lexicon IDs */
       Hash.id_list[Hash.N] = cl_regex2id(att, regex, flags, &list_size);
@@ -526,7 +526,7 @@ scancorpus_add_key(char *key)
         Hash.id_list_size[Hash.N] = mark;
       }
       if (Hash.id_list_size == 0) {
-        fprintf(stderr, "Warning: no matches for key '%s' -- scan results will be empty\n", key);
+       Rprintf( "Warning: no matches for key '%s' -- scan results will be empty\n", key);
       }
     }
   }
@@ -538,13 +538,13 @@ scancorpus_add_key(char *key)
 
   if (is_structural) {                /* additional setup for s-attribute */
     if (cl_max_struc(att) <= 0) {
-      fprintf(stderr, "Error: s-attribute %s.%s is empty (aborted)\n", corpname, buf);
-      exit(1);
+     Rprintf( "Error: s-attribute %s.%s is empty (aborted)\n", corpname, buf);
+      rcqp_receive_error(1);
     }
     if (!cl_struc_values(att) && !(is_constraint && regex == NULL)) {
       /* s-attributes without annotation allowed for special ``?head'' constraints to restrict scan to regions */
-      fprintf(stderr, "Error: s-attribute %s.%s has no annotations (aborted)\n", corpname, buf);
-      exit(1);
+     Rprintf( "Error: s-attribute %s.%s has no annotations (aborted)\n", corpname, buf);
+      rcqp_receive_error(1);
     }
     Hash.current_struc[Hash.N] = -1;
     Hash.start_cpos[Hash.N] = -1;
@@ -634,8 +634,8 @@ main (int argc, char *argv[])
   corpname = argv[argind++];
   C = cl_new_corpus(reg_dir, corpname);
   if (C == NULL) {
-    fprintf(stderr, "Error: can't find corpus %s (in registry %s)\n", corpname, (reg_dir) ? reg_dir : cl_standard_registry());
-    exit(1);
+   Rprintf( "Error: can't find corpus %s (in registry %s)\n", corpname, (reg_dir) ? reg_dir : cl_standard_registry());
+    rcqp_receive_error(1);
   }
 
   /* now we know the corpus (and its character set) we can initialise the global regular expression object, if needed */
@@ -646,8 +646,8 @@ main (int argc, char *argv[])
     if (C->charset == utf8) {
       /* utf8: don't fold diacritics, but use Unicode character properties */
       if (NULL == (regular_rx = cl_new_regex("([\\pL\\pM]+|\\pN+)(-([\\pL\\pM]+|\\pN+))*", 0, C->charset)) ) {
-        fprintf(stderr, "Error: can't initialise regex\n");
-        exit(1);
+       Rprintf( "Error: can't initialise regex\n");
+        rcqp_receive_error(1);
       }
     }
     /* other character sets don't use regex engine: see scancorpus_word_is_regular */
@@ -662,8 +662,8 @@ main (int argc, char *argv[])
   /* determine size of corpus */
   word = cl_new_attribute(C, "word", ATT_POS);
   if (word == NULL) {
-    fprintf(stderr, "Error: can't load attribute %s.%s\n", corpname, "word");
-    exit(1);
+   Rprintf( "Error: can't load attribute %s.%s\n", corpname, "word");
+    rcqp_receive_error(1);
   }
   Csize = cl_max_cpos(word);
 
@@ -681,7 +681,7 @@ main (int argc, char *argv[])
       ranges_fh = fopen(ranges_file, "r");
       if (! ranges_fh) {
         perror(ranges_file);
-        exit(1);
+        rcqp_receive_error(1);
       }
     }
   }
@@ -693,8 +693,8 @@ main (int argc, char *argv[])
 
     Hash.frequency_values = cl_new_attribute(C, frequency_att, ATT_POS);
     if (Hash.frequency_values == NULL) {
-      fprintf(stderr, "Error: can't load attribute %s.%s\n", corpname, frequency_att);
-      exit(1);
+     Rprintf( "Error: can't load attribute %s.%s\n", corpname, frequency_att);
+      rcqp_receive_error(1);
     }
 
     freq_id_range = cl_max_id(Hash.frequency_values);
@@ -703,27 +703,27 @@ main (int argc, char *argv[])
       strval = cl_id2str(Hash.frequency_values, id);
       intval = atoi(strval);
       if (intval <= 0) {
-        fprintf(stderr, "Invalid frequency value '%s' in -F %s options. Aborted.\n", strval, frequency_att);
-        exit(1);
+       Rprintf( "Invalid frequency value '%s' in -F %s options. Aborted.\n", strval, frequency_att);
+        rcqp_receive_error(1);
       }
       Hash.frequency[id] = intval;
     }
   }
 
   if (! quiet)
-    fprintf(stderr, "Scanning corpus %s for %d-tuples ... \n", corpname, Hash.N);
+   Rprintf( "Scanning corpus %s for %d-tuples ... \n", corpname, Hash.N);
 
   /* loop over all the ranges to be scanned (which is just a single range without -R) */
   previous_end = -1;
   while (get_next_range(&start_cpos, &end_cpos)) {
     if (start_cpos <= previous_end) { /* this also ensures that start_cpos >= */
-      fprintf(stderr, "Overlapping or unsorted ranges: [?, %d] and [%d, %d]. Aborted.\n",
+     Rprintf( "Overlapping or unsorted ranges: [?, %d] and [%d, %d]. Aborted.\n",
               previous_end, start_cpos, end_cpos);
-      exit(1);
+      rcqp_receive_error(1);
     }
     if (end_cpos < start_cpos) {
-      fprintf(stderr, "Invalid range [%d, %d] (inversion). Aborted.\n", start_cpos, end_cpos);
-      exit(1);
+     Rprintf( "Invalid range [%d, %d] (inversion). Aborted.\n", start_cpos, end_cpos);
+      rcqp_receive_error(1);
     }
     previous_end = end_cpos;
     if (end_cpos >= Csize)        /* check that end_cpos is within allowed range [..., Csize-1] */
@@ -731,7 +731,7 @@ main (int argc, char *argv[])
     if (Hash.max_offset > 0)
       end_cpos -= Hash.max_offset; /* adjust end_cpos so that all tokens in the tuple fall within the specified range */
     if (end_cpos < start_cpos) {
-      fprintf(stderr, "Warning: range [%d, %d] is too small for selected data (skipped).\n",
+     Rprintf( "Warning: range [%d, %d] is too small for selected data (skipped).\n",
               start_cpos, end_cpos + Hash.max_offset);
     }
 
@@ -745,8 +745,8 @@ main (int argc, char *argv[])
       if ((! quiet) && ((cpos & 0xffff) == 0)) {
         int cpK = cpos >> 10;
         int csK = Csize >> 10;
-        fprintf(stderr, "Progress: %6dK / %dK   \r", cpK, csK);
-        fflush(stderr);
+       Rprintf( "Progress: %6dK / %dK   \r", cpK, csK);
+        rcqp_flush();
       }
 
       accept = 1;
@@ -871,13 +871,13 @@ main (int argc, char *argv[])
   } /* end of loop over ranges */
 
   if (! quiet)
-    fprintf(stderr, "Scan complete.                          \n");
+   Rprintf( "Scan complete.                          \n");
 
   /* close ranges file (if -R option had been used) */
   if (ranges_fh && ranges_fh != stdin)
     fclose(ranges_fh);
 
-  /* print hash contents to stdout or file (in hash-internal order) */
+  /* print hash contents to NULL or file (in hash-internal order) */
   {
     HashEntry entry;
     FILE *of;
@@ -893,30 +893,30 @@ main (int argc, char *argv[])
         of = popen(pipe_cmd, "w");
         if (of == NULL) {
           perror(pipe_cmd);
-          fprintf(stderr, "Can't write compressed file %s. Aborted.\n", output_file);
-          exit(1);
+         Rprintf( "Can't write compressed file %s. Aborted.\n", output_file);
+          rcqp_receive_error(1);
         }
         is_pipe = 1;
         if (! quiet)
-          fprintf(stderr, "Writing frequency table to compressed file %s ... ", output_file);
+         Rprintf( "Writing frequency table to compressed file %s ... ", output_file);
       }
       else {
         of = fopen(output_file, "w");
         if (of == NULL) {
           perror(output_file);
-          fprintf(stderr, "Can't create file %s. Aborted.\n", output_file);
-          exit(1);
+         Rprintf( "Can't create file %s. Aborted.\n", output_file);
+          rcqp_receive_error(1);
         }
         if (! quiet)
-          fprintf(stderr, "Writing frequency table to %s ... ", output_file);
+         Rprintf( "Writing frequency table to %s ... ", output_file);
       }
     }
     else {
-      of = stdout;
+      of = NULL;
       if (! quiet)
-        fprintf(stderr, "Printing frequency table on stdout ... \n");
+       Rprintf( "Printing frequency table on NULL ... \n");
     }
-    fflush(stderr);
+    rcqp_flush();
 
     for (bucket = 0; bucket < Hash.buckets; bucket++) {
       entry = Hash.table[bucket];
@@ -954,13 +954,13 @@ main (int argc, char *argv[])
         fclose(of);
     }
     if (! quiet)
-      fprintf(stderr, "ok.\n");
-  } /* endblock print hash contents to stdout */
+     Rprintf( "ok.\n");
+  } /* endblock print hash contents to NULL */
 
   /* final act of cleanup */
   cl_delete_regex(regular_rx);
 
-  exit(0);                        /* that was easy, wasn't it? */
+  rcqp_receive_error(0);                        /* that was easy, wasn't it? */
 }
 
 

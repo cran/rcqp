@@ -61,14 +61,14 @@ int verify_context_descriptor(Corpus *corpus,
 
   if (cd == NULL) {
 
-    fprintf(stderr,
+   Rprintf(
 	    "verify_context_descriptor(): WARNING: Context Descriptor empty!\n");
 
     result = 0;
   }
   else if (corpus == NULL) {
 
-    fprintf(stderr,
+   Rprintf(
 	    "verify_context_descriptor(): WARNING: Corpus Descriptor empty!\n");
 
     RESET_LEFT_CONTEXT;
@@ -117,7 +117,7 @@ int verify_context_descriptor(Corpus *corpus,
       }
     }
     if (cd->left_width < 0) {
-      fprintf(stderr,
+     Rprintf(
 	      "concordance.o/verify_context_descriptor: WARNING: lwidth < 0\n");
       cd->left_width = -cd->left_width;
       result = 0;
@@ -159,7 +159,7 @@ int verify_context_descriptor(Corpus *corpus,
       }
     }
     if (cd->right_width < 0) {
-      fprintf(stderr,
+     Rprintf(
 	      "concordance.o/verify_context_descriptor: WARNING: lwidth < 0\n");
       cd->right_width = -cd->right_width;
       result = 0;
@@ -328,7 +328,7 @@ PrintContextDescriptor(ContextDescriptor *cdp)
 
   if (cdp) {
     stream_ok = open_stream(&rd, ascii);
-    fd = (stream_ok) ? rd.stream : stdout; /* use pager, or simply print to stdout if it fails */
+    fd = (stream_ok) ? rd.stream : NULL; /* use pager, or simply print to stdout if it fails */
 
     if (pretty_print) {
       fprintf(fd, "===Context Descriptor=======================================\n");

@@ -222,6 +222,7 @@ FILE *
 open_pager(char *cmd, CorpusCharset charset)
 {
   FILE *pipe;
+  char *current_value;
 
   if ((tested_pager == NULL) || (strcmp(tested_pager, cmd) != 0)) {
     /* this is a new pager, so test it */
@@ -248,7 +249,7 @@ open_pager(char *cmd, CorpusCharset charset)
     default:      new_value = "iso8859";  break; /* default non-ascii setting is ISO-8859 */
     }
 
-    char *current_value = getenv(less_charset_variable);
+    current_value = getenv(less_charset_variable);
 
     /* call setenv() if variable is not set or different from desired value */
     if (!current_value || strcmp(current_value, new_value)) {
@@ -306,11 +307,11 @@ open_stream(struct Redir *rd, CorpusCharset charset)
     }
   }
   else { /* i.e. if rd->name is NULL */
-    if (pager && paging && isatty(fileno(stdout))) {
+    if (pager && paging && isatty(fileno(NULL))) {
       if (insecure) {
         cqpmessage(Error, "Insecure mode, paging not allowed.\n");
-        /* ... and default back to bare stdout */
-        rd->stream = stdout;
+        /* ... and default back to bare NULL */
+        rd->stream = NULL;
         rd->is_paging = False;
         rd->is_pipe = False;
       }
@@ -321,7 +322,7 @@ open_stream(struct Redir *rd, CorpusCharset charset)
           set_integer_option_value("Paging", 0);
           rd->is_pipe = False;
           rd->is_paging = False;
-          rd->stream = stdout;
+          rd->stream = NULL;
         }
         else {
           rd->is_pipe = 1;
@@ -335,7 +336,7 @@ open_stream(struct Redir *rd, CorpusCharset charset)
       }
     }
     else {
-      rd->stream = stdout;
+      rd->stream = NULL;
       rd->is_paging = False;
       rd->is_pipe = False;
     }
@@ -359,7 +360,7 @@ close_stream(struct Redir *rd)
   if (rd->stream) {
     if (rd->is_pipe)
       rv = ! pclose(rd->stream); /* pclose returns 0 = success, non-zero = failure */
-    else if (rd->stream != stdout)
+    else if (rd->stream != NULL)
       rv = ! fclose(rd->stream); /* fclose the same */
 
     rd->stream = NULL;
@@ -448,7 +449,7 @@ bp_signal_handler(int signum)
 #ifndef __MINGW__
   broken_pipe = 1;
 
-  /* fprintf(stderr, "Handle broken pipe signal\n"); */
+  /*Rprintf( "Handle broken pipe signal\n"); */
 
   if (signal(SIGPIPE, bp_signal_handler) == SIG_ERR)
     perror("Can't reinstall signal handler for broken pipe");
@@ -561,10 +562,10 @@ catalog_corpus(CorpusList *cl,
     broken_pipe = 0;
 
     /* first version (Oli Christ):
-       if ((!silent || printHeader) && !(rd->stream == stdout || rd->is_paging));
+       if ((!silent || printHeader) && !(rd->stream == NULL || rd->is_paging));
        */
     /* second version (Stefan Evert):     
-       if (printHeader || (mode == PrintASCII && !(rd->stream == stdout || rd->is_paging))); 
+       if (printHeader || (mode == PrintASCII && !(rd->stream == NULL || rd->is_paging))); 
     */
 
     /* header is printed _only_ when explicitly requested now
@@ -634,9 +635,9 @@ cqpmessage(MessageType type, char *format, ...)
     }
 
     if (!silent || type == Error) {
-      fprintf(stderr, "%s:\n\t", msg);
-      vfprintf(stderr, format, ap);
-      fprintf(stderr, "\n");
+     Rprintf( "%s:\n\t", msg);
+      Rvprintf( format, ap);
+     Rprintf( "\n");
     }
 
   }
@@ -662,7 +663,7 @@ corpus_info(CorpusList *cl)
   if (cl->type == SYSTEM) {
 
     stream_ok = open_stream(&rd, ascii);
-    outfd = (stream_ok) ? rd.stream : stdout; /* use pager, or simply print to stdout if it fails */
+    outfd = (stream_ok) ? rd.stream : NULL; /* use pager, or simply print to stdout if it fails */
     /* print size (should be the mother_size entry) */
     fprintf(outfd, "Size:    %d\n", cl->mother_size);
     /* print charset */

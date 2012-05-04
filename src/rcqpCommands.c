@@ -1,12 +1,13 @@
-// ===========================================================================
-// File: "rcqpCommands.c"
-//                        Created: 2012-01-13 18:49:02
-//              Last modification: 2012-01-25 15:07:01
-// Authors: Bernard Desgraupes <bernard.desgraupes@u-paris10.fr>
-//          Sylvain Loiseau <sylvain.loiseau@univ-paris13.fr>
-// (c) Copyright: 2011-2012
-// All rights reserved.
-// ===========================================================================
+/* ===========================================================================
+* File: "rcqpCommands.c"
+*                        Created: 2012-01-13 18:49:02
+*              Last modification: 2012-01-25 15:07:01
+* Authors: Bernard Desgraupes <bernard.desgraupes@u-paris10.fr>
+*          Sylvain Loiseau <sylvain.loiseau@univ-paris13.fr>
+* (c) Copyright: 2011-2012
+* All rights reserved.
+* ===========================================================================
+*/
 	
 #include "rcqp.h"
 
@@ -25,14 +26,14 @@ SEXP rcqpCmd_list_corpora()
 	CorpusList *	cl;
 	int				i = 0, n = 0;
 	
-	// First count corpora
+	/* First count corpora */
 	for (cl = FirstCorpusFromList(); cl != NULL; cl = NextCorpusFromList(cl)) {
 		if (cl->type == SYSTEM) n++;
 	}
 
 	result = PROTECT(allocVector(STRSXP, n));
 
-	// Then build list of names
+	/* Then build list of names */
 	for (cl = FirstCorpusFromList(); cl != NULL; cl = NextCorpusFromList(cl)) {
 		if (cl->type == SYSTEM) {
 			SET_STRING_ELT(result, i, mkChar(cl->name));
@@ -154,14 +155,14 @@ SEXP rcqpCmd_attributes(SEXP inCorpus, SEXP inType)
 		UNPROTECT(1);
 		rcqp_error_code(CQI_CQP_ERROR_NO_SUCH_CORPUS);
 	} else {
-		// First count attributes
+		/* First count attributes */
 		for (a = first_corpus_attribute(cl->corpus); a != NULL; a = next_corpus_attribute()) {
 			if (a->type == type) n++;
 		}
 		
 		result = PROTECT(allocVector(STRSXP, n));
 		
-		// Then build list of names
+		/* Then build list of names */
 		for (a = first_corpus_attribute(cl->corpus); a != NULL; a = next_corpus_attribute()) {
 			if (a->type == type) {
 				SET_STRING_ELT(result, i, mkChar(a->any.name));
@@ -199,7 +200,7 @@ SEXP rcqpCmd_attribute_size(SEXP inAttribute)
 
 	a = (char*)CHAR(STRING_ELT(inAttribute,0));
 	
-	// Need to try all possible attribute types
+	/* Need to try all possible attribute types */
 	attribute = cqi_lookup_attribute(a, ATT_POS);
 	if (attribute != NULL) {
 		size = cl_max_cpos(attribute);
@@ -263,7 +264,7 @@ SEXP rcqpCmd_structural_attribute_has_values(SEXP inAttribute)
 	Attribute *		attribute;
 	
 	
-	// rcqp_initialize();
+	/* rcqp_initialize(); */
 	if (!isString(inAttribute) || length(inAttribute) != 1) error("argument 'attribute' must be a string");
 	PROTECT(inAttribute);
 
@@ -446,7 +447,7 @@ SEXP rcqpCmd_id2str(SEXP inAttribute, SEXP inIds)
 		for (i=0; i<len; i++) {
 			idx = INTEGER(inIds)[i];	
 			str = cl_id2str(attribute, idx);
-            // Sends "" if str == NULL (cpos out of range)
+            /* Sends "" if str == NULL (cpos out of range) */
 			if (str != NULL) {
 				SET_STRING_ELT(result, i, mkChar(str));
 			} 
@@ -495,7 +496,7 @@ SEXP rcqpCmd_id2freq(SEXP inAttribute, SEXP inIds)
 		for (i=0; i<len; i++) {
 			idx = INTEGER(inIds)[i];	
 			f = cl_id2freq(attribute, idx);
-			// Return 0 if ID is out of range
+			/* Return 0 if ID is out of range */
 			if (f < 0) f = 0;
 			INTEGER(result)[i] = f;
 		}
@@ -595,7 +596,7 @@ SEXP rcqpCmd_cpos2id(SEXP inAttribute, SEXP inCpos)
 		for (i=0; i<len; i++) {
 			cpos = INTEGER(inCpos)[i];	
 			id = cl_cpos2id(attribute, cpos);
-            // Return -1 if cpos is out of range
+            /* Return -1 if cpos is out of range */
 			if (id < 0) id = -1;
 			INTEGER(result)[i] = id;
 		}
@@ -643,7 +644,7 @@ SEXP rcqpCmd_cpos2str(SEXP inAttribute, SEXP inCpos)
 		for (i=0; i<len; i++) {
 			cpos = INTEGER(inCpos)[i];	
 			str = cl_cpos2str(attribute, cpos);
-            // Sends "" if str == NULL (cpos out of range)
+            /* Sends "" if str == NULL (cpos out of range) */
 			if (str != NULL) {
 				SET_STRING_ELT(result, i, mkChar(str));
 			} 
@@ -692,7 +693,7 @@ SEXP rcqpCmd_cpos2struc(SEXP inAttribute, SEXP inCpos)
 		for (i=0; i<len; i++) {
 			cpos = INTEGER(inCpos)[i];	
 			struc = cl_cpos2struc(attribute, cpos);
-            // Return -1 if cpos is out of range
+            /* Return -1 if cpos is out of range */
 			if (struc < 0) struc = -1;
 			INTEGER(result)[i] = struc;
 		}
@@ -740,7 +741,7 @@ SEXP rcqpCmd_cpos2lbound(SEXP inAttribute, SEXP inCpos)
 		for (i=0; i<len; i++) {
 			cpos = INTEGER(inCpos)[i];	
 			struc = cl_cpos2struc(attribute, cpos);
-			// Return -1 if cpos is out of range
+			/* Return -1 if cpos is out of range */
 			if (struc < 0) {
 				struc = -1;
 			} else {
@@ -796,7 +797,7 @@ SEXP rcqpCmd_cpos2rbound(SEXP inAttribute, SEXP inCpos)
 		for (i=0; i<len; i++) {
 			cpos = INTEGER(inCpos)[i];	
 			struc = cl_cpos2struc(attribute, cpos);
-			// Return -1 if cpos is out of range
+			/* Return -1 if cpos is out of range */
 			if (struc < 0) {
 				struc = -1;
 			} else {
@@ -904,7 +905,7 @@ SEXP rcqpCmd_cpos2alg(SEXP inAttribute, SEXP inCpos)
 		for (i=0; i<len; i++) {
 			cpos = INTEGER(inCpos)[i];	
 			alg = cl_cpos2alg(attribute, cpos);
-            // Return -1 if cpos is out of range
+            /* Return -1 if cpos is out of range */
 			if (alg < 0) alg = -1;
 			INTEGER(result)[i] = alg;
 		}
@@ -998,7 +999,7 @@ SEXP rcqpCmd_struc2str(SEXP inAttribute, SEXP inIds)
 		for (i=0; i<len; i++) {
 			idx = INTEGER(inIds)[i];	
 			str = cl_struc2str(attribute, idx);
-            // Sends "" if str == NULL (cpos out of range)
+            /* Sends "" if str == NULL (cpos out of range) */
 			if (str != NULL) {
 				SET_STRING_ELT(result, i, mkChar(str));
 			} 
@@ -1217,14 +1218,14 @@ SEXP rcqpCmd_list_subcorpora(SEXP inCorpus)
 		UNPROTECT(1);
 		rcqp_error_code(cqi_errno);
 	} else {
-		// First count subcorpora
+		/* First count subcorpora */
 		for (cl = FirstCorpusFromList(); cl != NULL; cl = NextCorpusFromList(cl)) {
 			if (cl->type == SUB && cl->corpus == mother->corpus) n++;
 		}
 		
 		result = PROTECT(allocVector(STRSXP, n));
 
-		// Then build list of names
+		/* Then build list of names */
 		for (cl = FirstCorpusFromList(); cl != NULL; cl = NextCorpusFromList(cl)) {
 			if (cl->type == SUB && cl->corpus == mother->corpus) {
 				SET_STRING_ELT(result, i, mkChar(cl->name));
@@ -1322,20 +1323,20 @@ SEXP rcqpCmd_dump_subcorpus(SEXP inSubcorpus, SEXP inFirst, SEXP inLast)
 	result = PROTECT(allocMatrix(INTSXP, nrows, 4));
 	
 	for (i = 0; i< nrows; i++) {
-		// 'match' column
+		/* 'match' column */
 		INTEGER(result)[i] = cl->range[i+first].start;
 		
-		// 'matchend' column
+		/* 'matchend' column */
 		INTEGER(result)[i+nrows] = cl->range[i+first].end;
 		
-		// 'target' column
+		/* 'target' column */
 		if (cl->targets == NULL) {
 			INTEGER(result)[i+2*nrows] = -1;
 		} else {
 			INTEGER(result)[i+2*nrows] = cl->targets[i+first];
 		} 
 		
-		// 'keyword' column
+		/* 'keyword' column */
 		if (cl->keywords == NULL) {
 			INTEGER(result)[i+3*nrows] = -1;
 		} else {
@@ -1370,7 +1371,7 @@ SEXP rcqpCmd_drop_subcorpus(SEXP inSubcorpus)
 	
 	subcorpus = (char*)CHAR(STRING_ELT(inSubcorpus,0));
 	
-	// Make sure it is a subcorpus, not a root corpus
+	/* Make sure it is a subcorpus, not a root corpus */
 	if (!split_subcorpus_spec(subcorpus, &c, &sc)) {
 		UNPROTECT(1);
 		rcqp_error_code(cqi_errno);
@@ -1447,8 +1448,8 @@ SEXP rcqpCmd_fdist1(SEXP inSubcorpus, SEXP inField1, SEXP inKey1, SEXP inCutoff,
 	fieldtype = rcqp_get_field_type(inField1);
 	att = (char*)CHAR(STRING_ELT(inKey1,0));
 	
-    // compute_grouping() returns tokens with f > cutoff, 
-    // but CQi specifies f >= cutoff
+    /* compute_grouping() returns tokens with f > cutoff, */
+    /* but CQi specifies f >= cutoff */
     cutoff = (cutoff > 0) ? cutoff - 1 : 0;
     table = compute_grouping(cl, NoField, 0, NULL, fieldtype, offset, att, cutoff);
     if (table == NULL) {
@@ -1521,8 +1522,8 @@ SEXP rcqpCmd_fdist2(SEXP inSubcorpus, SEXP inField1, SEXP inKey1, SEXP inField2,
 	att1 = (char*)CHAR(STRING_ELT(inKey1,0));
 	att2 = (char*)CHAR(STRING_ELT(inKey2,0));
 	
-    // compute_grouping() returns tokens with f > cutoff, 
-    // but CQi specifies f >= cutoff
+    /* compute_grouping() returns tokens with f > cutoff, */
+    /* but CQi specifies f >= cutoff */
     cutoff = (cutoff > 0) ? cutoff - 1 : 0;
 
 	table = compute_grouping(cl, fieldtype1, 0, att1, fieldtype2, 0, att2, cutoff);

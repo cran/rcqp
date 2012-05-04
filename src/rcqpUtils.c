@@ -1,19 +1,20 @@
-// ===========================================================================
-// File: "rcqpUtils.c"
-//                        Created: 2012-01-13 18:49:02
-//              Last modification: 2012-01-19 12:02:10
-// Authors: Bernard Desgraupes <bernard.desgraupes@u-paris10.fr>
-//          Sylvain Loiseau <sylvain.loiseau@univ-paris13.fr>
-// (c) Copyright: 2011-2012
-// All rights reserved.
-// ===========================================================================
+/* ===========================================================================
+* File: "rcqpUtils.c"
+*                        Created: 2012-01-13 18:49:02
+*              Last modification: 2012-01-19 12:02:10
+* Authors: Bernard Desgraupes <bernard.desgraupes@u-paris10.fr>
+*          Sylvain Loiseau <sylvain.loiseau@univ-paris13.fr>
+* (c) Copyright: 2011-2012
+* All rights reserved.
+* ===========================================================================
+*/
 	
 #include "rcqp.h"
 
 
 #define RCQP_ATT_HASH_SIZE 16384
 
-// Needed for cross-compilation (mingw)
+/* Needed for cross-compilation (mingw) */
 int yydebug = 0;
 
 /* 
@@ -227,7 +228,7 @@ rcqp_get_field_type(SEXP inField)
  */
 void rcqp_send_error()
 {
-//	error("cqp error #%d\n", cderrno);
+/*	error("cqp error #%d\n", cderrno); */
 	Rprintf("Error! Please close and restart R as rcqp may be in unknown state");
 	
 }

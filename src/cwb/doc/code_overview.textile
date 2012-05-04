@@ -612,7 +612,7 @@ h4. utils/cwb-itoa.c
 h4. utils/cwb-lexdecode.c
 
 * code for @cwb-lexdecode@, which 
-** "Prints the lexicon (or part of it) of a positional attribute on stdout..."
+** "Prints the lexicon (or part of it) of a positional attribute on NULL..."
 * _depends_on_: the CL via @cl/cl.h@, but @globals corpus attributes macros@ are directly #included as well.
 
 h4. utils/cwb-makeall.c

@@ -76,7 +76,7 @@ best_path(FMS fms,
           int f1, int l1,
           int f2, int l2,
           int beam_width,       /* beam search */
-          int verbose,          /* echo progress info on stdout ? */
+          int verbose,          /* echo progress info on NULL ? */
           /* output */
           int *steps,
           int **out1,

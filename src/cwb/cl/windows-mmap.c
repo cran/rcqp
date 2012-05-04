@@ -58,16 +58,16 @@ mmap(void *start, size_t length, int prot, int flags, int fd, off_t offset)
   if (!fstat(fd, &st))
     len = (size_t) st.st_size;
   else {
-    fprintf(stderr,"mmap: could not determine filesize");
-    exit(1);
+   Rprintf("mmap: could not determine filesize");
+    rcqp_receive_error(1);
   }
 
   if ((length + offset) > len)
     length = len - offset;
 
   if (!(flags & MAP_PRIVATE)) {
-    fprintf(stderr,"Invalid usage of mmap when built with USE_WIN32_MMAP");
-    exit(1);
+   Rprintf("Invalid usage of mmap when built with USE_WIN32_MMAP");
+    rcqp_receive_error(1);
   }
 
   hmap = CreateFileMapping((HANDLE)_get_osfhandle(fd), 0, PAGE_WRITECOPY, 0, 0, 0);
@@ -78,7 +78,7 @@ mmap(void *start, size_t length, int prot, int flags, int fd, off_t offset)
   temp = MapViewOfFileEx(hmap, FILE_MAP_COPY, h, l, length, start);
 
   if (!CloseHandle(hmap))
-    fprintf(stderr,"unable to close file mapping handle\n");
+   Rprintf("unable to close file mapping handle\n");
   return temp ? temp : MAP_FAILED;
 }
 

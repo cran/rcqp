@@ -28,7 +28,7 @@ char *progname;
 void
 sdecode_usage(void)
 {
-  fprintf(stderr,
+ Rprintf(
           "\n"
           "Usage: %s [options] corpus-id -S <att>\n\n"
           "Outputs a list of the given s-attribute, with begin and end positions\n\n"
@@ -41,7 +41,7 @@ sdecode_usage(void)
           "   <region_start> TAB <region_end> [ TAB <annotation> ]\n"
           "Part of the IMS Open Corpus Workbench v" VERSION "\n\n"
           , progname);
-  exit(1);
+  rcqp_receive_error(1);
 }
 
 
@@ -88,8 +88,8 @@ main(int argc, char **argv)
     case 'r':
       if (registry_directory == NULL) registry_directory = optarg;
       else {
-        fprintf(stderr, "%s: -r option used twice\n", progname);
-        exit(2);
+       Rprintf( "%s: -r option used twice\n", progname);
+        rcqp_receive_error(2);
       }
       break;
 
@@ -116,19 +116,19 @@ main(int argc, char **argv)
     sdecode_usage();
 
   if (!show_regions && !show_values) {
-    fprintf(stderr, "Error: options -n and -v cannot be combined (would print nothing)\n");
-    exit(1);
+   Rprintf( "Error: options -n and -v cannot be combined (would print nothing)\n");
+    rcqp_receive_error(1);
   }
 
   /* first argument: corpus id */
   corpus_id = argv[optind++];
   if ((corpus = cl_new_corpus(registry_directory, corpus_id)) == NULL) {
-    fprintf(stderr, "%s: Corpus <%s> not registered in %s\n",
+   Rprintf( "%s: Corpus <%s> not registered in %s\n",
               progname,
               corpus_id,
               (registry_directory ? registry_directory
                : central_corpus_directory()));
-    exit(1);
+    rcqp_receive_error(1);
   }
 
   /* second argument: -S */
@@ -138,10 +138,10 @@ main(int argc, char **argv)
   /* third argument: attribute name */
   attr_name = argv[optind];
   if ((att = cl_new_attribute(corpus, attr_name, ATT_STRUC)) == NULL) {
-    fprintf(stderr, "%s: Can't access s-attribute <%s.%s>\n",
+   Rprintf( "%s: Can't access s-attribute <%s.%s>\n",
               progname,
               corpus_id, attr_name);
-    exit(1);
+    rcqp_receive_error(1);
   }
 
   /* check if attribute has annotations */
@@ -149,8 +149,8 @@ main(int argc, char **argv)
   if (! has_values)
     show_values = 0;
   if (!show_regions && !has_values) {
-    fprintf(stderr, "Error: option -n can only be used if s-attribute has annotated values\n");
-    exit(1);
+   Rprintf( "Error: option -n can only be used if s-attribute has annotated values\n");
+    rcqp_receive_error(1);
   }
 
   /* attribute size, i.e. number of regions */
@@ -160,23 +160,23 @@ main(int argc, char **argv)
   for (n = 0; n < att_size; n++) {
     if (!cl_struc2cpos(att, n, &start, &end)) {
       cl_error("Can't find region boundaries");
-      exit(1);
+      rcqp_receive_error(1);
     }
     if (show_regions) {
-      printf("%d\t%d", start, end);
+     Rprintf("%d\t%d", start, end);
       if (show_values)
-        printf("\t");
+       Rprintf("\t");
     }
     if (show_values) {
       annot = cl_struc2str(att, n);
       if (annot == NULL) {
-        printf("<no annotation>");
+       Rprintf("<no annotation>");
       }
       else {
-        printf("%s", annot);
+       Rprintf("%s", annot);
       }
     }
-    printf("\n");
+   Rprintf("\n");
   }
 
   /* that was all ...  */

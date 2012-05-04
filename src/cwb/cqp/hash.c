@@ -16,31 +16,32 @@
  */
 
 
-// int 
-// is_prime(int n) {
-//   int i;
-//   for(i = 2; i*i <= n; i++)
-//     if ((n % i) == 0) 
-//       return 0;
-//   return 1;
-// }
-// 
-// int 
-// find_prime(int n) {
-//   for( ; n > 0 ; n++)		/* will exit on int overflow */
-//     if (is_prime(n)) 
-//       return n;
-//   return 0;
-// }
-// 
-// unsigned int 
-// hash_string(char *string) {
-//   unsigned char *s = (unsigned char *)string;
-//   unsigned int result = 0;
-//   for( ; *s; s++)
-//     result = (result * 33 ) ^ (result >> 27) ^ *s;
-//   return result;
-// }
+/* int 
+ * is_prime(int n) {
+ *   int i;
+ *   for(i = 2; i*i <= n; i++)
+ *     if ((n % i) == 0) 
+ *       return 0;
+ *   return 1;
+ * }
+ * 
+ * int 
+ * find_prime(int n) {
+ *   for( ; n > 0 ; n++)		/ * will exit on int overflow * /
+ *     if (is_prime(n)) 
+ *       return n;
+ *   return 0;
+ * }
+ * 
+ * unsigned int 
+ * hash_string(char *string) {
+ *   unsigned char *s = (unsigned char *)string;
+ *   unsigned int result = 0;
+ *   for( ; *s; s++)
+ *     result = (result * 33 ) ^ (result >> 27) ^ *s;
+ *   return result;
+ * }
+ */
 
 unsigned int 
 hash_macro(char *macro_name, unsigned int args) {

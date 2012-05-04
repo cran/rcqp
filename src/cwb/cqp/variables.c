@@ -114,7 +114,7 @@ VariableAddItem(Variable v, char *item)
                                            v->nr_items);
       
       if (v->items == NULL) {
-        fprintf(stderr, "Fatal Error #6: no memory left.");
+       Rprintf( "Fatal Error #6: no memory left.");
         perror("Memory fault");
         assert(0 && "Big Problem here!");
       }
@@ -188,7 +188,7 @@ DropVariable(Variable *vp)
     }
 
   if (i >= nr_variables) {
-    fprintf(stderr, "Error #5 in variable logic. Please contact developer.\n");
+   Rprintf( "Error #5 in variable logic. Please contact developer.\n");
   }
   
   *vp = NULL;
@@ -233,7 +233,7 @@ NewVariable(char *varname)
       VariableSpace = (Variable *)cl_realloc(VariableSpace, 
                                           nr_variables * sizeof(Variable));
     if (VariableSpace == NULL) {
-      fprintf(stderr, "Fatal Error: Variable space out of memory.\n");
+     Rprintf( "Fatal Error: Variable space out of memory.\n");
       assert(0 && "Sorry, big problem here!");
     }
     
@@ -406,7 +406,7 @@ VerifyVariable(Variable v,
 
       if (!v->items[i].free) {
         if (v->items[i].sval == NULL) {
-          fprintf(stderr, "Error #1 in variable logic. Contact developer.\n");
+         Rprintf( "Error #1 in variable logic. Contact developer.\n");
           v->items[i].ival = -1;
         }
         else
@@ -469,7 +469,7 @@ GetVariableItems(Variable v,
       for (i = 0; i < v->nr_items; i++)
         if (!v->items[i].free && v->items[i].ival >= 0) {
           if (ip >= v->nr_valid_items)
-            fprintf(stderr, "Error #2 in variable logic. Please contact developer.\n");
+           Rprintf( "Error #2 in variable logic. Please contact developer.\n");
           else {
             items[ip] = v->items[i].ival;
             ip++;
@@ -477,7 +477,7 @@ GetVariableItems(Variable v,
         }
 
       if (ip != v->nr_valid_items) 
-        fprintf(stderr, "Error #3 in variable logic. Please contact developer.\n");
+       Rprintf( "Error #3 in variable logic. Please contact developer.\n");
 
       /* eval_bool() expects a sorted list of IDs (for binary search) */
       qsort(items, *nr_items, sizeof(int), intcompare);

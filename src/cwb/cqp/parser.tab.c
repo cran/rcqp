@@ -144,7 +144,7 @@ void yyerror (char *s)
 
 void warn_query_lock_violation(void) {
   if (which_app != cqpserver)
-    fprintf(stderr, "WARNING: query lock violation attempted\n");
+   Rprintf( "WARNING: query lock violation attempted\n");
   query_lock_violation++;       /* this is for the CQPserver */
 }
 
@@ -168,12 +168,12 @@ synchronize(void)
   enable_macros = 0;
 
   if (cqp_input_string != NULL) {
-    fprintf(stderr, "Synchronizing to end of line ... \n");
+   Rprintf( "Synchronizing to end of line ... \n");
     while (!(yychar <= 0))
       yychar = yylex();
   }
   else {
-    fprintf(stderr, "Synchronizing until next ';'...\n");
+   Rprintf( "Synchronizing until next ';'...\n");
     while (!(yychar <= 0 || yychar == ';'))
       yychar = yylex();
   }
@@ -2321,9 +2321,9 @@ yyreduce:
                         query_lock = 0;
                       }
                       else {
-                        fprintf(stderr, "ALERT! Query lock violation.\n");
-                        printf("\n"); /* so CQP.pm won't block -- should no longer be needed after switching to .EOL. mechanism */
-                        exit(1);
+                       Rprintf( "ALERT! Query lock violation.\n");
+                       Rprintf("\n"); /* so CQP.pm won't block -- should no longer be needed after switching to .EOL. mechanism */
+                        rcqp_receive_error(1);
                       }
                     }
     break;
@@ -2422,7 +2422,7 @@ yyreduce:
 
 /* Line 1806 of yacc.c  */
 #line 438 "../cwb/cqp/parser.y"
-    { printf("-::-EOL-::-\n"); fflush(stdout); }
+    {Rprintf("-::-EOL-::-\n"); rcqp_flush(); }
     break;
 
   case 47:
@@ -2462,7 +2462,7 @@ yyreduce:
 #line 459 "../cwb/cqp/parser.y"
     { (yyval.redir).name = (char *)NULL;
                                           (yyval.redir).mode = (char *)NULL;
-                                          (yyval.redir).stream = stdout;
+                                          (yyval.redir).stream = NULL;
                                           (yyval.redir).is_pipe = 0;
                                         }
     break;

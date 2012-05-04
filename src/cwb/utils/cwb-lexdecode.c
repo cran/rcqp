@@ -62,7 +62,7 @@ lexdecode_print_item_info(Attribute *attr, int id, char *fallback_s)
     item = cl_id2all(attr, id, &freq, &slen);
     if (cl_errno != CDA_OK) {
       cl_error("(aborting) get_id_info() failed");
-      exit(1);
+      rcqp_receive_error(1);
     }
   }
   else {
@@ -72,10 +72,10 @@ lexdecode_print_item_info(Attribute *attr, int id, char *fallback_s)
     item = NULL;
   }
 
-  if (print_nr)    printf("%7d\t", id);
-  if (print_freqs) printf("%7d\t", freq);
-  if (print_len)   printf("%7d\t", slen);
-  printf("%s\n", item ? item : fallback_s);
+  if (print_nr)   Rprintf("%7d\t", id);
+  if (print_freqs)Rprintf("%7d\t", freq);
+  if (print_len)  Rprintf("%7d\t", slen);
+ Rprintf("%s\n", item ? item : fallback_s);
 }
 
 /**
@@ -102,26 +102,26 @@ lexdecode_show(char *attr_name, char *rx, int rx_flags)
   Attribute *attr = NULL;
 
   if ((attr = cl_new_attribute(corpus, attr_name, ATT_POS)) == NULL) {
-    fprintf(stderr, "Attribute %s.%s does not exist. Aborted.\n",
+   Rprintf( "Attribute %s.%s does not exist. Aborted.\n",
             corpus_id, attr_name);
-    exit(1);
+    rcqp_receive_error(1);
   }
 
   attr_size = cl_max_cpos(attr);
   if (cl_errno != CDA_OK) {
     cl_error("(aborting) cl_max_cpos() failed");
-    exit(1);
+    rcqp_receive_error(1);
   }
 
   size = cl_max_id(attr);
   if (cl_errno != CDA_OK) {
     cl_error("(aborting) cl_max_id() failed");
-    exit(1);
+    rcqp_receive_error(1);
   }
 
   if (show_size_only) {
-    printf("Tokens:\t%d\n", attr_size);
-    printf("Types:\t%d\n", size);
+   Rprintf("Tokens:\t%d\n", attr_size);
+   Rprintf("Types:\t%d\n", size);
   }
   else {                        /* without -S option */
 
@@ -132,14 +132,14 @@ lexdecode_show(char *attr_name, char *rx, int rx_flags)
       }
       else if ((input_fd = fopen(input_filename, "r")) == NULL) {
         perror(input_filename);
-        exit(1);
+        rcqp_receive_error(1);
       }
 
       while (fgets(s, CL_MAX_LINE_LENGTH, input_fd) != NULL) {
 
         len = strlen(s);
         if (len <= 0) {
-          fprintf(stderr, "%s Warning: read empty string from input file (ignored)\n",
+         Rprintf( "%s Warning: read empty string from input file (ignored)\n",
                   progname);
         }
         else {
@@ -154,7 +154,7 @@ lexdecode_show(char *attr_name, char *rx, int rx_flags)
             i = cl_str2id(attr, s);
 
           if ((i < 0) && (!freq_0_if_unknown))
-              fprintf(stderr, "%s Warning: ``%s'' not found in lexicon (ignored)\n", progname, s);
+             Rprintf( "%s Warning: ``%s'' not found in lexicon (ignored)\n", progname, s);
             else
               lexdecode_print_item_info(attr, i, (input_are_numbers) ? NULL : s);
         }
@@ -182,7 +182,7 @@ lexdecode_show(char *attr_name, char *rx, int rx_flags)
           i = cl_sort2id(attr, k);
           if (cl_errno != CDA_OK) {
             cl_error("(aborting) cl_sort2id() failed");
-            exit(1);
+            rcqp_receive_error(1);
           }
         }
         else {
@@ -203,28 +203,28 @@ lexdecode_show(char *attr_name, char *rx, int rx_flags)
 void
 lexdecode_usage(void)
 {
-  fprintf(stderr, "\n");
-  fprintf(stderr, "Usage:  %s [options] <corpus>\n\n", progname);
-  fprintf(stderr, "Prints the lexicon (or part of it) of a positional attribute on stdout,\n");
-  fprintf(stderr, "optionally with frequency information. The output line format is\n");
-  fprintf(stderr, "  [ <lexicon id> TAB ] [ <frequency> TAB ] [<length> TAB ] <string>\n\n");
-  fprintf(stderr, "Options:\n");
-  fprintf(stderr, "  -P <att>  use p-attribute <att> [default: word]\n");
-  fprintf(stderr, "  -S        only show lexicon and corpus size\n");
-  fprintf(stderr, "  -r <dir>  set registry directory\n");
-  fprintf(stderr, "  -f        show frequency (number of occurrences)\n");
-  fprintf(stderr, "  -n        show internal lexicon ID\n");
-  fprintf(stderr, "  -l        show length of annotation string\n");
-  fprintf(stderr, "  -s        print in (lexically) sorted order\n");
-  fprintf(stderr, "  -p <rx>   show lexicon entries matching regexp <rx> only\n");
-  fprintf(stderr, "  -c        [with -p <rx>] ignore case\n");
-  fprintf(stderr, "  -d        [with -p <rx>] ignore diacritics\n");
-  fprintf(stderr, "  -F <file> lookup strings read from <file> ('-' for stdin)\n");
-  fprintf(stderr, "  -0        [with -F <file>] show non-existing strings with frequency 0\n");
-  fprintf(stderr, "  -N        [with -F <file>] read lexicon IDs from <file>\n");
-  fprintf(stderr, "  -h        this help page\n\n");
-  fprintf(stderr, "Part of the IMS Open Corpus Workbench v" VERSION "\n\n");
-  exit(2);
+ Rprintf( "\n");
+ Rprintf( "Usage:  %s [options] <corpus>\n\n", progname);
+ Rprintf( "Prints the lexicon (or part of it) of a positional attribute on NULL,\n");
+ Rprintf( "optionally with frequency information. The output line format is\n");
+ Rprintf( "  [ <lexicon id> TAB ] [ <frequency> TAB ] [<length> TAB ] <string>\n\n");
+ Rprintf( "Options:\n");
+ Rprintf( "  -P <att>  use p-attribute <att> [default: word]\n");
+ Rprintf( "  -S        only show lexicon and corpus size\n");
+ Rprintf( "  -r <dir>  set registry directory\n");
+ Rprintf( "  -f        show frequency (number of occurrences)\n");
+ Rprintf( "  -n        show internal lexicon ID\n");
+ Rprintf( "  -l        show length of annotation string\n");
+ Rprintf( "  -s        print in (lexically) sorted order\n");
+ Rprintf( "  -p <rx>   show lexicon entries matching regexp <rx> only\n");
+ Rprintf( "  -c        [with -p <rx>] ignore case\n");
+ Rprintf( "  -d        [with -p <rx>] ignore diacritics\n");
+ Rprintf( "  -F <file> lookup strings read from <file> ('-' for stdin)\n");
+ Rprintf( "  -0        [with -F <file>] show non-existing strings with frequency 0\n");
+ Rprintf( "  -N        [with -F <file>] read lexicon IDs from <file>\n");
+ Rprintf( "  -h        this help page\n\n");
+ Rprintf( "Part of the IMS Open Corpus Workbench v" VERSION "\n\n");
+  rcqp_receive_error(2);
 }
 
 
@@ -273,8 +273,8 @@ main(int argc, char **argv) {
       if (registry_directory == NULL)
         registry_directory = optarg;
       else {
-        fprintf(stderr, "%s: -r option used twice\n", progname);
-        exit(2);
+       Rprintf( "%s: -r option used twice\n", progname);
+        rcqp_receive_error(2);
       }
       break;
 
@@ -338,16 +338,16 @@ main(int argc, char **argv) {
     corpus_id = argv[optind++];
 
     if ((corpus = cl_new_corpus(registry_directory, corpus_id)) == NULL) {
-      fprintf(stderr, "%s: Corpus %s not found in registry %s . Aborted.\n",
+     Rprintf( "%s: Corpus %s not found in registry %s . Aborted.\n",
               progname, corpus_id,
               (registry_directory ? registry_directory : central_corpus_directory()));
-      exit(1);
+      rcqp_receive_error(1);
     }
 
     if (optind < argc) {
-      fprintf(stderr, "Too many arguments. Try \"%s -h\" for more information.\n",
+     Rprintf( "Too many arguments. Try \"%s -h\" for more information.\n",
               progname);
-      exit(2);
+      rcqp_receive_error(2);
     }
 
     lexdecode_show(attr_name, rx, rx_flags);
@@ -355,10 +355,10 @@ main(int argc, char **argv) {
     cl_delete_corpus(corpus);
   }
   else {
-    fprintf(stderr, "No corpus specified. Try \"%s -h\" for more information.\n",
+   Rprintf( "No corpus specified. Try \"%s -h\" for more information.\n",
             progname);
-    exit(2);
+    rcqp_receive_error(2);
   }
 
-  exit(0);
+  rcqp_receive_error(0);
 }

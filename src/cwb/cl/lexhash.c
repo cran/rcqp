@@ -260,13 +260,13 @@ cl_lexhash_check_grow(cl_lexhash hash)
   hash->last_performance = ((double) hash->comparisons) / PERFORMANCE_COUNT;
   if (hash->auto_grow && (hash->last_performance > DEFAULT_PERFORMANCE_LIMIT)) {
     if (cl_debug) {
-      fprintf(stderr, "[lexhash autogrow: (perf = %3.1f  @ fill rate = %3.1f (%d/%d)]\n",
+     Rprintf( "[lexhash autogrow: (perf = %3.1f  @ fill rate = %3.1f (%d/%d)]\n",
               hash->last_performance, fill_rate, hash->entries, hash->buckets);
     }
     if (fill_rate < 2.0) {
       /* there are, on average, less than two entries per bucket. */
       if (cl_debug)
-        fprintf(stderr, "[autogrow aborted because of low fill rate]\n");
+       Rprintf( "[autogrow aborted because of low fill rate]\n");
       return 0;
     }
     temp = cl_new_lexhash(hash->entries); /* create new hash with fill rate == 1.0 */
@@ -292,7 +292,7 @@ cl_lexhash_check_grow(cl_lexhash hash)
     cl_free(temp);                      /* we can simply deallocate temp now, having stolen its hash table */
     if (cl_debug) {
       fill_rate = ((double) hash->entries) / hash->buckets;
-      fprintf(stderr, "[grown to %d buckets  @ fill rate = %3.1f (%d/%d)]\n",
+     Rprintf( "[grown to %d buckets  @ fill rate = %3.1f (%d/%d)]\n",
               hash->buckets, fill_rate, hash->entries, hash->buckets);
     }
   }

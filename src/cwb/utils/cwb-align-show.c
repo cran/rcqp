@@ -60,11 +60,11 @@ int COL_SEP = 2;                    /**< column separator (blanks) */
 void
 alignshow_print_help(void)
 {
-  fprintf(stderr, "  RET    show next aligned region\n");
-  fprintf(stderr, "  p <n>  print next <n> regions\n");
-  fprintf(stderr, "  s <n>  skip next <n> regions\n");
-  fprintf(stderr, "  h      this list (help)\n");
-  fprintf(stderr, "  q, x   exit %s\n", progname);
+ Rprintf( "  RET    show next aligned region\n");
+ Rprintf( "  p <n>  print next <n> regions\n");
+ Rprintf( "  s <n>  skip next <n> regions\n");
+ Rprintf( "  h      this list (help)\n");
+ Rprintf( "  q, x   exit %s\n", progname);
 }
 
 /**
@@ -73,21 +73,21 @@ alignshow_print_help(void)
 void
 alignshow_usage(void)
 {
-  fprintf(stderr, "\n");
-  fprintf(stderr, "Usage: %s [options] <alignment file>\n\n", progname);
-  fprintf(stderr, "  -P <p-att> display positional attribute <p-att> [word]\n");
-  fprintf(stderr, "  -r <reg>   use registry directory <reg>\n");
-  fprintf(stderr, "  -w <n>     set display column width to <n>   [%d]\n", COL_WIDTH);
-  fprintf(stderr, "  -s <n>     set column separator width to <n> [%d]\n", COL_SEP);
-  fprintf(stderr, "  -W         use alternative default width settings for wide terminal\n");
-  fprintf(stderr, "  -h         this help page\n\n");
-  fprintf(stderr, "Displays alignment results in terminal. Aligned regions are\n");
-  fprintf(stderr, "displayed side-by-side, one region at a time. The following\n");
-  fprintf(stderr, "interactive commands are available:\n\n");
+ Rprintf( "\n");
+ Rprintf( "Usage: %s [options] <alignment file>\n\n", progname);
+ Rprintf( "  -P <p-att> display positional attribute <p-att> [word]\n");
+ Rprintf( "  -r <reg>   use registry directory <reg>\n");
+ Rprintf( "  -w <n>     set display column width to <n>   [%d]\n", COL_WIDTH);
+ Rprintf( "  -s <n>     set column separator width to <n> [%d]\n", COL_SEP);
+ Rprintf( "  -W         use alternative default width settings for wide terminal\n");
+ Rprintf( "  -h         this help page\n\n");
+ Rprintf( "Displays alignment results in terminal. Aligned regions are\n");
+ Rprintf( "displayed side-by-side, one region at a time. The following\n");
+ Rprintf( "interactive commands are available:\n\n");
   alignshow_print_help();
-  fprintf(stderr, "\n");
-  fprintf(stderr, "Part of the IMS Open Corpus Workbench v" VERSION "\n\n");
-  exit(1);
+ Rprintf( "\n");
+ Rprintf( "Part of the IMS Open Corpus Workbench v" VERSION "\n\n");
+  rcqp_receive_error(1);
 }
 
 
@@ -122,8 +122,8 @@ alignshow_parse_args(int ac, char *av[], int min_args)
       if (registry_dir == NULL)
         registry_dir = optarg;
       else {
-        fprintf(stderr, "%s: -r option used twice\n", progname);
-        exit(2);
+       Rprintf( "%s: -r option used twice\n", progname);
+        rcqp_receive_error(2);
       }
       break;
       /* -w: column width */
@@ -131,9 +131,9 @@ alignshow_parse_args(int ac, char *av[], int min_args)
       if (1 != sscanf(optarg, "%d", &n))
         alignshow_usage();
       if ((n < MIN_COL_WIDTH) || (n > MAX_COL_WIDTH)) {
-        fprintf(stderr, "%s: column width must be in range %d .. %d\n",
+       Rprintf( "%s: column width must be in range %d .. %d\n",
                 progname, MIN_COL_WIDTH, MAX_COL_WIDTH);
-        exit(1);
+        rcqp_receive_error(1);
       }
       else {
         COL_WIDTH = n;
@@ -185,8 +185,8 @@ alignshow_goodbye(int error_level)
     af = NULL;
   }
   if (error_level == 0)
-    printf("Goodbye.\n");
-  exit(error_level);
+   Rprintf("Goodbye.\n");
+  rcqp_receive_error(error_level);
 }
 
 
@@ -197,7 +197,7 @@ alignshow_goodbye(int error_level)
 void
 alignshow_end_of_alignment(void)
 {
-  printf("=========================== END OF ALIGNMENT FILE ============================\n");
+ Rprintf("=========================== END OF ALIGNMENT FILE ============================\n");
   alignshow_goodbye(0);
 }
 
@@ -245,8 +245,8 @@ alignshow_print_next_region(FILE *f)
   if (NULL == fgets(line, CL_MAX_LINE_LENGTH, f))
     alignshow_end_of_alignment();
   if (5 > (args = sscanf(line, "%d %d %d %d %s %d", &f1, &l1, &f2, &l2, type, &quality))) {
-    fprintf(stderr, "%s: format error in line\n\t%s", progname, line);
-    fprintf(stderr, "*** IGNORED ***\n");
+   Rprintf( "%s: format error in line\n\t%s", progname, line);
+   Rprintf( "*** IGNORED ***\n");
     return;
   }
 
@@ -256,9 +256,9 @@ alignshow_print_next_region(FILE *f)
   else
     sprintf(line, "%s-alignment [%d, %d] x [%d, %d] ", type, f1, l1, f2, l2);
   n = (2 * COL_WIDTH + COL_SEP) - strlen(line);
-  printf("%s", line);
-  while ((n--) > 0) printf("=");
-  printf("\n\n");
+ Rprintf("%s", line);
+  while ((n--) > 0)Rprintf("=");
+ Rprintf("\n\n");
 
   i1 = f1; i2 = f2;
   while ((i1 <= l1) || (i2 <= l2)) {
@@ -280,10 +280,10 @@ alignshow_print_next_region(FILE *f)
         w++;
       }
     }
-    printf("%s", col);                /* print left column and fill */
-    while ((w++) < COL_WIDTH) printf(" ");
+   Rprintf("%s", col);                /* print left column and fill */
+    while ((w++) < COL_WIDTH)Rprintf(" ");
 
-    for (n = COL_SEP; n > 0; n--) printf(" "); /* column separator */
+    for (n = COL_SEP; n > 0; n--)Rprintf(" "); /* column separator */
 
     /* fill right column */
     w = 0; col[0] = 0;
@@ -303,9 +303,9 @@ alignshow_print_next_region(FILE *f)
         w++;
       }
     }
-    printf("%s", col);                /* print left column (no need to fill) */
+   Rprintf("%s", col);                /* print left column (no need to fill) */
 
-    printf("\n");
+   Rprintf("\n");
   }
 }
 
@@ -345,8 +345,8 @@ main(int argc, char** argv)
     af = popen(pipe_cmd, "r");
     if (af == NULL) {
       perror(pipe_cmd);
-      fprintf(stderr, "%s: can't read compressed file %s\n", progname, align_name);
-      exit(1);
+     Rprintf( "%s: can't read compressed file %s\n", progname, align_name);
+      rcqp_receive_error(1);
     }
     af_is_pipe = 1;
     cl_free(pipe_cmd);
@@ -355,55 +355,55 @@ main(int argc, char** argv)
     af = fopen(align_name, "r");
     if (af == NULL) {
       perror(align_name);
-      fprintf(stderr, "%s: can't read file %s\n", progname, align_name);
-      exit(1);
+     Rprintf( "%s: can't read file %s\n", progname, align_name);
+      rcqp_receive_error(1);
     }
   }
 
   /* read header = first line */
   fgets(line, CL_MAX_LINE_LENGTH, af);
   if (4 != sscanf(line, "%s %s %s %s", corpus1_name, s1_name, corpus2_name, s2_name)) {
-    fprintf(stderr, "%s: %s not in .align format\n", progname, align_name);
-    fprintf(stderr, "wrong header: %s", line);
+   Rprintf( "%s: %s not in .align format\n", progname, align_name);
+   Rprintf( "wrong header: %s", line);
     alignshow_goodbye(1);
   }
 
   /* open corpus and attributes */
   if (NULL == (corpus1 = cl_new_corpus(registry_dir, corpus1_name))) {
-    fprintf(stderr, "%s: can't open corpus %s\n", progname, corpus1_name);
+   Rprintf( "%s: can't open corpus %s\n", progname, corpus1_name);
     alignshow_goodbye(1);
   }
   if (NULL == (corpus2 = cl_new_corpus(registry_dir, corpus2_name))) {
-    fprintf(stderr, "%s: can't open corpus %s\n", progname, corpus2_name);
+   Rprintf( "%s: can't open corpus %s\n", progname, corpus2_name);
     alignshow_goodbye(1);
   }
   if (NULL == (w1 = cl_new_attribute(corpus1, word_name, ATT_POS))) {
-    fprintf(stderr, "%s: can't open p-attribute %s.%s\n", progname, corpus1_name, word_name);
+   Rprintf( "%s: can't open p-attribute %s.%s\n", progname, corpus1_name, word_name);
     alignshow_goodbye(1);
   }
   if (NULL == (w2 = cl_new_attribute(corpus2, word_name, ATT_POS))) {
-    fprintf(stderr, "%s: can't open p-attribute %s.%s\n", progname, corpus2_name, word_name);
+   Rprintf( "%s: can't open p-attribute %s.%s\n", progname, corpus2_name, word_name);
     alignshow_goodbye(1);
   }
   if (NULL == (s1 = cl_new_attribute(corpus1, s1_name, ATT_STRUC))) {
-    fprintf(stderr, "%s: can't open s-attribute %s.%s\n",
+   Rprintf( "%s: can't open s-attribute %s.%s\n",
             progname, corpus1_name, s1_name);
     alignshow_goodbye(1);
   }
   if (NULL == (s2 = cl_new_attribute(corpus2, s2_name, ATT_STRUC))) {
-    fprintf(stderr, "%s: can't open s-attribute %s.%s\n",
+   Rprintf( "%s: can't open s-attribute %s.%s\n",
             progname, corpus2_name, s2_name);
     alignshow_goodbye(1);
   }
 
-  printf("Displaying alignment for [%s, %s] from file %s\n",
+ Rprintf("Displaying alignment for [%s, %s] from file %s\n",
          corpus1_name, corpus2_name, align_name);
-  printf("Enter 'h' for help.\n");
+ Rprintf("Enter 'h' for help.\n");
 
   /* main loop: read commands from stdin and display alignment */
   while (42) { /* :-) */
     /* command prompt */
-    printf(">> "); fflush(stdout);
+   Rprintf(">> "); rcqp_flush();
     fgets(cmd, CL_MAX_LINE_LENGTH, stdin);
 
     /* "parse" command, i.e. look at first character */
@@ -418,7 +418,7 @@ main(int argc, char** argv)
           n = 1;
         while ((n--) > 0) {
           alignshow_print_next_region(af);
-          if (n > 0) printf("\n");
+          if (n > 0)Rprintf("\n");
         }
         break;
       }
@@ -438,7 +438,7 @@ main(int argc, char** argv)
     case 'q': case 'x':
       alignshow_goodbye(0);
     default:
-      fprintf(stderr, "UNKNOWN COMMAND. Type 'h' for list of commands.\n");
+     Rprintf( "UNKNOWN COMMAND. Type 'h' for list of commands.\n");
     }
 
   }

@@ -5,7 +5,7 @@
 
 void rcqp_receive_error(int x)
 {
-//	error("cqp error #%d\n", cderrno);
+/*	error("cqp error #%d\n", cderrno); */
 	Rprintf("Error! Please close and restart R as rcqp may be in unknown state");
 	
 }

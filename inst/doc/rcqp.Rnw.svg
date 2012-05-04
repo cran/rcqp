@@ -184,40 +184,49 @@ id for a positional attribute\index{attribute!positional} or the first struc for
 <<cqi_session, echo=TRUE>>=
 sort(cqi_list_corpora())[1:6]
 
+#
 # create the subcorpus "Interesting" (it creates the subcorpus internaliy
 # with the given name but does not return any result).
 cqi_query("DICKENS", "Interesting", '"interest.*"');
 
+#
 # in the CQi API, the qualified name of subcorpus is corpus:subcorpus:
 nbr_hit <- cqi_subcorpus_size("DICKENS:Interesting");
 nbr_hit
 
+#
 # The subcorpus as a matrix: one line by hit, 
 # four columns: match, matchend, target, keyword.
 dump <- cqi_dump_subcorpus("DICKENS:Interesting",0,10)
 dump
 
+#
 # get the lemma of the "match" slot of each hit:
 # Word's attributes (such as "lemma", "word", "pos") are always accessed 
 # through qualified name : "corpus.attribute"
 lemma <- cqi_cpos2str("DICKENS.lemma", dump[,1])
 lemma
 
+#
 # You can acheave the same result in one more steps, using id as an 
 # intermediate step: 
 ids <- cqi_cpos2id("DICKENS.lemma", dump[,1]);
 lemma <- cqi_id2str("DICKENS.lemma", ids);
 lemma
 
+#
 # cqi_fdist1 create a frequency list according to one field (match, 
-# matchend...) in a query; cqi_fdist2 a cross tabulated 
+# matchend...) in a query and a properties of tokens (word, lemma, pos...) to
+# be used as modalities; cqi_fdist2 a cross tabulated 
 # frequency table according to two fields in a query
 
 flist <- cqi_fdist1("DICKENS:Interesting", "match", "word")
 flist
 
-# cqi_fdist1 et cqi_fdist2 return numeric matrix : (lemma) id -> freq.
-# use id2str in order to turn the (word) id into its form. 
+#
+# cqi_fdist1 et cqi_fdist2 return numeric matrix : id (in the set of words,
+# lemma, or pos...) -> freq.
+# use id2str in order to turn the id into its actual form. 
 data.frame(cqi_id2str("DICKENS.word", flist[,1]), flist[,2])
 
 @
@@ -563,7 +572,7 @@ particular functions for easily creating quantitative data structures.
 # create a corpus
 c <- corpus("DICKENS")
 # summary give a quick view of the information available in the corpus,
-# it does not display actual information:
+# it does not display content of the corpus:
 summary(c)
 #
 # printing the corpus (by default, first tokens only)
@@ -618,15 +627,17 @@ hist(sentences);
 
 \subsubsection{Accessing attribute}
 
-Attribute\index{attribute} can be accessed very easily by the "\$" and "[[" 
-operator.\index{\$.cqp\_corpus}\index{[[.cqp\_corpus}. The former suppose 
-to type the exact name, the latter allows for using a variable. Here are 
-three identical way of accessing the \texttt{word} attribute.
+Attribute\index{attribute} can be accessed very easily using the "\$" or the
+"[[" operator\index{\$.cqp\_corpus}\index{[[.cqp\_corpus}. Here are
+three identical ways of accessing the \texttt{word} attribute.
 
 <<attr_intro, echo=TRUE>>=
 c <- corpus("DICKENS");
+#
 x <- c$word
+#
 x <- c[["word"]]
+# `[[` allows for using a variable :
 attr <- "word"
 x <- c[[ attr ]]
 @
@@ -685,9 +696,9 @@ summary(c$np_h);
 
 \subsubsection{Creating a subcorpus}
 
-An \texttt{subcorpus} object
-is created with the function \texttt{subcorpus()}. In the CWB 
-terminology, a subcorpus\index{subcorpus} is the set of sequences matched by a query.
+An \texttt{subcorpus} object is created with the function \texttt{subcorpus()}.
+In the CWB terminology, a subcorpus\index{subcorpus} is the set of sequences
+matched by a query.
 
 <<subcorpus_session, echo=TRUE>>=
 c <- corpus("DICKENS");
