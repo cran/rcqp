@@ -1,0 +1,62 @@
+#!/bin/bash
+
+# Important note: this script includes the ${//} operator. You need bash, ksh or zsh to run it, not other variants of sh.
+
+config_file=$(cat config.mk)
+target="include \$(TOP)/config/platform/darwin-universal"
+rep="include \$(TOP)/config/platform/"
+
+uname_output=$(uname -a)
+
+if [[ "$uname_output" == Linux* ]]
+then
+  rep="${rep}linux"
+# don't know how to detect opteron?
+  if [[ "$uname_output" == *x86_64* ]]
+  then
+    rep="${rep}-64"
+  fi
+
+elif [[ "$uname_output" == Darwin* ]]
+then
+  if [[ "$uname_output" == *ppc ]]
+  then
+    echo "*** Mac OS X is no longer supported on PowerPC processors ***"
+    exit
+  else
+    # build core2-optimised universal binaries (i386 + x86_64) by default on recent Mac OS X
+    if [[ -f /opt/local/lib/libglib-2.0.dylib || -f /opt/local/lib/libglib-2.0.a ]]
+    then
+      rep="${rep}darwin-port-universal" # GLib seems to be provided by MacPorts
+    else
+      rep="${rep}darwin-universal" # assume that GLib is provided by HomeBrew or has been compiled by user
+    fi
+  fi
+
+elif [[ "$uname_output" == SunOS* ]]
+then
+  rep="${rep}solaris"
+
+elif [[ "$uname_output" == CYGWIN* ]]
+then
+  rep="${rep}cygwin"
+  # and add switch to cygwin in site as well 
+  # (nb. we may be coming from either standard or beta-install, depending on the version)
+  config_file = ${config_file/"include \$(TOP)/config/site/standard"/"include \$(TOP)/config/site/cygwin"}
+  config_file = ${config_file/"include \$(TOP)/config/site/beta-install"/"include \$(TOP)/config/site/cygwin"}
+
+else
+        # go for generic unix
+        rep="${rep}unix"
+fi
+
+echo "$target => $rep"
+
+config_file=${config_file/"$target"/"$rep"}
+
+rm -f config.mk.bak
+mv config.mk config.mk.bak
+echo "$config_file" > config.mk
+
+
+

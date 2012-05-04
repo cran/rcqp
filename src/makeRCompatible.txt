@@ -1,0 +1,26 @@
+rajouter cl.h dans quelques fichiers
+rajouter stdio.h dans cl.h avant l'appel à makeRCompatible.h
+
+rajouter makeRCompatible.h dans cqp/cqp.h
+
+
+Lignes commentées dans 
+cwb/cqp/cqp.c
+dans initialize_cqp :
+
+  /* let's always run stdout unbuffered */
+  /*  if (batchmode || rangeoutput || insecure || !isatty(fileno(stdout))) */
+  if (setvbuf(stdout, NULL, _IONBF, 0) != 0)
+    perror("unbuffer stdout");
+
+
+
+ svn ci rcqp/src/cwb/editline/vc_editline_config.h -m "win to unix line endings"
+
+dans :
+rcqp/src/cwb/cqp/output.c
+attention à remplacer "Warning" par "Issue" dans la fonction cqpmessage 
+pour éviter que ce soit interprété comme un "Warning" durant la phase "R 
+CMD check"
+
+Rajouter #include <time.h> dans cwb/cqp/cqp.h

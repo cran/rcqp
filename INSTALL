@@ -1,0 +1,154 @@
+Instructions to compile the rcqp package
+
+This document explains how to compile the rcqp extension for R on a Unix like 
+system, including Mac OS X.
+
+
+
+Prerequisites
+=============
+
+Building tools necessary:
+ - GCC 3.3 or newer recommended
+ - the ar and ranlib code archive utilities
+ - GNU make
+ - GNU bison & flex to generate the parsers
+ - the pkg-config program to find the required dependencies
+
+Obviously R must be installed on your system since rcqp is designed to be 
+an R extension and the compiling process needs to read the R headers.
+
+Additionnally two external libraries are necessary to compile the CWB 
+source code:
+ - the PCRE library: at least version 7 is recommended.
+   It is available to download from this address:
+        http://www.pcre.org/
+
+ - the Glib library: at least version 2 is required.
+   It is available to download from this address:
+        http://www.gtk.org/download.html
+
+Follow the instructions coming with these two libraries to compile and 
+install them on your machine if they are not already present.
+On Mac OS X, installing PCRE and Glib can be done using the MacPorts
+system. If MacPorts is installed on your system, you just have to type the
+following commands in a Terminal window in order to download, compile and
+install the PCRE and the Glib libraries :
+	sudo port -v install pcre
+	sudo port -v install glib2
+
+
+
+Download
+========
+
+The source code of the rcqp package is placed in a Subversion repository at
+RForge. In order to retrieve the source files, you need a Subversion
+client. If the command line client is installed on your machine, just type
+the following instruction from a Terminal window :
+    svn checkout svn://scm.r-forge.r-project.org/svnroot/rcwb/pkg/rcqp
+
+
+
+Configuration
+=============
+
+You can specify platform-specific and site-specific settings on the
+./configure command line using the RCQP_PLATFORM and RCQP_SITE variables.
+Their default values are 'linux' and 'standard' respectively. The possible
+values are the names mentionned in the commentys at the top of the the file
+cwb/configRcqp.mk.
+
+For cross-compilation for Windows, you should use mingw
+	./configure RCQP_PLATFORM=mingw
+More details on cross-compilation below.
+
+
+
+Building and installing with R on a Unix-like system
+====================================================
+
+From the directory containing the source code, i-e the directory containing
+the rcqp/ directory, execute the following command:
+	R CMD install rcqp
+
+R will automatically find the configure script, run it, execute the make 
+command and finally install the package in the appropriate location.
+
+If everything went as expected, your rcqp extension should now be 
+available. From the R console, type the following instruction to load it:
+	> library(rcqp)
+
+To get a detailed tutorial about how to use the functions it defines, read
+the vignette coming with the package. For this, you just have to type the
+following from the R console:
+	> vignette("rcqp")
+
+Help is also available through the usual mechanism. For instance, start with:
+	> ?rcqp
+
+
+
+Cross-compilation for Windows
+=============================
+
+The rcqp dynamic library can be compiled for Windows via cross-compilation
+on a Unix-like system. To do this, you need a cross-compiler. For instance,
+in order to cross-compile on a Mac OS X machine, you can use the
+i386-mingw32-gcc compiler which can be installed using MacPorts 
+(http://www.macports.org/). If MacPorts is installed on your machine, the 
+instruction is:
+	sudo port -v install i386-mingw32-gcc
+
+The configuration script needs to know about the following variables:
+	RCQP_CROSS_CC
+	RCQP_CROSS_HOST
+	RCQP_CROSS_ARCH
+
+The easiest way to define them is to create a configuration file named
+'rcqpcrossrc' in the same directory as the configure script itself. This
+file should contain definitions for the variables above. For instance
+	RCQP_CROSS_CC=i386-mingw32-gcc
+	RCQP_CROSS_HOST=i386-mingw32
+	RCQP_CROSS_ARCH=i386
+There is an example file in Extras/Scripts/Shell.
+
+You must also compile the pcre and glib-2.0 libraries using this cross- 
+compiler. Finally you also need to get the R.dll library for Windows used 
+by R. Alternatively you can find prebuilt binaires on the internet, like
+http://ftp.gnome.org/pub/gnome/binaries/win32/glib/2.28/glib-dev_2.28.8-1_win32.zip
+
+These external libraries should be located in some directory on your 
+machine. This directory contains the usual bin, include, lib 
+subdirectories.
+
+You specify the path to this directory in a variable named CROSS_COMPILATION_DIR
+which you can pass on the command line when you run the configure script. 
+
+You must also specify the RCQP_PLATFORM variable and set its value to 
+'mingw' as explained in the 'Configuration' section above..
+
+So a typical configuration command for cross-compilation for Windows is for
+instance:
+
+  ./configure RCQP_PLATFORM=mingwRcqp \
+    CROSS_COMPILATION_DIR=/path/to/external/libs \
+    --host=$RCQP_CROSS_HOST
+
+where you replace /path/to/external/libs by the appropriate path.
+
+After successively running the configure script, change directory to the 
+src/ subdirectory and execute the following instructions
+	make clean
+	make
+
+If everything goes right you should have at the end a rcqp.dll library in the
+CROSS_COMPILATION_DIR subdirectory.
+
+Troubleshooting
+===============
+
+In case of problems, please contact one of the authors of the rcqp project.
+
+
+

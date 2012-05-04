@@ -1,0 +1,1619 @@
+\documentclass{article}
+
+%\VignetteIndexEntry{Introduction to rcqp}
+%\VignetteDepends{reshape}
+\usepackage{lmodern}
+\usepackage{makeidx}
+\usepackage{hyperref}
+
+\makeindex 
+
+\title{Introduction to the rcqp package}
+
+\author{Bernard Desgraupes and Sylvain Loiseau\\<bernard.desgraupes@u-paris10.fr>, <sylvain.loiseau@univ-paris13.fr>}
+
+\date{\today}
+
+\usepackage{Sweave}
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+The \texttt{rcqp} R library is a wrapper on the CWB software.
+The CWB software, used in the field of corpus linguistics,
+lets index and query large annotated corpora. The \texttt{rcqp}
+library includes the CWB code and allows using R to execute
+CWB functions and import their output into statistical analyses.
+\end{abstract}
+
+
+\vspace{5mm}
+\hrule
+\tableofcontents
+\vspace{5mm}
+\hrule
+
+\newpage
+
+\section{Introduction}
+\label{sec:Intro}
+
+The CWB (Corpus Workbench) software\footnote{http://cwb.sourceforge.net/} is a
+set of tools for corpus\index{corpus} linguistics, providing a powerful indexation and query
+engine for annotated corpora. An interactive command line program called CQP
+(\emph{corpus query processor}) is provided, as well as a client/server 
+architecture.
+
+CWB offers access to corpora through manipulation of vectors of positions
+(offsets of the adressed / requested word(s) in the corpus\index{corpus}) which can be turned
+into the corresponding word\index{word} forms, lemmas\index{lemma}, or parts of speech\index{part of speech} if the corpus\index{corpus}
+provides these pieces of information.
+
+In \textbf{rcqp}, CWB is turned into an R library. As a result:
+
+\begin{itemize}
+\item the CWB data structures are mainly vectors, which are very convenient to manipulate in R;
+\item R vectors are wrappers on the inner CWB C arrays, thus providing
+efficient access;
+\item \texttt{rcqp} provides an easy way to run and query CWB, without having 
+to separately compile and
+install the CWB software;
+\item \texttt{rcqp} lets you take advantage of the R statistical capacities for analyzing the complex CWB data.
+\end{itemize}
+
+In \textbf{rcqp}, two different ways of calling CWB are provided:
+
+\begin{itemize}
+\item You can call CWB through the \textbf{cqi\_*} set of functions. These 
+functions implement an interface defined by CWB (CQi). 
+\item You can use a set of functions trying to help producing 
+quantitative structures (frequency lists, cross-tabulated frequency 
+tables) for statistical analyses of CWB corpora with R.
+\end{itemize}
+
+% ----------------------------------------------------------------
+% ----------------------------------------------------------------
+
+\subsection{CWB data-model and CQP syntax}
+
+
+Beside token attributes, called positionnal attribute, CWB corpora may
+have spans of tokens corresponding to various unit: phrases, clauses,
+sentences, paragraph, chapter, book, \ldots Each of these groups of
+span corresponding to an unit are called structural attribute.
+
+A corpus\index{corpus} may be represented as an array where each line represents a token 
+and each column represents an \textbf{attribute}\index{attribute}.
+Here are the first 20 lines of such an array, representing the DICKENS demo 
+corpus, with 38 columns.
+
+\begin{Schunk}
+\begin{Soutput}
+Using registry '/home/sloiseau/corpus/CWB/registry'.
+\end{Soutput}
+\begin{Soutput}
+   file file_name novel novel_title titlepage book book_num chapter chapter_num
+0     0         0     0           0         0   -1       -1      -1          -1
+1     0         0     0           0         0   -1       -1      -1          -1
+2     0         0     0           0         0   -1       -1      -1          -1
+3     0         0     0           0         0   -1       -1      -1          -1
+4     0         0     0           0         0   -1       -1      -1          -1
+5     0         0     0           0         0   -1       -1      -1          -1
+6     0         0     0           0         0   -1       -1      -1          -1
+7     0         0     0           0         0   -1       -1      -1          -1
+8     0         0     0           0         0   -1       -1      -1          -1
+9     0         0     0           0         0   -1       -1      -1          -1
+10    0         0     0           0         0   -1       -1      -1          -1
+11    0         0     0           0         0   -1       -1      -1          -1
+12    0         0     0           0         0   -1       -1      -1          -1
+13    0         0     0           0         0   -1       -1      -1          -1
+14    0         0     0           0         0   -1       -1      -1          -1
+15    0         0     0           0         0   -1       -1      -1          -1
+16    0         0     0           0         0   -1       -1      -1          -1
+17    0         0     0           0         0   -1       -1      -1          -1
+18    0         0     0           0         0   -1       -1      -1          -1
+19    0         0     0           0         0   -1       -1      -1          -1
+20    0         0     0           0         0   -1       -1      -1          -1
+   chapter_title title title_len p p_len s s_len np np1 np2 np_h np_h1 np_h2
+0             -1     0         0 0     0 0     0  0  -1  -1    0    -1    -1
+1             -1     0         0 0     0 0     0  0  -1  -1    0    -1    -1
+2             -1     0         0 0     0 0     0 -1  -1  -1   -1    -1    -1
+3             -1     0         0 1     1 1     1 -1  -1  -1   -1    -1    -1
+4             -1     0         0 1     1 1     1  1  -1  -1    1    -1    -1
+5             -1     0         0 1     1 1     1  1  -1  -1    1    -1    -1
+6             -1    -1        -1 2     2 2     2  2  -1  -1    2    -1    -1
+7             -1    -1        -1 2     2 2     2 -1  -1  -1   -1    -1    -1
+8             -1    -1        -1 2     2 2     2 -1  -1  -1   -1    -1    -1
+9             -1    -1        -1 2     2 2     2 -1  -1  -1   -1    -1    -1
+10            -1    -1        -1 2     2 2     2  3  -1  -1    3    -1    -1
+11            -1    -1        -1 2     2 2     2  3  -1  -1    3    -1    -1
+12            -1    -1        -1 2     2 2     2  3  -1  -1    3    -1    -1
+13            -1    -1        -1 2     2 2     2  3  -1  -1    3    -1    -1
+14            -1    -1        -1 2     2 2     2 -1  -1  -1   -1    -1    -1
+15            -1    -1        -1 2     2 2     2 -1  -1  -1   -1    -1    -1
+16            -1    -1        -1 2     2 2     2 -1  -1  -1   -1    -1    -1
+17            -1    -1        -1 2     2 2     2  4  -1  -1    4    -1    -1
+18            -1    -1        -1 2     2 2     2  4  -1  -1    4    -1    -1
+19            -1    -1        -1 2     2 2     2  4  -1  -1    4    -1    -1
+20            -1    -1        -1 2     2 2     2  4   0  -1    4     0    -1
+   np_len np_len1 np_len2 pp pp1 pp2 pp_h pp_h1 pp_h2 pp_len pp_len1 pp_len2
+0       0      -1      -1 -1  -1  -1   -1    -1    -1     -1      -1      -1
+1       0      -1      -1 -1  -1  -1   -1    -1    -1     -1      -1      -1
+2      -1      -1      -1 -1  -1  -1   -1    -1    -1     -1      -1      -1
+3      -1      -1      -1  0  -1  -1    0    -1    -1      0      -1      -1
+4       1      -1      -1  0  -1  -1    0    -1    -1      0      -1      -1
+5       1      -1      -1  0  -1  -1    0    -1    -1      0      -1      -1
+6       2      -1      -1 -1  -1  -1   -1    -1    -1     -1      -1      -1
+7      -1      -1      -1 -1  -1  -1   -1    -1    -1     -1      -1      -1
+8      -1      -1      -1 -1  -1  -1   -1    -1    -1     -1      -1      -1
+9      -1      -1      -1  1   0  -1    1     0    -1      1       0      -1
+10      3      -1      -1  1   0  -1    1     0    -1      1       0      -1
+11      3      -1      -1  1   0  -1    1     0    -1      1       0      -1
+12      3      -1      -1  1   0  -1    1     0    -1      1       0      -1
+13      3      -1      -1  1   0  -1    1     0    -1      1       0      -1
+14     -1      -1      -1  1  -1  -1    1    -1    -1      1      -1      -1
+15     -1      -1      -1 -1  -1  -1   -1    -1    -1     -1      -1      -1
+16     -1      -1      -1 -1  -1  -1   -1    -1    -1     -1      -1      -1
+17      4      -1      -1 -1  -1  -1   -1    -1    -1     -1      -1      -1
+18      4      -1      -1 -1  -1  -1   -1    -1    -1     -1      -1      -1
+19      4      -1      -1  2  -1  -1    2    -1    -1      2      -1      -1
+20      4       0      -1  2  -1  -1    2    -1    -1      2      -1      -1
+          word pos     lemma               nbc
+0            A  DT         a A Christmas Carol
+1    CHRISTMAS  NP Christmas A Christmas Carol
+2        CAROL  NN     carol A Christmas Carol
+3           by  IN        by A Christmas Carol
+4      Charles  NP   Charles A Christmas Carol
+5      Dickens  NP   Dickens A Christmas Carol
+6            I  PP         I A Christmas Carol
+7         have VBP      have A Christmas Carol
+8  endeavoured VBN endeavour A Christmas Carol
+9           in  IN        in A Christmas Carol
+10        this  DT      this A Christmas Carol
+11     Ghostly  JJ   ghostly A Christmas Carol
+12      little  JJ    little A Christmas Carol
+13        book  NN      book A Christmas Carol
+14           ,   ,         , A Christmas Carol
+15          to  TO        to A Christmas Carol
+16       raise  VB     raise A Christmas Carol
+17         the  DT       the A Christmas Carol
+18       Ghost  NN     ghost A Christmas Carol
+19          of  IN        of A Christmas Carol
+20          an  DT        an A Christmas Carol
+\end{Soutput}
+\end{Schunk}
+
+The first 34 columns represent \textbf{structural attributes}\index{attribute!structural}: this 
+kind of 
+attribute defines spans of tokens (like XML tags surrounding tokens), called \textbf{regions}\index{region}.
+A region is made of the tokens sharing a same value for this attribute.
+A region is always made of consecutive tokens.
+Thus, while the id is the same in a column, the corresponding tokens belong to the same region.
+The id identifying a region is called a \textbf{struc}\index{struc}.
+Since regions are defined thanks to a struc value on tokens, there is no 
+recursivity.
+Tokens between two regions, with respect to a given structural attribute\index{attribute!structural}, have a value of $-1$.
+
+Next there are several columns containing strings. They are the 
+\textbf{positional attributes}\index{attribute!positional}, giving for each word information such as lemma\index{lemma},
+word-form\index{word}, \index{pos} (part of speech\index{part of speech}),... Each positional attribute\index{attribute!positional} has a list of 
+\textbf{ids}\index{id}, which are  unique
+numerical codes for the different possible string forms.
+
+Moreover, certain structural attributes\index{attribute!structural} have a string value associated 
+with each \emph{struc}\index{struc} (region\index{region}). While each struc is unique to a region, string 
+values can be repeated over several regions. For instance, the np\_h structural
+ attribute, giving the head of the noun phrase, holds a string value.
+
+In short, in CQi function names, the following types of data are used:
+\begin{description}
+\item [cpos]\index{cpos} a position, or rank, identifying a unique token in the 
+corpus\index{corpus};
+\item [id]\index{id} an id for a form (type) in the lexicon of a positional attribute\index{attribute!positional} 
+lexicon;
+\item [str]\index{str} the string corresponding to an id in the lexicon of a positional 
+attribute lexicon\index{lexicon};
+\item [struc]\index{struc} the id of a region in a given structural attribute\index{attribute!structural}.
+\end{description}
+
+A subcorpus\index{subcorpus} is created thanks to the \texttt{cqi\_query}\index{cqi\_query} function. See 
+\textit{CQP Query Language Tutorial}, Stefan Evert \& The OCWB 
+Development Team, 17 February 2010, for a complete specification of the CQP query 
+language.
+
+A subcorpus\index{subcorpus} is a collection of sequences of tokens matched by a query and
+identified by their \emph{cpos}\index{cpos}. Since a query may match a sequence of tokens, a
+subcorpus is a collection of \emph{(match, matchend)} pairs, where \textbf{match}\index{match}
+is the cpos of 
+the first token and \textbf{matchend}\index{matchend} the cpos of the last token in the
+sequence matched.
+When only one token is addressed by a query, matchend is identical to match.
+
+The \textbf{match}\index{match} and \textbf{matchend}\index{matchend} positions (together with two other optional pieces of 
+information named \textbf{target}\index{target} and \textbf{keyword}\index{keyword}) are referred to as the
+\textbf{anchors}\index{anchor} (or sometime 
+\textbf{fields}\index{field}: see cqi\_fdist1 et cqi\_fdist2) 
+available on each hit.
+
+All indices are 0-based: the cpos of the first token is 0, the first 
+id for a positional attribute\index{attribute!positional} or the first struc for a structural attribute\index{attribute!structural} is 0, etc.
+
+
+% ----------------------------------------------------------------
+% ----------------------------------------------------------------
+
+
+\section{The CQi set of functions}
+\label{sec:cqi}
+
+\subsection{A sample session}
+
+\begin{Schunk}
+\begin{Sinput}
+> sort(cqi_list_corpora())[1:6]
+\end{Sinput}
+\begin{Soutput}
+[1] "CFR_FR"             "CFR_RU"             "CHRONIQUES_LATINES"
+[4] "CORPUS_ES"          "DEFINITION"         "DESCARTES_CORRESP" 
+\end{Soutput}
+\begin{Sinput}
+> # create the subcorpus "Interesting" (it creates the subcorpus internaliy
+> # with the given name but does not return any result).
+> cqi_query("DICKENS", "Interesting", '"interest.*"');
+> # in the CQi API, the qualified name of subcorpus is corpus:subcorpus:
+> nbr_hit <- cqi_subcorpus_size("DICKENS:Interesting");
+> nbr_hit
+\end{Sinput}
+\begin{Soutput}
+[1] 888
+\end{Soutput}
+\begin{Sinput}
+> # The subcorpus as a matrix: one line by hit, 
+> # four columns: match, matchend, target, keyword.
+> dump <- cqi_dump_subcorpus("DICKENS:Interesting",0,10)
+> dump
+\end{Sinput}
+\begin{Soutput}
+       [,1]  [,2] [,3] [,4]
+ [1,] 15921 15921   -1   -1
+ [2,] 17747 17747   -1   -1
+ [3,] 20189 20189   -1   -1
+ [4,] 24026 24026   -1   -1
+ [5,] 35161 35161   -1   -1
+ [6,] 35490 35490   -1   -1
+ [7,] 35903 35903   -1   -1
+ [8,] 43031 43031   -1   -1
+ [9,] 58109 58109   -1   -1
+[10,] 63109 63109   -1   -1
+[11,] 79532 79532   -1   -1
+\end{Soutput}
+\begin{Sinput}
+> # get the lemma of the "match" slot of each hit:
+> # Word's attributes (such as "lemma", "word", "pos") are always accessed 
+> # through qualified name : "corpus.attribute"
+> lemma <- cqi_cpos2str("DICKENS.lemma", dump[,1])
+> lemma
+\end{Sinput}
+\begin{Soutput}
+ [1] "interesting" "interest"    "interest"    "interest"    "interest"   
+ [6] "interest"    "interest"    "interested"  "interest"    "interest"   
+[11] "interest"   
+\end{Soutput}
+\begin{Sinput}
+> # You can acheave the same result in one more steps, using id as an 
+> # intermediate step: 
+> ids <- cqi_cpos2id("DICKENS.lemma", dump[,1]);
+> lemma <- cqi_id2str("DICKENS.lemma", ids);
+> lemma
+\end{Sinput}
+\begin{Soutput}
+ [1] "interesting" "interest"    "interest"    "interest"    "interest"   
+ [6] "interest"    "interest"    "interested"  "interest"    "interest"   
+[11] "interest"   
+\end{Soutput}
+\begin{Sinput}
+> # cqi_fdist1 create a frequency list according to one field (match, 
+> # matchend...) in a query; cqi_fdist2 a cross tabulated 
+> # frequency table according to two fields in a query
+> 
+> flist <- cqi_fdist1("DICKENS:Interesting", "match", "word")
+> flist
+\end{Sinput}
+\begin{Soutput}
+      [,1] [,2]
+[1,]  3221  566
+[2,]  2892  160
+[3,]  5300  125
+[4,] 12056   30
+[5,] 55879    3
+[6,] 43452    2
+[7,] 39795    1
+[8,] 37414    1
+\end{Soutput}
+\begin{Sinput}
+> # cqi_fdist1 et cqi_fdist2 return numeric matrix : (lemma) id -> freq.
+> # use id2str in order to turn the (word) id into its form. 
+> data.frame(cqi_id2str("DICKENS.word", flist[,1]), flist[,2])
+\end{Sinput}
+\begin{Soutput}
+  cqi_id2str..DICKENS.word...flist...1.. flist...2.
+1                               interest        566
+2                            interesting        160
+3                             interested        125
+4                              interests         30
+5                             interestin          3
+6                          interestingly          2
+7                             interest--          1
+8                           interest--or          1
+\end{Soutput}
+\end{Schunk}
+
+\subsection{Functions}
+\label{sec:cqi-functions}
+
+For more information about the actual use of these functions, see
+their respective help pages.
+
+All functions are prefixed with \textbf{cqi\_}.
+
+\paragraph{cqi\_list\_corpora}
+\index{cqi\_list\_corpora}
+
+List all the corpora available in the registry.
+
+\begin{Schunk}
+\begin{Sinput}
+> corpora <- cqi_list_corpora()
+> corpora[1:5]
+\end{Sinput}
+\begin{Soutput}
+[1] "ICHTYA_FR"         "ICHTYA_LAT"        "LITTRE_DEFINITION"
+[4] "TOUTMONTESQUIEU"   "DICKENS"          
+\end{Soutput}
+\end{Schunk}
+
+\paragraph{cqi\_full\_name}
+\index{cqi\_full\_name}
+
+Return the full name of a corpus\index{corpus}.
+
+\paragraph{cqi\_corpus\_info}
+\index{cqi\_corpus\_info}
+
+Return various informations about a corpus\index{corpus}.
+
+\paragraph{cqi\_query}
+\index{cqi\_query}
+
+Create a subcorpus\index{subcorpus}. A subcorpus is a list of hits. 
+Each hit contains four fields : \textbf{match} (the cpos\index{cpos} of the first token of the 
+matched sequence), \textbf{matchend} (the cpos of the last token of the matched 
+sequence, identical with match\index{match} if the sequence is one token long), and 
+two optionnal values (see CQP documentation), \textbf{target}\index{target} and 
+\textbf{keyword}\index{keyword}.
+
+\begin{Schunk}
+\begin{Sinput}
+> corpora <- cqi_list_corpora()
+> cqi_query("DICKENS", "Subcorpus", '"interesting"');
+\end{Sinput}
+\end{Schunk}
+
+The \texttt{cqi\_query}\index{cqi\_query} does not return any value; it creates the
+subcorpus\index{subcorpus} as an object internally. Use \texttt{cqi\_dump\_subcorpus}\index{cqi\_dump\_subcorpus}
+for retrieving the subcorpus contents. The subcorpus name must begin
+with a capital letter.
+
+\paragraph{cqi\_list\_subcorpora}
+\index{cqi\_list\_subcorpora}
+
+List the created subcorpora.
+
+\paragraph{cqi\_drop\_subcorpus}
+\index{cqi\_drop\_subcorpus}
+
+Delete a subcorpus\index{subcorpus}.
+
+\paragraph{cqi\_dump\_subcorpus}
+\index{cqi\_dump\_subcorpus}
+
+Retrieve the subcorpus\index{subcorpus} created by a call to the \texttt{cqi\_query}\index{cqi\_query} function as a 
+four-column matrix: one row by hit, and one column for each of the four 
+fields (see \texttt{cqi\_query}).
+
+\begin{Schunk}
+\begin{Sinput}
+> cqi_query("DICKENS", "Subcorpus", '"interesting"');
+> x <- cqi_dump_subcorpus("DICKENS:Subcorpus");
+> x[1:10,];
+\end{Sinput}
+\begin{Soutput}
+        [,1]   [,2] [,3] [,4]
+ [1,]  15921  15921   -1   -1
+ [2,] 131848 131848   -1   -1
+ [3,] 176031 176031   -1   -1
+ [4,] 248048 248048   -1   -1
+ [5,] 248883 248883   -1   -1
+ [6,] 270757 270757   -1   -1
+ [7,] 470828 470828   -1   -1
+ [8,] 514381 514381   -1   -1
+ [9,] 514394 514394   -1   -1
+[10,] 519640 519640   -1   -1
+\end{Soutput}
+\end{Schunk}
+
+\paragraph{cqi\_subcorpus\_size}
+\index{cqi\_subcorpus\_size}
+
+Return the number of hits in a subcorpus\index{subcorpus}. This is the same as the number 
+of rows returned by \texttt{cqi\_dump\_subcorpus}\index{cqi\_dump\_subcorpus}.
+
+\paragraph{cqi\_attributes}
+\index{cqi\_attributes}
+
+Get the list of attributes\index{attribute} (positional, structural, or aligned) in a 
+corpus\index{corpus}.
+
+\begin{Schunk}
+\begin{Sinput}
+> positional_attributes <- cqi_attributes("DICKENS", "p");
+> positional_attributes
+\end{Sinput}
+\begin{Soutput}
+[1] "word"  "pos"   "lemma" "nbc"  
+\end{Soutput}
+\begin{Sinput}
+> structural_attributes <- cqi_attributes("DICKENS", "s");
+> structural_attributes
+\end{Sinput}
+\begin{Soutput}
+ [1] "file"          "file_name"     "novel"         "novel_title"  
+ [5] "titlepage"     "book"          "book_num"      "chapter"      
+ [9] "chapter_num"   "chapter_title" "title"         "title_len"    
+[13] "p"             "p_len"         "s"             "s_len"        
+[17] "np"            "np1"           "np2"           "np_h"         
+[21] "np_h1"         "np_h2"         "np_len"        "np_len1"      
+[25] "np_len2"       "pp"            "pp1"           "pp2"          
+[29] "pp_h"          "pp_h1"         "pp_h2"         "pp_len"       
+[33] "pp_len1"       "pp_len2"      
+\end{Soutput}
+\end{Schunk}
+
+\paragraph{cqi\_lexicon\_size}
+\index{cqi\_lexicon\_size}
+
+Number of forms in a positional attribute\index{attribute!positional}. Attributes are 
+denoted using their \emph{qualified name}, of the form 
+\verb|corpus:attribute|.
+
+\begin{Schunk}
+\begin{Sinput}
+> lexicon_size <- cqi_lexicon_size("DICKENS:word");
+> lexicon_size
+\end{Sinput}
+\begin{Soutput}
+NULL
+\end{Soutput}
+\end{Schunk}
+
+The greatest id of an attribute is lexicon\_size $ - 1 $.
+
+\paragraph{cqi\_structural\_attribute\_has\_values}
+\index{cqi\_structural\_attribute\_has\_values}
+
+Ask if a structural attribute\index{attribute!structural} has a string value associated with its 
+region\index{region}. For retrieving the actual string value associated with a region id 
+(a struc\index{struc}), see \texttt{cqi\_struc2str}\index{cqi\_struc2str}.
+
+\begin{Schunk}
+\begin{Sinput}
+> has_values <- cqi_structural_attribute_has_values("DICKENS.np_h");
+> has_values
+\end{Sinput}
+\begin{Soutput}
+[1] TRUE
+\end{Soutput}
+\end{Schunk}
+
+\paragraph{cqi\_attribute\_size}
+\index{cqi\_attribute\_size}
+
+Return the number of actual elements (number of occurrences).
+
+\begin{itemize}
+\item on a positional attribute\index{attribute!positional}, it gives the number of tokens.
+\item on a structural attribute\index{attribute!structural}, it gives the number of regions.
+\item on an alignment attribute\index{attribute!alignment}, it gives the number of aligned pairs.
+\end{itemize}
+
+\paragraph{cqi\_cpos2id}
+\index{cqi\_cpos2id}
+
+Convert from a token cpos\index{cpos} to the corresponding id\index{id} in a given positional attribute\index{attribute!positional}.
+
+\begin{Schunk}
+\begin{Sinput}
+> id <- cqi_cpos2id("DICKENS.word", 0:20);
+> id
+\end{Sinput}
+\begin{Soutput}
+ [1]  0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20
+\end{Soutput}
+\end{Schunk}
+
+\paragraph{cqi\_str2id}
+\index{cqi\_str2id}
+
+Get the id\index{id} corresponding to the specified string in the lexicon\index{lexicon} of a given positional attribute\index{attribute!positional}.
+
+\begin{Schunk}
+\begin{Sinput}
+> id <- cqi_str2id("DICKENS.word", "interesting");
+> id
+\end{Sinput}
+\begin{Soutput}
+[1] 2892
+\end{Soutput}
+\end{Schunk}
+
+\paragraph{cqi\_id2cpos}
+\index{cqi\_id2cpos}
+
+Return all the tokens (cpos\index{cpos}) corresponding to the specified id\index{id} of a 
+certain positional attribute\index{attribute!positional}.
+
+\begin{Schunk}
+\begin{Sinput}
+> id <- cqi_str2id("DICKENS.word", "interesting");
+> cpos <- cqi_id2cpos("DICKENS.word", id);
+> cpos[1:10]
+\end{Sinput}
+\begin{Soutput}
+ [1]  15921 131848 176031 248048 248883 270757 470828 514381 514394 519640
+\end{Soutput}
+\begin{Sinput}
+> length(cpos);
+\end{Sinput}
+\begin{Soutput}
+[1] 160
+\end{Soutput}
+\end{Schunk}
+
+\paragraph{cqi\_id2freq}
+\index{cqi\_id2freq}
+
+Return the number of tokens corresponding to the specified id\index{id} of a 
+certain positional attribute\index{attribute!positional}.
+
+\begin{Schunk}
+\begin{Sinput}
+> id <- cqi_str2id("DICKENS.word", "interesting");
+> freq <- cqi_id2freq("DICKENS.word", id);
+> freq
+\end{Sinput}
+\begin{Soutput}
+[1] 160
+\end{Soutput}
+\end{Schunk}
+
+\paragraph{cqi\_id2str}
+\index{cqi\_id2str}
+
+Return the string corresponding to the specified id of a 
+certain positional attribute\index{attribute!positional}.
+
+\begin{Schunk}
+\begin{Sinput}
+> id <- cqi_str2id("DICKENS.word", "interesting");
+> str <- cqi_id2str("DICKENS.word", id);
+> str
+\end{Sinput}
+\begin{Soutput}
+[1] "interesting"
+\end{Soutput}
+\end{Schunk}
+
+\paragraph{cqi\_cpos2str}
+\index{cqi\_cpos2str}
+
+Return the string of a given positional attribute\index{attribute!positional} corresponding to a given id\index{id}. 
+This is identical to using \texttt{cqi\_cpos2id}\index{cqi\_cpos2id} then \texttt{cqi\_id2str}\index{cqi\_id2str}.
+
+\begin{Schunk}
+\begin{Sinput}
+> str <- cqi_cpos2str("DICKENS.word", 1:10);
+> str
+\end{Sinput}
+\begin{Soutput}
+ [1] "CHRISTMAS"   "CAROL"       "by"          "Charles"     "Dickens"    
+ [6] "I"           "have"        "endeavoured" "in"          "this"       
+\end{Soutput}
+\end{Schunk}
+
+\paragraph{cqi\_regex2id}
+\index{cqi\_regex2id}
+
+Get the id\index{id} corresponding to the string of a positional attribute\index{attribute!positional} matched by a 
+given regex.
+
+\begin{Schunk}
+\begin{Sinput}
+> id <- cqi_regex2id("DICKENS.word", '"Interest.*"');
+> id
+\end{Sinput}
+\begin{Soutput}
+integer(0)
+\end{Soutput}
+\end{Schunk}
+
+\paragraph{cqi\_cpos2struc}
+\index{cqi\_cpos2struc}
+
+Get the region\index{region} id (the struc\index{struc}, of a given structural attribute\index{attribute!structural}) to which 
+a given token belongs. Below, we are in the sentence with struc 53, then 54.
+
+\begin{Schunk}
+\begin{Sinput}
+> struc <- cqi_cpos2struc("DICKENS.s", 1010:1020);
+> struc
+\end{Sinput}
+\begin{Soutput}
+ [1] 53 53 53 53 53 53 54 54 54 54 54
+\end{Soutput}
+\end{Schunk}
+
+If the token is outside any region\index{region} in the given structural attribute\index{attribute!structural}, -1 
+is returned.
+
+\begin{Schunk}
+\begin{Sinput}
+> # In this sequence, tokens are not in nominal phrases.
+> cqi_cpos2struc("DICKENS.np", 1000:1010)
+\end{Sinput}
+\begin{Soutput}
+ [1] -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+\end{Soutput}
+\end{Schunk}
+
+\paragraph{cqi\_struc2cpos}
+\index{cqi\_struc2cpos}
+
+Get the first and last cpos\index{cpos} (tokens) belonging to a struc\index{struc} (a region\index{region} id) of a given 
+structural attribute\index{attribute!structural}. The second argument is a vector of length 1, the 
+returned value a vector of length 2.
+
+\begin{Schunk}
+\begin{Sinput}
+> cpos <- cqi_struc2cpos("DICKENS.np_h", 10);
+> cpos
+\end{Sinput}
+\begin{Soutput}
+[1] 50 51
+\end{Soutput}
+\end{Schunk}
+
+\paragraph{cqi\_struc2str}
+\index{cqi\_struc2str}
+
+Get the string mapped to a region id (a struc\index{struc}) of a given structural 
+attribute; available only for structural attributes\index{attribute!structural} having values.
+
+\begin{Schunk}
+\begin{Sinput}
+> str <- cqi_struc2str("DICKENS.np_h", 10);
+> str
+\end{Sinput}
+\begin{Soutput}
+[1] "house"
+\end{Soutput}
+\end{Schunk}
+
+\paragraph{cqi\_cpos2lbound}
+\index{cqi\_cpos2lbound}
+
+Given a token, return the left-most token belonging to the same 
+region\index{region} in the given structural attribute\index{attribute!structural}.
+
+This is implemented as a simple shortcut for functions \texttt{cqi\_cpos2struc}\index{cqi\_cpos2struc} and
+\texttt{cqi\_struc2cpos[1]}\index{cqi\_struc2cpos[1]}.
+
+\begin{Schunk}
+\begin{Sinput}
+> str <- cqi_cpos2lbound("DICKENS.np_h", 10);
+> str
+\end{Sinput}
+\begin{Soutput}
+[1] 10
+\end{Soutput}
+\end{Schunk}
+
+\paragraph{cqi\_cpos2rbound}
+\index{cqi\_cpos2rbound}
+
+Given a token, return the right-most token belonging to the same 
+region\index{region} in the given structural attribute\index{attribute!structural}.
+
+This is implemented as a simple shortcut for functions \texttt{cqi\_cpos2struc}\index{cqi\_cpos2struc} and 
+\texttt{cqi\_struc2cpos(...)[2]}\index{cqi\_struc2cpos}.
+
+\begin{Schunk}
+\begin{Sinput}
+> str <- cqi_cpos2rbound("DICKENS.np_h", 10);
+> str
+\end{Sinput}
+\begin{Soutput}
+[1] 13
+\end{Soutput}
+\end{Schunk}
+
+\paragraph{cqi\_alg2cpos}
+\index{cqi\_alg2cpos}
+
+Convert from an id\index{id} denoting a region\index{region} of an alignment attribute\index{attribute!alignment} to cpos\index{cpos} of tokens contained into this 
+region in the aligned corpora.
+
+Suppose that two parallel corpora \textbf{VIE\_FR} and \textbf{VIE\_RU} have 
+been encoded using \textbf{tu\_id} as the 
+attribute containing aligned chunks of text. The alignment attribute\index{attribute!alignment} 
+is named \textbf{vie\_fr} in the corpus\index{corpus} \textbf{VIE\_RU} and \textbf{vie\_ru} 
+in the corpus \textbf{VIE\_FR}.
+
+For region 5 of the \textbf{tu\_id} attribute in \textbf{VIE\_RU}, the 
+corresponding cpos\index{cpos} in corpus \textbf{VIE\_RU} are obtained with:
+
+\begin{verbatim}
+> cpos <- cqi_alg2cpos("VIE_RU.vie_fr", 5)
+> cpos
+[1]  89 132 110 166
+> str <- cqi_cpos2str("VIE_FR.word", cpos)
+[1] "comme"  "dont"   "Jeanne" "."
+\end{verbatim}
+
+\paragraph{cqi\_cpos2alg}
+\index{cqi\_cpos2alg}
+
+Convert from a token in corpus\index{corpus} A to the corresponding
+region\index{region} of an alignment attribute\index{attribute!alignment} in an aligned corpus B.
+
+\paragraph{cqi\_fdist1}
+\index{cqi\_fdist1}
+
+Get a frequency list\index{frequency!list} of the strings of a given positional attribute\index{attribute!positional} in a 
+subcorpus\index{subcorpus}.
+
+In the following example, get all part-of-speech tags :
+
+\begin{Schunk}
+\begin{Sinput}
+> cqi_query("DICKENS", "Noun", '[pos="N.*"]')
+> fdist <- cqi_fdist1("DICKENS:Noun", "match", "pos")
+> cqi_id2str("DICKENS.pos", fdist[,1])
+\end{Sinput}
+\begin{Soutput}
+[1] "NN"  "NP"  "NNS" "NPS"
+\end{Soutput}
+\begin{Sinput}
+> fdist[,2]
+\end{Sinput}
+\begin{Soutput}
+[1] 396069 131638  89577    448
+\end{Soutput}
+\end{Schunk}
+
+\paragraph{cqi\_fdist2}
+\index{cqi\_fdist2}
+
+Get a cross-tabulated table of the string values of a given positional
+attribute in a subcorpus \index{subcorpus} against the string values of
+another positional attribute.
+
+
+\section{Integrating CQP into R S3 objects and quantitative structures}
+
+A set of high-level functions is aimed at making easier the use of cqp 
+with R and more self-explanatory the data model of CWB. It provides in 
+particular functions for easily creating quantitative data structures.
+
+\subsection{A sample session}
+\label{sec:rcqp-session}
+
+\begin{Schunk}
+\begin{Sinput}
+> # create a corpus
+> c <- corpus("DICKENS")
+> # summary give a quick view of the information available in the corpus,
+> # it does not display actual information:
+> summary(c)
+\end{Sinput}
+\begin{Soutput}
+DICKENS 
+Number or tokens in the corpus: 3407085 
+Positional attributes (4)
+positional : DICKENS.lemma (41222 types; 3407085 tokens)
+		 "a", "Christmas", "carol", "by", "Charles", "Dickens", "I", "have", "endeavour", "in", ... 
+positional : DICKENS.nbc (726 types; 3407085 tokens)
+		 "A Christmas Carol", "A Christmas Carol, Ch. 1", ... 
+positional : DICKENS.pos (43 types; 3407085 tokens)
+		 "DT", "NP", "NN", "IN", "PP", "VBP", "VBN", "JJ", ",", "TO", ... 
+positional : DICKENS.word (57568 types; 3407085 tokens)
+		 "A", "CHRISTMAS", "CAROL", "by", "Charles", "Dickens", "I", "have", "endeavoured", "in", ... 
+Structural attributes (34)
+structural : DICKENS.book (17 regions)
+structural : DICKENS.book_num (7 types; 17 regions)
+		 "1", "2", "3", "1", "2", "3", "4". 
+structural : DICKENS.chapter (696 regions)
+structural : DICKENS.chapter_num (73 types; 696 regions)
+		 "1", "2", "3", "4", "5", "1", "2", "3", "4", "5", ... 
+structural : DICKENS.chapter_title (559 types; 696 regions)
+		 "Marley's Ghost", "The First of the Three Spirits", ... 
+structural : DICKENS.file (14 regions)
+structural : DICKENS.file_name (14 types; 14 regions)
+		 "Source/Dickens:ChristmasCarol.txt.gz", "Source/Dickens:DavidCopperfield.txt.gz", ... 
+structural : DICKENS.novel (14 regions)
+structural : DICKENS.novel_title (14 types; 14 regions)
+		 "A Christmas Carol", "David Copperfield", "Dombey and Son", ... 
+structural : DICKENS.np (419363 regions)
+structural : DICKENS.np1 (90915 regions)
+structural : DICKENS.np2 (25640 regions)
+structural : DICKENS.np_h (10713 types; 419363 regions)
+		 "CHRISTMAS", "Dickens", "I", "book", "ghost", "other", "season", "me", "May", "it", ... 
+structural : DICKENS.np_h1 (7248 types; 90915 regions)
+		 "idea", "burial", "clerk", "undertaker", "mourner", "myself", "ironmongery", ... 
+structural : DICKENS.np_h2 (4298 types; 25640 regions)
+		 "reader", "humour", "trade", "nose", "cheek", "such", "place", "path", "sympathy", ... 
+structural : DICKENS.np_len (39 types; 419363 regions)
+		 "2", "2", "1", "4", "18", "2", "2", "1", "1", "1", ... 
+structural : DICKENS.np_len1 (33 types; 90915 regions)
+		 "15", "2", "2", "2", "3", "1", "4", "2", "1", "4", ... 
+structural : DICKENS.np_len2 (27 types; 25640 regions)
+		 "2", "3", "2", "3", "2", "1", "6", "5", "3", "2", ... 
+structural : DICKENS.p (61177 regions)
+structural : DICKENS.p_len (523 types; 61177 regions)
+		 "3", "3", "56", "12", "6", "62", "9", "94", "218", "63", ... 
+structural : DICKENS.pp (116608 regions)
+structural : DICKENS.pp1 (38889 regions)
+structural : DICKENS.pp2 (9000 regions)
+structural : DICKENS.pp_h (91 types; 116608 regions)
+		 "by", "in", "of", "with", "about", "of", "by", "of", "about", "of", ... 
+structural : DICKENS.pp_h1 (76 types; 38889 regions)
+		 "in", "of", "with", "with", "with", "of", "in", "on", "on", "on", ... 
+structural : DICKENS.pp_h2 (64 types; 9000 regions)
+		 "with", "of", "on", "with", "in", "of", "in", "of", "in", "from", ... 
+structural : DICKENS.pp_len (35 types; 116608 regions)
+		 "3", "6", "16", "11", "2", "3", "3", "6", "3", "5", ... 
+structural : DICKENS.pp_len1 (30 types; 38889 regions)
+		 "5", "4", "3", "3", "2", "4", "3", "7", "4", "8", ... 
+structural : DICKENS.pp_len2 (26 types; 9000 regions)
+		 "2", "3", "3", "3", "8", "3", "7", "5", "2", "3", ... 
+structural : DICKENS.s (152455 regions)
+structural : DICKENS.s_len (224 types; 152455 regions)
+		 "3", "3", "41", "15", "12", "6", "8", "8", "22", "4", ... 
+structural : DICKENS.title (733 regions)
+structural : DICKENS.title_len (48 types; 733 regions)
+		 "6", "6", "9", "9", "8", "7", "5", "5", "4", "6", ... 
+structural : DICKENS.titlepage (14 regions)
+Alignement attributes (0)
+\end{Soutput}
+\begin{Sinput}
+> #
+> # printing the corpus (by default, first tokens only)
+> c
+\end{Sinput}
+\begin{Soutput}
+   file file_name novel novel_title titlepage book book_num chapter chapter_num
+0     0         0     0           0         0   -1       -1      -1          -1
+1     0         0     0           0         0   -1       -1      -1          -1
+2     0         0     0           0         0   -1       -1      -1          -1
+3     0         0     0           0         0   -1       -1      -1          -1
+4     0         0     0           0         0   -1       -1      -1          -1
+5     0         0     0           0         0   -1       -1      -1          -1
+6     0         0     0           0         0   -1       -1      -1          -1
+7     0         0     0           0         0   -1       -1      -1          -1
+8     0         0     0           0         0   -1       -1      -1          -1
+9     0         0     0           0         0   -1       -1      -1          -1
+10    0         0     0           0         0   -1       -1      -1          -1
+11    0         0     0           0         0   -1       -1      -1          -1
+12    0         0     0           0         0   -1       -1      -1          -1
+13    0         0     0           0         0   -1       -1      -1          -1
+14    0         0     0           0         0   -1       -1      -1          -1
+15    0         0     0           0         0   -1       -1      -1          -1
+16    0         0     0           0         0   -1       -1      -1          -1
+17    0         0     0           0         0   -1       -1      -1          -1
+18    0         0     0           0         0   -1       -1      -1          -1
+19    0         0     0           0         0   -1       -1      -1          -1
+20    0         0     0           0         0   -1       -1      -1          -1
+   chapter_title title title_len p p_len s s_len np np1 np2 np_h np_h1 np_h2
+0             -1     0         0 0     0 0     0  0  -1  -1    0    -1    -1
+1             -1     0         0 0     0 0     0  0  -1  -1    0    -1    -1
+2             -1     0         0 0     0 0     0 -1  -1  -1   -1    -1    -1
+3             -1     0         0 1     1 1     1 -1  -1  -1   -1    -1    -1
+4             -1     0         0 1     1 1     1  1  -1  -1    1    -1    -1
+5             -1     0         0 1     1 1     1  1  -1  -1    1    -1    -1
+6             -1    -1        -1 2     2 2     2  2  -1  -1    2    -1    -1
+7             -1    -1        -1 2     2 2     2 -1  -1  -1   -1    -1    -1
+8             -1    -1        -1 2     2 2     2 -1  -1  -1   -1    -1    -1
+9             -1    -1        -1 2     2 2     2 -1  -1  -1   -1    -1    -1
+10            -1    -1        -1 2     2 2     2  3  -1  -1    3    -1    -1
+11            -1    -1        -1 2     2 2     2  3  -1  -1    3    -1    -1
+12            -1    -1        -1 2     2 2     2  3  -1  -1    3    -1    -1
+13            -1    -1        -1 2     2 2     2  3  -1  -1    3    -1    -1
+14            -1    -1        -1 2     2 2     2 -1  -1  -1   -1    -1    -1
+15            -1    -1        -1 2     2 2     2 -1  -1  -1   -1    -1    -1
+16            -1    -1        -1 2     2 2     2 -1  -1  -1   -1    -1    -1
+17            -1    -1        -1 2     2 2     2  4  -1  -1    4    -1    -1
+18            -1    -1        -1 2     2 2     2  4  -1  -1    4    -1    -1
+19            -1    -1        -1 2     2 2     2  4  -1  -1    4    -1    -1
+20            -1    -1        -1 2     2 2     2  4   0  -1    4     0    -1
+   np_len np_len1 np_len2 pp pp1 pp2 pp_h pp_h1 pp_h2 pp_len pp_len1 pp_len2
+0       0      -1      -1 -1  -1  -1   -1    -1    -1     -1      -1      -1
+1       0      -1      -1 -1  -1  -1   -1    -1    -1     -1      -1      -1
+2      -1      -1      -1 -1  -1  -1   -1    -1    -1     -1      -1      -1
+3      -1      -1      -1  0  -1  -1    0    -1    -1      0      -1      -1
+4       1      -1      -1  0  -1  -1    0    -1    -1      0      -1      -1
+5       1      -1      -1  0  -1  -1    0    -1    -1      0      -1      -1
+6       2      -1      -1 -1  -1  -1   -1    -1    -1     -1      -1      -1
+7      -1      -1      -1 -1  -1  -1   -1    -1    -1     -1      -1      -1
+8      -1      -1      -1 -1  -1  -1   -1    -1    -1     -1      -1      -1
+9      -1      -1      -1  1   0  -1    1     0    -1      1       0      -1
+10      3      -1      -1  1   0  -1    1     0    -1      1       0      -1
+11      3      -1      -1  1   0  -1    1     0    -1      1       0      -1
+12      3      -1      -1  1   0  -1    1     0    -1      1       0      -1
+13      3      -1      -1  1   0  -1    1     0    -1      1       0      -1
+14     -1      -1      -1  1  -1  -1    1    -1    -1      1      -1      -1
+15     -1      -1      -1 -1  -1  -1   -1    -1    -1     -1      -1      -1
+16     -1      -1      -1 -1  -1  -1   -1    -1    -1     -1      -1      -1
+17      4      -1      -1 -1  -1  -1   -1    -1    -1     -1      -1      -1
+18      4      -1      -1 -1  -1  -1   -1    -1    -1     -1      -1      -1
+19      4      -1      -1  2  -1  -1    2    -1    -1      2      -1      -1
+20      4       0      -1  2  -1  -1    2    -1    -1      2      -1      -1
+          word pos     lemma               nbc
+0            A  DT         a A Christmas Carol
+1    CHRISTMAS  NP Christmas A Christmas Carol
+2        CAROL  NN     carol A Christmas Carol
+3           by  IN        by A Christmas Carol
+4      Charles  NP   Charles A Christmas Carol
+5      Dickens  NP   Dickens A Christmas Carol
+6            I  PP         I A Christmas Carol
+7         have VBP      have A Christmas Carol
+8  endeavoured VBN endeavour A Christmas Carol
+9           in  IN        in A Christmas Carol
+10        this  DT      this A Christmas Carol
+11     Ghostly  JJ   ghostly A Christmas Carol
+12      little  JJ    little A Christmas Carol
+13        book  NN      book A Christmas Carol
+14           ,   ,         , A Christmas Carol
+15          to  TO        to A Christmas Carol
+16       raise  VB     raise A Christmas Carol
+17         the  DT       the A Christmas Carol
+18       Ghost  NN     ghost A Christmas Carol
+19          of  IN        of A Christmas Carol
+20          an  DT        an A Christmas Carol
+\end{Soutput}
+\end{Schunk}
+
+\subsection{Functions}
+
+\label{sec:rcqp-functions}
+
+\subsubsection{Creating a corpus}
+
+The first step is creating a corpus\index{corpus} object.  A
+\texttt{corpus} object is created with the function \texttt{corpus()}.
+This object may be used with the two functions below, as well as for
+creating \texttt{subcorpus}\index{subcorpus}, \texttt{cqp\_flist} and
+\texttt{cqp\_ftable} objects (see below).
+
+\paragraph{print}
+\index{print}
+
+Print all information (but the value of structural attributes\index{attribute!structural} having a 
+value) as a dataframe.
+
+\paragraph{summary}
+\index{summary}
+
+Give the number of tokens of a corpus\index{corpus}, list all the attributes 
+(positional, structural, alignment) ; for each positional attribute\index{attribute!positional} (and 
+structural attribute\index{attribute!structural} having a value) give the number of types and print 
+some type samples.
+
+\paragraph{write}
+\index{write}
+
+Write into a file with an argument \emph{filename} and optional arguments \emph{from} 
+and \emph{to} denoting token cpos\index{cpos}.
+
+\paragraph{region\_sizes.cqp\_corpus}
+\index{region\_sizes.cqp\_corpus}
+
+Create a variable containing the size (in tokens) of a given structural 
+attribute.
+
+\begin{Schunk}
+\begin{Sinput}
+> c <- corpus("DICKENS");
+> sentences <- region_sizes(c$s);
+> hist(sentences);
+\end{Sinput}
+\end{Schunk}
+
+% ======================================================
+
+\subsubsection{Accessing attribute}
+
+Attribute\index{attribute} can be accessed very easily by the "\$" and "[[" 
+operator.\index{\$.cqp\_corpus}\index{[[.cqp\_corpus}. The former suppose 
+to type the exact name, the latter allows for using a variable. Here are 
+three identical way of accessing the \texttt{word} attribute.
+
+\begin{Schunk}
+\begin{Sinput}
+> c <- corpus("DICKENS");
+> x <- c$word
+> x <- c[["word"]]
+> attr <- "word"
+> x <- c[[ attr ]]
+\end{Sinput}
+\end{Schunk}
+
+Once created, several functions are available.
+
+\index{attribute!positional}Positional attribute have the functions
+\texttt{ntype}, \texttt{types}, \texttt{ntoken} and \texttt{tokens}.
+\index{ntype}\index{types}\index{ntoken}\index{tokens}
+
+\begin{Schunk}
+\begin{Sinput}
+> c <- corpus("DICKENS");
+> a <- c$pos
+> ntoken(a)
+\end{Sinput}
+\begin{Soutput}
+[1] 3407085
+\end{Soutput}
+\begin{Sinput}
+> tokens(a)[1:5]
+\end{Sinput}
+\begin{Soutput}
+[1] "DT" "NP" "NN" "DT" "DT"
+\end{Soutput}
+\begin{Sinput}
+> ntype(a)
+\end{Sinput}
+\begin{Soutput}
+[1] 43
+\end{Soutput}
+\begin{Sinput}
+> types(a)
+\end{Sinput}
+\begin{Soutput}
+ [1] "DT"   "NP"   "NN"   "IN"   "PP"   "VBP"  "VBN"  "JJ"   ","    "TO"  
+[11] "VB"   "WDT"  "MD"   "RB"   "PP$"  "NNS"  "RP"   "CC"   "SENT" "CD"  
+[21] ":"    "POS"  "VBD"  "EX"   "VBZ"  "''"   "WP"   "JJS"  "WRB"  "VBG" 
+[31] "RBR"  "PDT"  "UH"   "JJR"  "``"   "WP$"  "("    ")"    "RBS"  "NPS" 
+[41] "FW"   "LS"   "SYM" 
+\end{Soutput}
+\begin{Sinput}
+> w <- c$word
+> ntoken(w)
+\end{Sinput}
+\begin{Soutput}
+[1] 3407085
+\end{Soutput}
+\begin{Sinput}
+> tokens(w)[1:5]
+\end{Sinput}
+\begin{Soutput}
+[1] "A"         "CHRISTMAS" "CAROL"     "by"        "Charles"  
+\end{Soutput}
+\begin{Sinput}
+> ntype(w)
+\end{Sinput}
+\begin{Soutput}
+[1] 57568
+\end{Soutput}
+\begin{Sinput}
+> types(w)[1:10]
+\end{Sinput}
+\begin{Soutput}
+ [1] "A"           "CHRISTMAS"   "CAROL"       "by"          "Charles"    
+ [6] "Dickens"     "I"           "have"        "endeavoured" "in"         
+\end{Soutput}
+\end{Schunk}
+
+\index{attribute!structural}Structural attribute have the functions
+\texttt{nregions}, i.e. the number of regions, \texttt{tokens} : the 
+region id (\texttt{struc}) of each token of the corpus. Moreover, 
+for structural attribute with value, the function \texttt{regions} allows 
+for retreiving the value of each region.
+\index{nregion}\index{tokens}\index{regions}
+
+\begin{Schunk}
+\begin{Sinput}
+> c <- corpus("DICKENS");
+> s <- c$s
+> nregion(s)
+\end{Sinput}
+\begin{Soutput}
+[1] 152455
+\end{Soutput}
+\begin{Sinput}
+> np <- c$np_h
+> nregion(np)
+\end{Sinput}
+\begin{Soutput}
+[1] 419363
+\end{Soutput}
+\begin{Sinput}
+> regions(np)[1:10]
+\end{Sinput}
+\begin{Soutput}
+ [1] "CHRISTMAS" "Dickens"   "I"         "book"      "ghost"     "other"    
+ [7] "season"    "me"        "May"       "it"       
+\end{Soutput}
+\end{Schunk}
+
+A function \texttt{summary}\index{summary.cqp\_attr} print information 
+about an attribute:
+
+\begin{Schunk}
+\begin{Sinput}
+> c <- corpus("DICKENS");
+> summary(c$lemma)
+\end{Sinput}
+\begin{Soutput}
+positional : DICKENS.lemma (41222 types; 3407085 tokens)
+		 "a", "Christmas", "carol", "by", "Charles", "Dickens", "I", "have", "endeavour", "in", ... 
+\end{Soutput}
+\begin{Sinput}
+> summary(c$s)
+\end{Sinput}
+\begin{Soutput}
+structural : DICKENS.s (152455 regions)
+\end{Soutput}
+\begin{Sinput}
+> summary(c$np_h);
+\end{Sinput}
+\begin{Soutput}
+structural : DICKENS.np_h (10713 types; 419363 regions)
+		 "CHRISTMAS", "Dickens", "I", "book", "ghost", "other", "season", "me", "May", "it", ... 
+\end{Soutput}
+\end{Schunk}
+
+% ======================================================
+
+\subsubsection{Creating a subcorpus}
+
+An \texttt{subcorpus} object
+is created with the function \texttt{subcorpus()}. In the CWB 
+terminology, a subcorpus\index{subcorpus} is the set of sequences matched by a query.
+
+\begin{Schunk}
+\begin{Sinput}
+> c <- corpus("DICKENS");
+> sc <- subcorpus(c, '"interesting" "to" @ []');
+> # sc
+> #
+> # if you want to change the lines printed (0-based);
+> # use from/to options:
+> print(sc, from=2, to=5);
+\end{Sinput}
+\begin{Soutput}
+    270757  ? ' It can hardly be << interesting to you >> , ' said I. ' Yes , 
+    639982 he parent of a son is  << interesting to me >> . ' Has Mrs Blimber 
+    835921  sister as if it were << interesting to him >> to see them together
+   1012817 ive security . It was  << interesting to be >> in the quiet old tow
+\end{Soutput}
+\begin{Sinput}
+> #
+> # if you want more access on the kwic presentation
+> # (sorting, printing), you can construct a cqp_kwic object:
+> k <- cqp_kwic(sc, right.context=10, left.context=10)
+> print(k, from=5, to=10)
+\end{Sinput}
+\begin{Soutput}
+   1012817 ty . It was    << interesting to be >> in the qui
+   1197341 's not very   << interesting to you >> , and I am
+   1903972 se was made   << interesting to the >> public , b
+   2521810 proving and  << interesting to hear >> two politi
+   3014814 t is always << interesting to trace >> a resembla
+   3040285 es , highly     << interesting to a >> bystander 
+\end{Soutput}
+\begin{Sinput}
+> k <- sort(k, sort.anchor="target", sort.offset=0, sort.attribute="word")
+> print(k, from=5, to=10)
+\end{Sinput}
+\begin{Soutput}
+    835921  if it were   << interesting to him >> to see the
+    248883 It was very    << interesting to me >> to see the
+    639982 of a son is    << interesting to me >> . ' Has Mr
+   1903972 se was made   << interesting to the >> public , b
+   3014814 t is always << interesting to trace >> a resembla
+    270757 n hardly be   << interesting to you >> , ' said I
+\end{Soutput}
+\end{Schunk}
+
+\paragraph{print}
+\index{print}
+
+Print a KWIC (\emph{keyword in context}) form.
+
+\paragraph{summary}
+\index{summary}
+
+Get a quick summary of the size and content of the subcorpus\index{subcorpus}.
+
+\subsubsection{Creating a frequency list}
+\index{frequency!list}
+
+A frequency list may be created either with a corpus\index{corpus} or with a subcorpus\index{subcorpus}.
+
+\begin{Schunk}
+\begin{Sinput}
+> c <- corpus("DICKENS");
+> fl <- cqp_flist(c$lemma);
+> summary(fl);
+\end{Sinput}
+\begin{Soutput}
+A frequency list
+  Number of tokens: 3407085 
+  Number of types: 41222 
+  Corpus: DICKENS 
+  Attribute: lemma 
+\end{Soutput}
+\begin{Sinput}
+> #
+> # get only the 1% most frequent forms
+> fl <- cqp_flist(c$lemma, cutoff=0.01);
+> summary(fl);
+\end{Sinput}
+\begin{Soutput}
+A frequency list
+  Number of tokens: 2662681 
+  Number of types: 412 
+  Corpus: DICKENS 
+  Attribute: lemma 
+\end{Soutput}
+\begin{Sinput}
+> fl[1:30]
+\end{Sinput}
+\begin{Soutput}
+     ,    the      .    and     be      '     of     to      a   have      I 
+282600 142776 114392 100637  94181  74246  74054  72343  63468  63306  51848 
+    in   that     it    his     he    you   with      ;    say    not     as 
+ 47556  37913  35867  35374  35015  31127  27889  26591  26437  24702  23821 
+   her     at    for      !     do     on     my      ? 
+ 21531  19770  19763  18134  18023  17441  16932  16032 
+\end{Soutput}
+\begin{Sinput}
+> #
+> # get only the forms with freq > 100
+> fl <- cqp_flist(c$lemma, cutoff=100);
+> summary(fl);
+\end{Sinput}
+\begin{Soutput}
+A frequency list
+  Number of tokens: 3112708 
+  Number of types: 2245 
+  Corpus: DICKENS 
+  Attribute: lemma 
+\end{Soutput}
+\begin{Sinput}
+> fl[1:30]
+\end{Sinput}
+\begin{Soutput}
+         a  Christmas         by    Charles          I       have  endeavour 
+     63468        168      12594        258      51848      63306        239 
+        in       this     little       book          ,         to      raise 
+     47556      12613       6724        649     282600      72343        787 
+       the      ghost         of         an       idea      which      shall 
+    142776        253      74054       7878        625      11921       1968 
+       not        put         my     reader        out     humour       with 
+     24702       2624      16932        135       7583        207      27889 
+themselves       each 
+       726        928 
+\end{Soutput}
+\end{Schunk}
+
+With a subcorpus, a lot of options are available in order to construct the 
+frequency list with a particular anchor\index{anchor}, an offset for address tokens 
+before or after this anchor, and left and right contexts in order to 
+include tokens in a span.
+
+\begin{Schunk}
+\begin{Sinput}
+> c <- corpus("DICKENS");
+> sc <- subcorpus(c, '"interesting" "to" @ []');
+> #
+> # Create a cqp_flist with the target anchor
+> fl <- cqp_flist(sc, "target", "word");
+> summary(fl);
+\end{Sinput}
+\begin{Soutput}
+A frequency list
+  Number of tokens: 12 
+  Number of types: 10 
+  Subcorpus: Uvpydcjgri 
+  Parent corpus: DICKENS 
+  anchor: target 
+  left.context: 0 
+  right.context: 0 
+  attribute: word 
+  offset: 0 
+\end{Soutput}
+\begin{Sinput}
+> #
+> # Same anchor, but count parts of speech
+> fl <- cqp_flist(sc, "target", "pos");
+> fl;
+\end{Sinput}
+\begin{Soutput}
+ type frequency
+   NP         6
+   DT         3
+   DT         3
+\end{Soutput}
+\begin{Sinput}
+> #
+> # You can extend the span around the anchor with `left.context' and 
+> # `right.context'
+> fl <- cqp_flist(sc, "match", "pos", left.context=5, right.context=5);
+> fl;
+\end{Sinput}
+\begin{Soutput}
+ type frequency
+   DT         9
+   NN        11
+   IN         8
+   PP        18
+  VBN         2
+   JJ        17
+    ,         8
+   TO        14
+   VB         7
+   MD         1
+   RB         9
+  NNS         1
+   CC         3
+ SENT         5
+   CD         1
+    :         1
+  VBD         7
+  VBZ         5
+   ''         4
+  VBG         1
+\end{Soutput}
+\begin{Sinput}
+> #
+> # or with a match..matchend span :
+> fl <- cqp_flist(sc, c("match", "matchend"), "pos");
+> fl;
+\end{Sinput}
+\begin{Soutput}
+ type frequency
+   DT         3
+   PP         6
+   JJ        12
+   TO        12
+   VB         3
+\end{Soutput}
+\begin{Sinput}
+> #
+> # The two can be used together:
+> fl <- cqp_flist(sc, c("match", "matchend"), "pos", left.context=5, right.context=5);
+> fl;
+\end{Sinput}
+\begin{Soutput}
+ type frequency
+   DT        11
+   NP         4
+   NN        13
+   IN         9
+   PP        20
+  VBP         1
+  VBN         2
+   JJ        19
+    ,        10
+   TO        14
+   VB         7
+  WDT         1
+   MD         2
+   RB        11
+  NNS         3
+   CC         3
+ SENT         5
+   CD         1
+    :         2
+  POS         1
+  VBD         7
+  VBZ         5
+   ''         4
+  VBG         1
+\end{Soutput}
+\end{Schunk}
+
+\paragraph{summary.cqp\_flist}
+\index{summary.cqp\_flist}
+
+Print information about the frequency list\index{frequency!list}.
+
+\subsubsection{Creating a frequency table}
+\index{frequency!table}
+
+The \texttt{cqp\_ftable} function creates a frequency table: a cross-tabulated
+frequency count according to two attributes.
+\texttt{cqp\_ftable} may be applied either on a corpus\index{corpus}, or a subcorpus\index{subcorpus}.
+It produces a dataframe.
+
+\paragraph{cqp\_ftable with corpus}
+
+\texttt{cqp\_ftable} lets create frequency tables using a 
+corpus\index{corpus} object. The cross-tabulated fields may be positional or  
+structural attributes\index{attribute!structural}.
+
+\begin{Schunk}
+\begin{Sinput}
+> library(reshape);
+> c <- corpus("DICKENS");
+> f <- cqp_ftable(c, "novel_title", "pos");
+> f[1:10,]
+\end{Sinput}
+\end{Schunk}
+
+\begin{verbatim}
+         novel_title    pp_h freq
+1  A Christmas Carol       '  615
+2  A Christmas Carol       , 2759
+3  A Christmas Carol       :  514
+4  A Christmas Carol       `  259
+5  A Christmas Carol       (   17
+6  A Christmas Carol       )   17
+7  A Christmas Carol      CC 1333
+8  A Christmas Carol      CD  189
+9  A Christmas Carol      DT 2885
+10 A Christmas Carol      EX   91
+\end{verbatim}
+
+\begin{Schunk}
+\begin{Sinput}
+> #
+> # create a contingency table
+> t <- cast(f, novel_title ~ pos, value="freq", fun.aggregate=sum )
+> #
+> # Visual inspection of frequency of various POS in the different novels
+> mosaicplot(as.matrix(t));
+\end{Sinput}
+\end{Schunk}
+
+Positional attributes (and structural attributes\index{attribute!structural} having values) are 
+represented by their string values rather than by ids. For 
+positional attributes\index{attribute!positional}, it is only a matter of presentation, since each 
+id\index{id} has its own string; but for structural attributes\index{attribute!structural} having values,
+it may entail a different counting: occurrences of phenomena belonging to
+different strucs\index{struc} but with same value are then counted together.
+You can force the use of ids rather than string values with the 
+\texttt{attribute1.use.id} and \texttt{attribute2.use.id} options.
+
+Counts are made on token basis, i.e. each corpus token is an 
+individual on which the two modalities (attributes) are considered. If you 
+use two structural attributes\index{attribute!structural} as arguments in \texttt{cqp\_ftable},
+and one of them does not have values, then the third column counts the number of 
+tokens in the smallest region. In the following example, each line 
+gives the length (in number of tokens, third column) of each sentence (second column)
+in each novel, represented by its title:
+
+\begin{Schunk}
+\begin{Sinput}
+> f <- cqp_ftable(c, "novel_title", "s")
+> f[1:10,]
+\end{Sinput}
+\end{Schunk}
+
+\begin{verbatim}
+         novel_title s freq
+1  A Christmas Carol 0    3
+2  A Christmas Carol 1    3
+3  A Christmas Carol 2   41
+4  A Christmas Carol 3   15
+5  A Christmas Carol 4   12
+6  A Christmas Carol 5    6
+7  A Christmas Carol 6    8
+8  A Christmas Carol 7    8
+9  A Christmas Carol 8   22
+10 A Christmas Carol 9    4
+\end{verbatim}
+
+If both structural attributes\index{attribute!structural} have values, you may want to count the 
+number of 
+times the modalities are cooccurring, rather than the total number of 
+tokens included in these cooccurrences. For that purpose, you can use the
+\texttt{structural.attribute.unique.id=TRUE} option. In the following 
+example, we count the number of times each head appears in each novel :
+
+\begin{Schunk}
+\begin{Sinput}
+> f <- cqp_ftable(c, "novel_title", "pp_h", structural.attribute.unique.id=TRUE)
+> f[1:10,]
+\end{Sinput}
+\end{Schunk}
+\begin{verbatim}
+         novel_title    pp_h freq
+1  A Christmas Carol            1
+2  A Christmas Carol   about   21
+3  A Christmas Carol   above    2
+4  A Christmas Carol  across    3
+5  A Christmas Carol   after   12
+6  A Christmas Carol against    6
+7  A Christmas Carol   along    2
+8  A Christmas Carol amongst    7
+9  A Christmas Carol      as   15
+10 A Christmas Carol      at   83
+\end{verbatim}
+
+Here on the contrary, we count the total number of tokens in each 
+prepositional phrase having a given head :
+
+\begin{Schunk}
+\begin{Sinput}
+> f <- cqp_ftable(c, "novel_title", "pp_h")
+> f[1:10,]
+\end{Sinput}
+\end{Schunk}
+\begin{verbatim}
+         novel_title    pp_h  freq
+1  A Christmas Carol         29265
+2  A Christmas Carol   about    83
+3  A Christmas Carol   above    12
+4  A Christmas Carol  across     9
+5  A Christmas Carol   after    58
+6  A Christmas Carol against    18
+7  A Christmas Carol   along    20
+8  A Christmas Carol amongst    24
+9  A Christmas Carol      as    42
+10 A Christmas Carol      at   287
+\end{verbatim}
+
+\paragraph{cqp\_ftable with subcorpus}
+
+Applied on a subcorpus\index{subcorpus}, the \texttt{cqp\_ftable} function is mainly a wrapper on the 
+\texttt{cqi\_fdist2}\index{cqi\_fdist2} function. However, it returns a three columns dataframe
+with <strings>, <string>, <freq> rather than a three columns matrix with 
+<ids>, <ids>, <freq> like \texttt{cqi\_fdist2}\index{cqi\_fdist2}.
+
+\begin{Schunk}
+\begin{Sinput}
+> c <- corpus("DICKENS");
+> sc <- subcorpus(c, '"from" @ [] "to" []')
+> f <- cqp_ftable(sc, "target", "word", "matchend", "word");
+> f[1:10,]
+\end{Sinput}
+\begin{Soutput}
+   target.word matchend.word freq
+1         time          time   87
+2         head          foot   70
+3          day           day   42
+4         side          side   31
+5      morning         night   14
+6          one       another   13
+7          one           the   13
+8        place         place   10
+9        mouth         mouth    7
+10        hour          hour    7
+\end{Soutput}
+\end{Schunk}
+
+% ----------------------------------------------------------------
+% ----------------------------------------------------------------
+
+% \begin{Schunk}
+% \begin{Sinput}
+% 
+% \end{Sinput}
+% \end{Schunk}
+
+\printindex
+
+\end{document}
+
+

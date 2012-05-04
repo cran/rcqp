@@ -1,0 +1,6 @@
+#	@echo "Nothing to do."
+#	@echo "Windows dll are downloaded from an external server."
+#	@echo "See ../configure.win file."
+
+OBJECTS=
+SHLIB_EXT=.dll

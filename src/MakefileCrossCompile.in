@@ -1,0 +1,115 @@
+# ===========================================================================
+# File: "Makefile.in"
+#                        Created: 2012-01-14 11:45:26
+#              Last modification: 2012-04-06 08:42:24
+# Authors: Bernard Desgraupes <bernard.desgraupes@u-paris10.fr>
+#          Sylvain Loiseau <sylvain.loiseau@univ-paris13.fr>
+# This is part of the R package 'rcqp'.
+# ===========================================================================
+# NB: on Mac OSX 10.5, use -gdwarf-2 instead of -g to avoid warnings about
+# missing "atom for N_GSYM stabs".
+# 
+# ARCHIS := -arch i386 -arch ppc -arch x86_64 -arch ppc64
+# 
+# % pkg-config --libs libpcre
+# -L/opt/local/lib -lpcre  
+# % pkg-config --libs glib-2.0
+# -L/opt/local/lib -lglib-2.0 -lintl  
+
+
+## Read configuration settings for cwb
+TOP = $(shell pwd)/cwb
+include $(TOP)/configRcqpCrossCompile.mk
+
+CFLAGS:=${CFLAGS} @RCQP_R_CFLAGS@
+
+# Cross-compilation with mingw
+ifdef __MINGW__ 
+	CROSS_COMPILATION_LFLAGS = -L@CROSS_COMPILATION_DIR@/lib
+	RCQP_LIB_SUFFIX=.dll
+	RCQP_SHAREDLIB_FLAG=-shared
+	RCQP_OUTDIR=win32/
+else
+	CROSS_COMPILATION_LFLAGS = 
+	RCQP_LIB_SUFFIX=.so
+	RCQP_OUTDIR=
+	ifeq ($(shell uname),Darwin)
+	RCQP_SHAREDLIB_FLAG=-dynamiclib
+	else
+	RCQP_SHAREDLIB_FLAG=-shared
+	endif
+endif
+
+
+# Source files
+# ============
+
+# C files
+RCQP_C_SRC := rcqpCommands.c rcqpUtils.c
+
+RCQP_C_OBJ := $(RCQP_C_SRC:.c=.o)
+
+RCQP_VIGNETTE_RNW := rcqp.Rnw
+RCQP_VIGNETTE_TEX :=  $(RCQP_VIGNETTE_RNW:.Rnw=.tex)
+RCQP_VIGNETTE_IDX :=  $(RCQP_VIGNETTE_RNW:.Rnw=.idx)
+RCQP_VIGNETTE_PDF :=  $(RCQP_VIGNETTE_RNW:.Rnw=.pdf)
+
+
+# Substitutable variables
+# =======================
+
+RCQP_STATLIB=cwb/libclcqp.a
+
+RCQP_R_CPPFLAGS=@RCQP_R_CPPFLAGS@
+
+ifdef __MINGW__ 
+	RCQP_R_LIBR=-lR
+else
+	RCQP_R_LIBR=@RCQP_R_LIBR@
+endif
+
+
+
+# Targets
+# =======
+
+rcqp: ${RCQP_C_SRC} cwb
+	# Compile the C files
+	${CC} ${CFLAGS} -c ${RCQP_C_SRC} ${RCQP_R_CPPFLAGS}
+	#
+	# Link the library
+	${CC} -o ${RCQP_OUTDIR}$@$(RCQP_LIB_SUFFIX) $(RCQP_SHAREDLIB_FLAG) ${RCQP_C_OBJ} \
+		${RCQP_STATLIB} \
+	    $(CROSS_COMPILATION_LFLAGS) $(LDFLAGS_ALL) $(LDFLAGS_CQP) \
+		${RCQP_R_LIBR}
+
+
+cwb:
+	${MAKE} --makefile=MakefileRcqpCrossCompile -C cwb
+
+
+.PHONY: clean
+
+
+clean:
+	${MAKE} --makefile=MakefileRcqpCrossCompile -C cwb clean
+	${RM} *.o *.so
+	cd ../inst/doc/; \
+	${RM} *.tex *.aux *.log *.toc *.idx *.synctex.gz
+
+
+clean-all:
+	${MAKE} --makefile=MakefileRcqpCrossCompile -C cwb clean-all
+	${RM} *.o *.so Makefile
+	cd ../inst/doc/; \
+	${RM} *.tex *.aux *.log *.toc *.idx *.ind *.ilg *.pdf *.synctex.gz
+
+
+vignette:
+	cd ../inst/doc; \
+	${RM} ${RCQP_VIGNETTE_TEX}; \
+	echo "library(\"utils\"); Sweave(\"${RCQP_VIGNETTE_RNW}\")" | R --no-save --no-restore ; \
+	pdflatex ${RCQP_VIGNETTE_TEX}; \
+	makeindex ${RCQP_VIGNETTE_IDX}; \
+	pdflatex ${RCQP_VIGNETTE_TEX};
+

@@ -1,0 +1,930 @@
+\documentclass{article}
+\SweaveOpts{engine=R,eps=FALSE,pdf=TRUE,width=5,height=3,strip.white=true,keep.source=TRUE}
+%\VignetteIndexEntry{Introduction to rcqp}
+%\VignetteDepends{reshape}
+\usepackage{lmodern}
+\usepackage{makeidx}
+\usepackage{hyperref}
+
+\makeindex 
+
+\title{Introduction to the rcqp package}
+
+\author{Bernard Desgraupes and Sylvain Loiseau\\<bernard.desgraupes@u-paris10.fr>, <sylvain.loiseau@univ-paris13.fr>}
+
+\date{\today}
+
+<<startup, echo=FALSE>>=
+#
+# Convert given token span of a corpus into a tabular
+#
+corpus2LaTeXtabular <- function (corpus_name="DICKENS", from=0, to=20) {
+  c <- corpus(corpus_name);
+  df <- print(c, from, to);
+  att <- sort(cqi_attributes(corpus_name, "p"), decreasing=TRUE);
+  att <- att[-which(att == "nbc")];
+  df <- df[,att]
+    df <- t(df)
+    cat(paste("\\begin{tabular}{|l|", paste(rep("l", ncol(df)), collapse=""), "|}\\hline\n"));
+  cat(paste("\\textbf{CPOS}", paste(paste("&\\textbf{", 0:(ncol(df)-1), "}", sep=""), collapse=""), paste("\\\\\\hline\n")));
+  for (l in 1:nrow(df)) {
+    line <- df[l,];
+    line <- gsub(pattern="$", fixed=T, replacement="", x=line)
+      cat(paste("\\textbf{",att[l], "}", paste(paste("&", line), collapse=""), paste("\\\\\\hline\n"), sep=""));
+  }
+  cat("\\end{tabular}\n");
+}
+@
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+The \texttt{rcqp} R library is a wrapper on the CWB software.
+The CWB software, used in the field of corpus linguistics,
+lets index and query large annotated corpora. The \texttt{rcqp}
+library includes the CWB code and allows using R to execute
+CWB functions and import their output into statistical analyses.
+\end{abstract}
+
+
+\vspace{5mm}
+\hrule
+\tableofcontents
+\vspace{5mm}
+\hrule
+
+\newpage
+
+\section{Introduction}
+\label{sec:Intro}
+
+The CWB (Corpus Workbench) software\footnote{http://cwb.sourceforge.net/} is a
+set of tools for corpus\index{corpus} linguistics, providing a powerful indexation and query
+engine for annotated corpora. An interactive command line program called CQP
+(\emph{corpus query processor}) is provided, as well as a client/server 
+architecture.
+
+CWB offers access to corpora through manipulation of vectors of positions
+(offsets of the adressed / requested word(s) in the corpus\index{corpus}) which can be turned
+into the corresponding word\index{word} forms, lemmas\index{lemma}, or parts of speech\index{part of speech} if the corpus\index{corpus}
+provides these pieces of information.
+
+In \textbf{rcqp}, CWB is turned into an R library. As a result:
+
+\begin{itemize}
+\item the CWB data structures are mainly vectors, which are very convenient to manipulate in R;
+\item R vectors are wrappers on the inner CWB C arrays, thus providing
+efficient access;
+\item \texttt{rcqp} provides an easy way to run and query CWB, without having 
+to separately compile and
+install the CWB software;
+\item \texttt{rcqp} lets you take advantage of the R statistical capacities for analyzing the complex CWB data.
+\end{itemize}
+
+In \textbf{rcqp}, two different ways of calling CWB are provided:
+
+\begin{itemize}
+\item You can call CWB through the \textbf{cqi\_*} set of functions. These 
+functions implement an interface defined by CWB (CQi). 
+\item You can use a set of functions trying to help producing 
+quantitative structures (frequency lists, cross-tabulated frequency 
+tables) for statistical analyses of CWB corpora with R.
+\end{itemize}
+
+% ----------------------------------------------------------------
+% ----------------------------------------------------------------
+
+
+\section{The CQi set of functions}
+\label{sec:cqi}
+
+\subsection{CWB data-model}
+
+Detailled information about the data model used into CWB is available in
+\textit{CQP Query Language Tutorial}, Stefan Evert \& The OCWB 
+Development Team, 17 February 2010.
+
+In the short presentation below, the conventions used in \texttt{cqi\_*} function
+names are in boldface.
+
+The fundamental information is the position, or rank, of each token: each token
+has a position, 0-based, called \textbf{cpos}\index{cpos}.
+
+A corpus\index{corpus} may be represented as an array where each line represents a token 
+and each column represents an \textbf{attribute}\index{attribute}.
+Here are the first 20 lines of such an array, representing the DICKENS demo 
+corpus, with 38 columns.
+
+<<cqi_corpus_representation, echo=FALSE>>=
+library(rcqp)
+c <- corpus("DICKENS")
+c
+@
+
+The first 34 columns represent \textbf{structural attributes}\index{attribute!structural}: this 
+kind of 
+attribute defines spans of tokens (like XML tags surrounding tokens), called \textbf{regions}\index{region}.
+A region is made of the tokens sharing a same value for this attribute.
+A region is always made of consecutive tokens.
+Thus, while the id is the same in a column, the corresponding tokens belong to the same region.
+The id identifying a region is called a \textbf{struc}\index{struc}.
+Since regions are defined thanks to a struc value on tokens, there is no 
+recursivity.
+Tokens between two regions, with respect to a given structural attribute\index{attribute!structural}, have a value of $-1$.
+
+Next there are several columns containing strings. They are the 
+\textbf{positional attributes}\index{attribute!positional}, giving for each word information such as lemma\index{lemma},
+word-form\index{word}, \index{pos} (part of speech\index{part of speech}),... Each positional attribute\index{attribute!positional} has a list of 
+\textbf{ids}\index{id}, which are  unique
+numerical codes for the different possible string forms.
+
+Moreover, certain structural attributes\index{attribute!structural} have a string value associated 
+with each \emph{struc}\index{struc} (region\index{region}). While each struc is unique to a region, string 
+values can be repeated over several regions. For instance, the np\_h structural
+ attribute, giving the head of the noun phrase, holds a string value.
+
+In short, in CQi function names, the following types of data are used:
+\begin{description}
+\item [cpos]\index{cpos} a position, or rank, identifying a unique token in the 
+corpus\index{corpus};
+\item [id]\index{id} an id for a form (type) in the lexicon of a positional attribute\index{attribute!positional} 
+lexicon;
+\item [str]\index{str} the string corresponding to an id in the lexicon of a positional 
+attribute lexicon\index{lexicon};
+\item [struc]\index{struc} the id of a region in a given structural attribute\index{attribute!structural}.
+\end{description}
+
+A subcorpus\index{subcorpus} is created thanks to the \texttt{cqi\_query}\index{cqi\_query} function. See 
+\textit{CQP Query Language Tutorial}, Stefan Evert \& The OCWB 
+Development Team, 17 February 2010, for a complete specification of the CQP query 
+language.
+
+A subcorpus\index{subcorpus} is a collection of sequences of tokens matched by a query and
+identified by their \emph{cpos}\index{cpos}. Since a query may match a sequence of tokens, a
+subcorpus is a collection of \emph{(match, matchend)} pairs, where \textbf{match}\index{match}
+is the cpos of 
+the first token and \textbf{matchend}\index{matchend} the cpos of the last token in the
+sequence matched.
+When only one token is addressed by a query, matchend is identical to match.
+
+The \textbf{match}\index{match} and \textbf{matchend}\index{matchend} positions (together with two other optional pieces of 
+information named \textbf{target}\index{target} and \textbf{keyword}\index{keyword}) are referred to as the
+\textbf{anchors}\index{anchor} (or sometime 
+\textbf{fields}\index{field}: see cqi\_fdist1 et cqi\_fdist2) 
+available on each hit.
+
+All indices are 0-based: the cpos of the first token is 0, the first 
+id for a positional attribute\index{attribute!positional} or the first struc for a structural attribute\index{attribute!structural} is 0, etc.
+
+
+\subsection{A sample session}
+
+<<cqi_session, echo=TRUE>>=
+sort(cqi_list_corpora())[1:6]
+
+# create the subcorpus "Interesting" (it creates the subcorpus internaliy
+# with the given name but does not return any result).
+cqi_query("DICKENS", "Interesting", '"interest.*"');
+
+# in the CQi API, the qualified name of subcorpus is corpus:subcorpus:
+nbr_hit <- cqi_subcorpus_size("DICKENS:Interesting");
+nbr_hit
+
+# The subcorpus as a matrix: one line by hit, 
+# four columns: match, matchend, target, keyword.
+dump <- cqi_dump_subcorpus("DICKENS:Interesting",0,10)
+dump
+
+# get the lemma of the "match" slot of each hit:
+# Word's attributes (such as "lemma", "word", "pos") are always accessed 
+# through qualified name : "corpus.attribute"
+lemma <- cqi_cpos2str("DICKENS.lemma", dump[,1])
+lemma
+
+# You can acheave the same result in one more steps, using id as an 
+# intermediate step: 
+ids <- cqi_cpos2id("DICKENS.lemma", dump[,1]);
+lemma <- cqi_id2str("DICKENS.lemma", ids);
+lemma
+
+# cqi_fdist1 create a frequency list according to one field (match, 
+# matchend...) in a query; cqi_fdist2 a cross tabulated 
+# frequency table according to two fields in a query
+
+flist <- cqi_fdist1("DICKENS:Interesting", "match", "word")
+flist
+
+# cqi_fdist1 et cqi_fdist2 return numeric matrix : (lemma) id -> freq.
+# use id2str in order to turn the (word) id into its form. 
+data.frame(cqi_id2str("DICKENS.word", flist[,1]), flist[,2])
+
+@
+
+\subsection{Functions}
+\label{sec:cqi-functions}
+
+For more information about the actual use of these functions, see
+their respective help pages.
+
+All functions are prefixed with \textbf{cqi\_}.
+
+\paragraph{cqi\_list\_corpora}
+\index{cqi\_list\_corpora}
+
+List all the corpora available in the registry.
+
+<<list_corpora, echo=TRUE>>=
+corpora <- cqi_list_corpora()
+corpora[1:5]
+@
+
+\paragraph{cqi\_full\_name}
+\index{cqi\_full\_name}
+
+Return the full name of a corpus\index{corpus}.
+
+\paragraph{cqi\_corpus\_info}
+\index{cqi\_corpus\_info}
+
+Return various informations about a corpus\index{corpus}.
+
+\paragraph{cqi\_query}
+\index{cqi\_query}
+
+Create a subcorpus\index{subcorpus}. A subcorpus is a list of hits. 
+Each hit contains four fields : \textbf{match} (the cpos\index{cpos} of the first token of the 
+matched sequence), \textbf{matchend} (the cpos of the last token of the matched 
+sequence, identical with match\index{match} if the sequence is one token long), and 
+two optionnal values (see CQP documentation), \textbf{target}\index{target} and 
+\textbf{keyword}\index{keyword}.
+
+<<cqi_query, echo=TRUE>>=
+corpora <- cqi_list_corpora()
+cqi_query("DICKENS", "Subcorpus", '"interesting"');
+@
+
+The \texttt{cqi\_query}\index{cqi\_query} does not return any value; it creates the
+subcorpus\index{subcorpus} as an object internally. Use \texttt{cqi\_dump\_subcorpus}\index{cqi\_dump\_subcorpus}
+for retrieving the subcorpus contents. The subcorpus name must begin
+with a capital letter.
+
+\paragraph{cqi\_list\_subcorpora}
+\index{cqi\_list\_subcorpora}
+
+List the created subcorpora.
+
+\paragraph{cqi\_drop\_subcorpus}
+\index{cqi\_drop\_subcorpus}
+
+Delete a subcorpus\index{subcorpus}.
+
+\paragraph{cqi\_dump\_subcorpus}
+\index{cqi\_dump\_subcorpus}
+
+Retrieve the subcorpus\index{subcorpus} created by a call to the \texttt{cqi\_query}\index{cqi\_query} function as a 
+four-column matrix: one row by hit, and one column for each of the four 
+fields (see \texttt{cqi\_query}).
+
+<<dump_subcorpus, echo=TRUE>>=
+cqi_query("DICKENS", "Subcorpus", '"interesting"');
+x <- cqi_dump_subcorpus("DICKENS:Subcorpus");
+x[1:10,];
+@
+
+\paragraph{cqi\_subcorpus\_size}
+\index{cqi\_subcorpus\_size}
+
+Return the number of hits in a subcorpus\index{subcorpus}. This is the same as the number 
+of rows returned by \texttt{cqi\_dump\_subcorpus}\index{cqi\_dump\_subcorpus}.
+
+\paragraph{cqi\_attributes}
+\index{cqi\_attributes}
+
+Get the list of attributes\index{attribute} (positional, structural, or aligned) in a 
+corpus\index{corpus}.
+
+<<cqi_attributes, echo=TRUE>>=
+positional_attributes <- cqi_attributes("DICKENS", "p");
+positional_attributes
+structural_attributes <- cqi_attributes("DICKENS", "s");
+structural_attributes
+@
+
+\paragraph{cqi\_lexicon\_size}
+\index{cqi\_lexicon\_size}
+
+Number of forms in a positional attribute\index{attribute!positional}. Attributes are 
+denoted using their \emph{qualified name}, of the form 
+\verb|corpus:attribute|.
+
+<<lexicon_size, echo=TRUE>>=
+lexicon_size <- cqi_lexicon_size("DICKENS:word");
+lexicon_size
+@
+
+The greatest id of an attribute is lexicon\_size $ - 1 $.
+
+\paragraph{cqi\_structural\_attribute\_has\_values}
+\index{cqi\_structural\_attribute\_has\_values}
+
+Ask if a structural attribute\index{attribute!structural} has a string value associated with its 
+region\index{region}. For retrieving the actual string value associated with a region id 
+(a struc\index{struc}), see \texttt{cqi\_struc2str}\index{cqi\_struc2str}.
+
+<<structural_attributes_has_values, echo=TRUE>>=
+has_values <- cqi_structural_attribute_has_values("DICKENS.np_h");
+has_values
+@
+
+\paragraph{cqi\_attribute\_size}
+\index{cqi\_attribute\_size}
+
+Return the number of actual elements (number of occurrences).
+
+\begin{itemize}
+\item on a positional attribute\index{attribute!positional}, it gives the number of tokens.
+\item on a structural attribute\index{attribute!structural}, it gives the number of regions.
+\item on an alignment attribute\index{attribute!alignment}, it gives the number of aligned pairs.
+\end{itemize}
+
+\paragraph{cqi\_cpos2id}
+\index{cqi\_cpos2id}
+
+Convert from a token cpos\index{cpos} to the corresponding id\index{id} in a given positional attribute\index{attribute!positional}.
+
+<<cpos2id, echo=TRUE>>=
+id <- cqi_cpos2id("DICKENS.word", 0:20);
+id
+@
+
+\paragraph{cqi\_str2id}
+\index{cqi\_str2id}
+
+Get the id\index{id} corresponding to the specified string in the lexicon\index{lexicon} of a given positional attribute\index{attribute!positional}.
+
+<<str2id, echo=TRUE>>=
+id <- cqi_str2id("DICKENS.word", "interesting");
+id
+@
+
+\paragraph{cqi\_id2cpos}
+\index{cqi\_id2cpos}
+
+Return all the tokens (cpos\index{cpos}) corresponding to the specified id\index{id} of a 
+certain positional attribute\index{attribute!positional}.
+
+<<id2cpos, echo=TRUE>>=
+id <- cqi_str2id("DICKENS.word", "interesting");
+cpos <- cqi_id2cpos("DICKENS.word", id);
+cpos[1:10]
+length(cpos);
+@
+
+\paragraph{cqi\_id2freq}
+\index{cqi\_id2freq}
+
+Return the number of tokens corresponding to the specified id\index{id} of a 
+certain positional attribute\index{attribute!positional}.
+
+<<id2freq, echo=TRUE>>=
+id <- cqi_str2id("DICKENS.word", "interesting");
+freq <- cqi_id2freq("DICKENS.word", id);
+freq
+@
+
+\paragraph{cqi\_id2str}
+\index{cqi\_id2str}
+
+Return the string corresponding to the specified id of a 
+certain positional attribute\index{attribute!positional}.
+
+<<id2str, echo=TRUE>>=
+id <- cqi_str2id("DICKENS.word", "interesting");
+str <- cqi_id2str("DICKENS.word", id);
+str
+@
+
+\paragraph{cqi\_cpos2str}
+\index{cqi\_cpos2str}
+
+Return the string of a given positional attribute\index{attribute!positional} corresponding to a given id\index{id}. 
+This is identical to using \texttt{cqi\_cpos2id}\index{cqi\_cpos2id} then \texttt{cqi\_id2str}\index{cqi\_id2str}.
+
+<<cpos2str, echo=TRUE>>=
+str <- cqi_cpos2str("DICKENS.word", 1:10);
+str
+@
+
+\paragraph{cqi\_regex2id}
+\index{cqi\_regex2id}
+
+Get the id\index{id} corresponding to the string of a positional attribute\index{attribute!positional} matched by a 
+given regex.
+
+<<regex2id, echo=TRUE>>=
+id <- cqi_regex2id("DICKENS.word", '"Interest.*"');
+id
+@
+
+\paragraph{cqi\_cpos2struc}
+\index{cqi\_cpos2struc}
+
+Get the region\index{region} id (the struc\index{struc}, of a given structural attribute\index{attribute!structural}) to which 
+a given token belongs. Below, we are in the sentence with struc 53, then 54.
+
+<<cpos2struc, echo=TRUE>>=
+struc <- cqi_cpos2struc("DICKENS.s", 1010:1020);
+struc
+@
+
+If the token is outside any region\index{region} in the given structural attribute\index{attribute!structural}, -1 
+is returned.
+
+<<cpos2struc, echo=TRUE>>=
+# In this sequence, tokens are not in nominal phrases.
+cqi_cpos2struc("DICKENS.np", 1000:1010)
+@
+
+\paragraph{cqi\_struc2cpos}
+\index{cqi\_struc2cpos}
+
+Get the first and last cpos\index{cpos} (tokens) belonging to a struc\index{struc} (a region\index{region} id) of a given 
+structural attribute\index{attribute!structural}. The second argument is a vector of length 1, the 
+returned value a vector of length 2.
+
+<<struc2cpos, echo=TRUE>>=
+cpos <- cqi_struc2cpos("DICKENS.np_h", 10);
+cpos
+@
+
+\paragraph{cqi\_struc2str}
+\index{cqi\_struc2str}
+
+Get the string mapped to a region id (a struc\index{struc}) of a given structural 
+attribute; available only for structural attributes\index{attribute!structural} having values.
+
+<<struc2str, echo=TRUE>>=
+str <- cqi_struc2str("DICKENS.np_h", 10);
+str
+@
+
+\paragraph{cqi\_cpos2lbound}
+\index{cqi\_cpos2lbound}
+
+Given a token, return the left-most token belonging to the same 
+region\index{region} in the given structural attribute\index{attribute!structural}.
+
+This is implemented as a simple shortcut for functions \texttt{cqi\_cpos2struc}\index{cqi\_cpos2struc} and
+\texttt{cqi\_struc2cpos[1]}\index{cqi\_struc2cpos[1]}.
+
+<<cpos2lbound, echo=TRUE>>=
+str <- cqi_cpos2lbound("DICKENS.np_h", 10);
+str
+@
+
+\paragraph{cqi\_cpos2rbound}
+\index{cqi\_cpos2rbound}
+
+Given a token, return the right-most token belonging to the same 
+region\index{region} in the given structural attribute\index{attribute!structural}.
+
+This is implemented as a simple shortcut for functions \texttt{cqi\_cpos2struc}\index{cqi\_cpos2struc} and 
+\texttt{cqi\_struc2cpos(...)[2]}\index{cqi\_struc2cpos}.
+
+<<cpos2rbound, echo=TRUE>>=
+str <- cqi_cpos2rbound("DICKENS.np_h", 10);
+str
+@
+
+\paragraph{cqi\_alg2cpos}
+\index{cqi\_alg2cpos}
+
+Convert from an id\index{id} denoting a region\index{region} of an alignment attribute\index{attribute!alignment} to cpos\index{cpos} of tokens contained into this 
+region in the aligned corpora.
+
+Suppose that two parallel corpora \textbf{VIE\_FR} and \textbf{VIE\_RU} have 
+been encoded using \textbf{tu\_id} as the 
+attribute containing aligned chunks of text. The alignment attribute\index{attribute!alignment} 
+is named \textbf{vie\_fr} in the corpus\index{corpus} \textbf{VIE\_RU} and \textbf{vie\_ru} 
+in the corpus \textbf{VIE\_FR}.
+
+For region 5 of the \textbf{tu\_id} attribute in \textbf{VIE\_RU}, the 
+corresponding cpos\index{cpos} in corpus \textbf{VIE\_RU} are obtained with:
+
+\begin{verbatim}
+> cpos <- cqi_alg2cpos("VIE_RU.vie_fr", 5)
+> cpos
+[1]  89 132 110 166
+> str <- cqi_cpos2str("VIE_FR.word", cpos)
+[1] "comme"  "dont"   "Jeanne" "."
+\end{verbatim}
+
+\paragraph{cqi\_cpos2alg}
+\index{cqi\_cpos2alg}
+
+Convert from a token in corpus\index{corpus} A to the corresponding
+region\index{region} of an alignment attribute\index{attribute!alignment} in an aligned corpus B.
+
+\paragraph{cqi\_fdist1}
+\index{cqi\_fdist1}
+
+Get a frequency list\index{frequency!list} of the strings of a given positional attribute\index{attribute!positional} in a 
+subcorpus\index{subcorpus}.
+
+In the following example, get all part-of-speech tags :
+
+<<fdist1, echo=TRUE>>=
+cqi_query("DICKENS", "Noun", '[pos="N.*"]')
+fdist <- cqi_fdist1("DICKENS:Noun", "match", "pos")
+cqi_id2str("DICKENS.pos", fdist[,1])
+fdist[,2]
+@
+
+\paragraph{cqi\_fdist2}
+\index{cqi\_fdist2}
+
+Get a cross-tabulated table of the string values of a given positional
+attribute in a subcorpus \index{subcorpus} against the string values of
+another positional attribute.
+
+
+\section{Integrating CQP into R S3 objects and quantitative structures}
+
+A set of high-level functions is aimed at making easier the use of cqp 
+with R and more self-explanatory the data model of CWB. It provides in 
+particular functions for easily creating quantitative data structures.
+
+\subsection{A sample session}
+\label{sec:rcqp-session}
+
+<<rcqp_session, echo=TRUE>>=
+# create a corpus
+c <- corpus("DICKENS")
+# summary give a quick view of the information available in the corpus,
+# it does not display actual information:
+summary(c)
+#
+# printing the corpus (by default, first tokens only)
+c
+@
+
+\subsection{Functions}
+
+\label{sec:rcqp-functions}
+
+\subsubsection{Creating a corpus}
+
+The first step is creating a corpus\index{corpus} object.  A
+\texttt{corpus} object is created with the function \texttt{corpus()}.
+This object may be used with the two functions below, as well as for
+creating \texttt{subcorpus}\index{subcorpus}, \texttt{cqp\_flist} and
+\texttt{cqp\_ftable} objects (see below).
+
+\paragraph{print}
+\index{print}
+
+Print all information (but the value of structural attributes\index{attribute!structural} having a 
+value) as a dataframe.
+
+\paragraph{summary}
+\index{summary}
+
+Give the number of tokens of a corpus\index{corpus}, list all the attributes 
+(positional, structural, alignment) ; for each positional attribute\index{attribute!positional} (and 
+structural attribute\index{attribute!structural} having a value) give the number of types and print 
+some type samples.
+
+\paragraph{write}
+\index{write}
+
+Write into a file with an argument \emph{filename} and optional arguments \emph{from} 
+and \emph{to} denoting token cpos\index{cpos}.
+
+\paragraph{region\_sizes.cqp\_corpus}
+\index{region\_sizes.cqp\_corpus}
+
+Create a variable containing the size (in tokens) of a given structural 
+attribute.
+
+<<region_size_session, fig=FALSE, echo=TRUE>>=
+c <- corpus("DICKENS");
+sentences <- region_sizes(c$s);
+hist(sentences);
+@
+
+% ======================================================
+
+\subsubsection{Accessing attribute}
+
+Attribute\index{attribute} can be accessed very easily by the "\$" and "[[" 
+operator.\index{\$.cqp\_corpus}\index{[[.cqp\_corpus}. The former suppose 
+to type the exact name, the latter allows for using a variable. Here are 
+three identical way of accessing the \texttt{word} attribute.
+
+<<attr_intro, echo=TRUE>>=
+c <- corpus("DICKENS");
+x <- c$word
+x <- c[["word"]]
+attr <- "word"
+x <- c[[ attr ]]
+@
+
+Once created, several functions are available.
+
+\index{attribute!positional}Positional attribute have the functions
+\texttt{ntype}, \texttt{types}, \texttt{ntoken} and \texttt{tokens}.
+\index{ntype}\index{types}\index{ntoken}\index{tokens}
+
+<<attr_positional, echo=TRUE>>=
+c <- corpus("DICKENS");
+a <- c$pos
+ntoken(a)
+tokens(a)[1:5]
+
+ntype(a)
+types(a)
+
+w <- c$word
+ntoken(w)
+tokens(w)[1:5]
+
+ntype(w)
+types(w)[1:10]
+@
+
+\index{attribute!structural}Structural attribute have the functions
+\texttt{nregions}, i.e. the number of regions, \texttt{tokens} : the 
+region id (\texttt{struc}) of each token of the corpus. Moreover, 
+for structural attribute with value, the function \texttt{regions} allows 
+for retreiving the value of each region.
+\index{nregion}\index{tokens}\index{regions}
+
+<<attr_structural, echo=TRUE>>=
+c <- corpus("DICKENS");
+s <- c$s
+nregion(s)
+
+np <- c$np_h
+nregion(np)
+regions(np)[1:10]
+@
+
+A function \texttt{summary}\index{summary.cqp\_attr} print information 
+about an attribute:
+
+<<attr_summary, echo=TRUE>>=
+c <- corpus("DICKENS");
+summary(c$lemma)
+summary(c$s)
+summary(c$np_h);
+@
+
+% ======================================================
+
+\subsubsection{Creating a subcorpus}
+
+An \texttt{subcorpus} object
+is created with the function \texttt{subcorpus()}. In the CWB 
+terminology, a subcorpus\index{subcorpus} is the set of sequences matched by a query.
+
+<<subcorpus_session, echo=TRUE>>=
+c <- corpus("DICKENS");
+sc <- subcorpus(c, '"interesting" "to" @ []');
+# sc
+#
+# if you want to change the lines printed (0-based);
+# use from/to options:
+print(sc, from=2, to=5);
+#
+# if you want more access on the kwic presentation
+# (sorting, printing), you can construct a cqp_kwic object:
+k <- cqp_kwic(sc, right.context=10, left.context=10)
+print(k, from=5, to=10)
+k <- sort(k, sort.anchor="target", sort.offset=0, sort.attribute="word")
+print(k, from=5, to=10)
+@
+
+\paragraph{print}
+\index{print}
+
+Print a KWIC (\emph{keyword in context}) form.
+
+\paragraph{summary}
+\index{summary}
+
+Get a quick summary of the size and content of the subcorpus\index{subcorpus}.
+
+\subsubsection{Creating a frequency list}
+\index{frequency!list}
+
+A frequency list may be created either with a corpus\index{corpus} or with a subcorpus\index{subcorpus}.
+
+<<cqp_flist_session, echo=TRUE>>=
+
+c <- corpus("DICKENS");
+fl <- cqp_flist(c$lemma);
+summary(fl);
+#
+# get only the 1% most frequent forms
+fl <- cqp_flist(c$lemma, cutoff=0.01);
+summary(fl);
+fl[1:30]
+#
+# get only the forms with freq > 100
+fl <- cqp_flist(c$lemma, cutoff=100);
+summary(fl);
+fl[1:30]
+@
+
+With a subcorpus, a lot of options are available in order to construct the 
+frequency list with a particular anchor\index{anchor}, an offset for address tokens 
+before or after this anchor, and left and right contexts in order to 
+include tokens in a span.
+
+<<cqp_flist_session2, echo=TRUE>>=
+c <- corpus("DICKENS");
+sc <- subcorpus(c, '"interesting" "to" @ []');
+#
+# Create a cqp_flist with the target anchor
+fl <- cqp_flist(sc, "target", "word");
+summary(fl);
+#
+# Same anchor, but count parts of speech
+fl <- cqp_flist(sc, "target", "pos");
+fl;
+#
+# You can extend the span around the anchor with `left.context' and 
+# `right.context'
+fl <- cqp_flist(sc, "match", "pos", left.context=5, right.context=5);
+fl;
+#
+# or with a match..matchend span :
+fl <- cqp_flist(sc, c("match", "matchend"), "pos");
+fl;
+#
+# The two can be used together:
+fl <- cqp_flist(sc, c("match", "matchend"), "pos", left.context=5, right.context=5);
+fl;
+@
+
+\paragraph{summary.cqp\_flist}
+\index{summary.cqp\_flist}
+
+Print information about the frequency list\index{frequency!list}.
+
+\subsubsection{Creating a frequency table}
+\index{frequency!table}
+
+The \texttt{cqp\_ftable} function creates a frequency table: a cross-tabulated
+frequency count according to two attributes.
+\texttt{cqp\_ftable} may be applied either on a corpus\index{corpus}, or a subcorpus\index{subcorpus}.
+It produces a dataframe.
+
+\paragraph{cqp\_ftable with corpus}
+
+\texttt{cqp\_ftable} lets create frequency tables using a 
+corpus\index{corpus} object. The cross-tabulated fields may be positional or  
+structural attributes\index{attribute!structural}.
+
+<<cqp_ftable_session1a, fig=FALSE, echo=TRUE, eval=FALSE>>=
+library(reshape);
+c <- corpus("DICKENS");
+f <- cqp_ftable(c, "novel_title", "pos");
+f[1:10,]
+@
+
+\begin{verbatim}
+         novel_title    pp_h freq
+1  A Christmas Carol       '  615
+2  A Christmas Carol       , 2759
+3  A Christmas Carol       :  514
+4  A Christmas Carol       `  259
+5  A Christmas Carol       (   17
+6  A Christmas Carol       )   17
+7  A Christmas Carol      CC 1333
+8  A Christmas Carol      CD  189
+9  A Christmas Carol      DT 2885
+10 A Christmas Carol      EX   91
+\end{verbatim}
+
+<<cqp_ftable_session1b, fig=FALSE, echo=TRUE, eval=FALSE>>=
+#
+# create a contingency table
+t <- cast(f, novel_title ~ pos, value="freq", fun.aggregate=sum )
+#
+# Visual inspection of frequency of various POS in the different novels
+mosaicplot(as.matrix(t));
+@
+
+Positional attributes (and structural attributes\index{attribute!structural} having values) are 
+represented by their string values rather than by ids. For 
+positional attributes\index{attribute!positional}, it is only a matter of presentation, since each 
+id\index{id} has its own string; but for structural attributes\index{attribute!structural} having values,
+it may entail a different counting: occurrences of phenomena belonging to
+different strucs\index{struc} but with same value are then counted together.
+You can force the use of ids rather than string values with the 
+\texttt{attribute1.use.id} and \texttt{attribute2.use.id} options.
+
+Counts are made on token basis, i.e. each corpus token is an 
+individual on which the two modalities (attributes) are considered. If you 
+use two structural attributes\index{attribute!structural} as arguments in \texttt{cqp\_ftable},
+and one of them does not have values, then the third column counts the number of 
+tokens in the smallest region. In the following example, each line 
+gives the length (in number of tokens, third column) of each sentence (second column)
+in each novel, represented by its title:
+
+<<cqp_ftable_session2, echo=TRUE, eval=FALSE>>=
+f <- cqp_ftable(c, "novel_title", "s")
+f[1:10,]
+@
+
+\begin{verbatim}
+         novel_title s freq
+1  A Christmas Carol 0    3
+2  A Christmas Carol 1    3
+3  A Christmas Carol 2   41
+4  A Christmas Carol 3   15
+5  A Christmas Carol 4   12
+6  A Christmas Carol 5    6
+7  A Christmas Carol 6    8
+8  A Christmas Carol 7    8
+9  A Christmas Carol 8   22
+10 A Christmas Carol 9    4
+\end{verbatim}
+
+If both structural attributes\index{attribute!structural} have values, you may want to count the 
+number of 
+times the modalities are cooccurring, rather than the total number of 
+tokens included in these cooccurrences. For that purpose, you can use the
+\texttt{structural.attribute.unique.id=TRUE} option. In the following 
+example, we count the number of times each head appears in each novel :
+
+<<cqp_ftable_session3, echo=TRUE, eval=FALSE>>=
+f <- cqp_ftable(c, "novel_title", "pp_h", structural.attribute.unique.id=TRUE)
+f[1:10,]
+@
+\begin{verbatim}
+         novel_title    pp_h freq
+1  A Christmas Carol            1
+2  A Christmas Carol   about   21
+3  A Christmas Carol   above    2
+4  A Christmas Carol  across    3
+5  A Christmas Carol   after   12
+6  A Christmas Carol against    6
+7  A Christmas Carol   along    2
+8  A Christmas Carol amongst    7
+9  A Christmas Carol      as   15
+10 A Christmas Carol      at   83
+\end{verbatim}
+
+Here on the contrary, we count the total number of tokens in each 
+prepositional phrase having a given head :
+
+<<cqp_ftable_session4, echo=TRUE, eval=FALSE>>=
+f <- cqp_ftable(c, "novel_title", "pp_h")
+f[1:10,]
+@
+\begin{verbatim}
+         novel_title    pp_h  freq
+1  A Christmas Carol         29265
+2  A Christmas Carol   about    83
+3  A Christmas Carol   above    12
+4  A Christmas Carol  across     9
+5  A Christmas Carol   after    58
+6  A Christmas Carol against    18
+7  A Christmas Carol   along    20
+8  A Christmas Carol amongst    24
+9  A Christmas Carol      as    42
+10 A Christmas Carol      at   287
+\end{verbatim}
+
+\paragraph{cqp\_ftable with subcorpus}
+
+Applied on a subcorpus\index{subcorpus}, the \texttt{cqp\_ftable} function is mainly a wrapper on the 
+\texttt{cqi\_fdist2}\index{cqi\_fdist2} function. However, it returns a three columns dataframe
+with <strings>, <string>, <freq> rather than a three columns matrix with 
+<ids>, <ids>, <freq> like \texttt{cqi\_fdist2}\index{cqi\_fdist2}.
+
+<<cqp_ftable_session5, echo=TRUE>>=
+c <- corpus("DICKENS");
+sc <- subcorpus(c, '"from" @ [] "to" []')
+f <- cqp_ftable(sc, "target", "word", "matchend", "word");
+f[1:10,]
+@
+
+% ----------------------------------------------------------------
+% ----------------------------------------------------------------
+
+% \begin{Schunk}
+% \begin{Sinput}
+% 
+% \end{Sinput}
+% \end{Schunk}
+
+\printindex
+
+\end{document}
+
+

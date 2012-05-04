@@ -1,0 +1,163 @@
+# ===========================================================================
+# File: "MakefileRcqp.in"
+#                        Created: 2012-03-10 08:46:21
+#              Last modification: 2012-03-10 10:06:53
+# Authors: Bernard Desgraupes <bernard.desgraupes@u-paris10.fr>
+#          Sylvain Loiseau <sylvain.loiseau@univ-paris13.fr>
+# This is part of the R package 'rcqp'.
+# ===========================================================================
+
+
+## Read configuration settings and standard definitions
+
+$(info >>>>>>>>>  cc: ${CC})
+
+CFLAGS:=${CFLAGS} @RCQP_R_CFLAGS@
+
+## Cross-compilation with mingw
+ifdef __MINGW__ 
+CROSS_COMPILATION_DIR = @CROSS_COMPILATION_DIR@
+CFLAGS:=${CFLAGS} -I${CROSS_COMPILATION_DIR}/include
+endif
+
+
+# Source files
+# ============
+
+# cqp directory
+# -------------
+CQP_C_SRC := cqp/ascii-print.c cqp/attlist.c cqp/builtins.c cqp/concordance.c \
+	cqp/context_descriptor.c cqp/corpmanag.c cqp/cqp.c cqp/eval.c \
+	cqp/groups.c cqp/hash.c cqp/html-print.c cqp/latex-print.c cqp/macro.c \
+	cqp/matchlist.c cqp/options.c cqp/output.c cqp/parse_actions.c \
+	cqp/print-modes.c cqp/print_align.c cqp/ranges.c cqp/regex2dfa.c \
+	cqp/sgml-print.c cqp/symtab.c cqp/table.c cqp/targets.c cqp/tree.c \
+	cqp/variables.c
+CQP_C_H := $(CQP_C_SRC:.c=.h)
+CQP_C_OBJ := $(CQP_C_SRC:.c=.o)
+
+CQP_FLEX_SRC := cqp/parser.l
+CQP_FLEX_C := $(CQP_FLEX_SRC:.l=.yy.c)
+CQP_FLEX_H := $(CQP_FLEX_SRC:.l=.yy.h)
+CQP_FLEX_OBJ := $(CQP_FLEX_C:.c=.o)
+
+CQP_BISON_SRC := cqp/parser.y
+CQP_BISON_C := $(CQP_BISON_SRC:.y=.tab.c)
+CQP_BISON_H := $(CQP_BISON_SRC:.y=.tab.h)
+CQP_BISON_OBJ := $(CQP_BISON_C:.c=.o)
+
+CQP_FLEX_FLAGS=
+CQP_BISON_FLAGS=
+
+
+# CQi directory
+# -------------
+CQI_C_SRC := CQi/server.c CQi/auth.c 
+CQI_C_H := $(CQI_C_SRC:.c=.h) CQi/cqi.h
+CQI_C_OBJ := $(CQI_C_SRC:.c=.o)
+
+
+# cl directory
+# ------------
+MMAPS_SRC = cl/windows-mmap.c
+MMAPS_OBJ := $(MMAPS_SRC:.c=.o)
+ifndef __MINGW__
+MMAPS_SRC =
+endif
+
+CL_C_SRC = cl/globals.c cl/macros.c cl/list.c cl/lexhash.c cl/bitfields.c \
+	cl/storage.c cl/fileutils.c cl/special-chars.c cl/regopt.c cl/corpus.c \
+	cl/attributes.c cl/makecomps.c cl/cdaccess.c cl/bitio.c cl/endian.c \
+	cl/compression.c cl/binsert.c cl/class-mapping.c ${MMAPS_SRC}
+
+CL_C_H := $(CL_C_SRC:.c=.h)
+CL_C_OBJ := $(CL_C_SRC:.c=.o)
+
+CL_FLEX_SRC := cl/registry.l
+CL_FLEX_C := $(CL_FLEX_SRC:.l=.yy.c)
+CL_FLEX_H := $(CL_FLEX_SRC:.l=.yy.h)
+CL_FLEX_OBJ := $(CL_FLEX_C:.c=.o)
+
+CL_BISON_SRC := cl/registry.y
+CL_BISON_C := $(CL_BISON_SRC:.y=.tab.c)
+CL_BISON_H := $(CL_BISON_SRC:.y=.tab.h)
+CL_BISON_OBJ := $(CL_BISON_C:.c=.o)
+
+CL_FLEX_FLAGS=-Pcreg
+CL_BISON_FLAGS=-p creg -v
+
+
+CWB_C_OBJ := ${CQP_C_OBJ} ${CQI_C_OBJ} ${CL_C_OBJ}
+CWB_FLEX_OBJ := ${CQP_FLEX_OBJ} ${CL_FLEX_OBJ}
+CWB_BISON_OBJ := ${CQP_BISON_OBJ} ${CL_BISON_OBJ}
+ 
+
+# Substitutable variables
+# =======================
+
+FLEX_PRG=@LEX@
+BISON_PRG=@YACC@
+
+
+
+# Targets
+# =======
+
+# The order of the prerequisites is important: bison, then flex, 
+# then the C source files
+libclcqp.a: ${CWB_BISON_OBJ} ${CWB_FLEX_OBJ} ${CWB_C_OBJ}
+	rm $@
+	${AR} $@ ${CWB_C_OBJ} ${CWB_FLEX_OBJ} ${CWB_BISON_OBJ} 
+	${RANLIB} $@
+
+
+${CQP_FLEX_C}: ${CQP_FLEX_SRC}
+	${FLEX_PRG} ${CQP_FLEX_FLAGS} --header-file=${CQP_FLEX_H} -o ${CQP_FLEX_C} ${CQP_FLEX_SRC}
+
+
+${CQP_BISON_C}: ${CQP_BISON_SRC}
+	${BISON_PRG} ${CQP_BISON_FLAGS} --defines=${CQP_BISON_H} -o ${CQP_BISON_C} ${CQP_BISON_SRC}
+
+
+${CQP_FLEX_OBJ}: ${CQP_FLEX_C}
+	${CC} -c ${CFLAGS} -o ${CQP_FLEX_OBJ} ${CQP_FLEX_C}
+
+
+${CQP_BISON_OBJ}: ${CQP_BISON_C}
+	${CC} -c ${CFLAGS} -o ${CQP_BISON_OBJ} ${CQP_BISON_C}
+
+
+${CL_FLEX_C}: ${CL_FLEX_SRC}
+	${FLEX_PRG} ${CL_FLEX_FLAGS} --header-file=${CL_FLEX_H} -o ${CL_FLEX_C} ${CL_FLEX_SRC}
+
+
+${CL_BISON_C}: ${CL_BISON_SRC}
+	${BISON_PRG} ${CL_BISON_FLAGS} --defines=${CL_BISON_H} -o ${CL_BISON_C} ${CL_BISON_SRC}
+
+
+${CL_FLEX_OBJ}: ${CL_FLEX_C}
+	${CC} -c ${CFLAGS} -o ${CL_FLEX_OBJ} ${CL_FLEX_C}
+
+
+${CL_BISON_OBJ}: ${CL_BISON_C}
+	${CC} -c ${CFLAGS} -o ${CL_BISON_OBJ} ${CL_BISON_C}
+
+
+
+.PHONY: all clean clean-all
+
+all: libclcqp.a
+
+
+clean:
+	-${RM} ${CWB_C_OBJ} ${CWB_FLEX_OBJ} ${CWB_BISON_OBJ} \
+	    libclcqp.a ${MMAPS_OBJ}
+
+
+clean-all: clean
+	-${RM} ${CQP_FLEX_C} ${CQP_FLEX_H} \
+	    ${CQP_BISON_C} ${CQP_BISON_H} \
+	    ${CL_FLEX_C} ${CL_FLEX_H} \
+	    ${CL_BISON_C} ${CL_BISON_H} \
+		MakefileRcqp
+
