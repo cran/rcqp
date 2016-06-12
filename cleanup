@@ -1,0 +1,31 @@
+#!/bin/sh
+
+# ===========================================================================
+# File: "cleanup"
+#                        Created: 2016-06-07 18:35:25
+#              Last modification: 2016-06-07 18:40:37
+# Author: Bernard Desgraupes
+# e-mail: <bernard.desgraupes@u-paris10.fr>
+# ===========================================================================
+
+# The (Bourne shell) script cleanup is executed as last thing by R CMD
+# INSTALL if present and option --clean was given, and by R CMD BUILD when
+# preparing the package for building from its source. 
+
+rm -f src/*.{o,so}
+rm -f libclcqp.a
+rm -f src/cwb/cl/*.{o,so}
+rm -f src/cwb/CQi/*.{o,so}
+rm -f src/cwb/cqp/*.{o,so}
+rm -f src/cwb/utils/*.{o,so}
+rm -f src/Makevars
+rm -f config.{log,status}
+if test -e autom4te.cache; then \
+	rm -rf autom4te.cache/*; \
+	rmdir autom4te.cache; \
+fi
+rm -f vignettes/*.{tex,aux,bbl,blg,log,toc,idx,ind,ilg,out,synctex.gz} 
+
+
+
+

@@ -16,7 +16,7 @@
  */
 
 #ifndef _cqp_table_h
-#define _cqp_table_h_
+#define _cqp_table_h
 
 #include "corpmanag.h"
 

@@ -1,11 +1,23 @@
 \name{cqp_registry}
 \alias{cqp_registry}
+\alias{cqi_getRegistry}
+\alias{cqi_setRegistry}
 
 \title{The CQP registry}
 
 \description{
 Setting the CQP registry for rcqp.
 }
+
+\usage{
+	cqi_getRegistry()
+	cqi_setRegistry(path)
+}
+
+\arguments{
+	\item{path}{(\emph{string}) the full path of the registry directory.}
+}
+
 
 \details{
 
@@ -18,8 +30,14 @@ directory is to define the environment variable
 In \code{rcqp}, the \code{CORPUS_REGISTRY} environment variable is first
 read. If it is not set, rcqp tries to use the default registry directory,
 which varies according to your system (on most Unixes, it is
-\file{/usr/local/share/cwb/registry}; on Windows, it is \file{C:\\CWB\\Registry}). If this default
-directory does not exist, \code{rcqp} cannot proceed further.
+\file{/usr/local/share/cwb/registry}; on Windows, it is
+\file{C:\\CWB\\Registry}). If this default directory does not exist, \code{rcqp} 
+cannot proceed further. At this point, you can use the
+\code{cqi_setRegistry} function to specify the path of the registry
+directory.
+
+The path passed to the \code{cqi_setRegistry} function must exist. Note that,
+once it is set, the path of the registry may not be changed.
 
 In order to set the \code{CORPUS_REGISTRY} variable, you can 
 \itemize{
@@ -37,6 +55,14 @@ In order to set the \code{CORPUS_REGISTRY} variable, you can
 	
 	}
 }
+
+\value{
+	\code{cqi_getRegistry} returns a vector with the path of the registry
+	directory if it has been set, otherwise the NULL string.
+    \code{cqi_setRegistry} does not return anything.
+}
+
+
 
 \author{
 	Bernard Desgraupes - \email{bernard.desgraupes@u-paris10.fr} - University Paris-10.\cr
@@ -58,7 +84,10 @@ In order to set the \code{CORPUS_REGISTRY} variable, you can
 }
 
 \examples{
+\dontrun{
 Sys.setenv(CORPUS_REGISTRY="/users/vhugo/cwb/registry")
+cqi_setRegistry("/users/vhugo/cwb/registry")
+}
 }
 
 \keyword{registry}

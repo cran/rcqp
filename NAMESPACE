@@ -1,4 +1,6 @@
 export(
+	"cqi_getRegistry",
+	"cqi_setRegistry",
 	"cqi_attribute_size",
 	"cqi_attributes",
 	"cqi_alg2cpos",
@@ -20,7 +22,6 @@ export(
 	"cqi_lexicon_size",
 	"cqi_list_corpora",
 	"cqi_list_subcorpora",
-#	"cqi_cqp",
 	"cqi_query",
 	"cqi_regex2id",
 	"cqi_str2id",
@@ -82,10 +83,32 @@ export(
 	"size",
 	"size.cqp_corpus",
 	"size.cqp_subcorpus"
-
-
 )
 
-# 	"cqi_charset",
-# 	"cqi_idlist2cpos",
-# 	"cqi_properties",
+importFrom("plyr","count")
+importFrom("utils","write.table")
+
+S3method(cqp_flist,cqp_attr)
+S3method(cqp_flist,cqp_corpus)
+S3method(cqp_flist,cqp_subcorpus)
+S3method(cqp_ftable,cqp_corpus)
+S3method(cqp_ftable,cqp_subcorpus)
+S3method(cqp_kwic,cqp_subcorpus)
+S3method(nregion,cqp_attr)
+S3method(ntoken,cqp_attr)
+S3method(ntype,cqp_attr)
+S3method(print,cqp_attr)
+S3method(print,cqp_corpus)
+S3method(print,cqp_flist)
+S3method(print,cqp_kwic)
+S3method(print,cqp_subcorpus)
+S3method(regions,cqp_attr)
+S3method(size,cqp_corpus)
+S3method(size,cqp_subcorpus)
+S3method(sort,cqp_kwic)
+S3method(summary,cqp_attr)
+S3method(summary,cqp_corpus)
+S3method(summary,cqp_flist)
+S3method(summary,cqp_subcorpus)
+S3method(tokens,cqp_attr)
+S3method(types,cqp_attr)

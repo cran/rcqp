@@ -1,15 +1,113 @@
 /* ===========================================================================
 * File: "rcqpCommands.c"
 *                        Created: 2012-01-13 18:49:02
-*              Last modification: 2012-01-25 15:07:01
+*              Last modification: 2016-06-10 15:12:43
 * Authors: Bernard Desgraupes <bernard.desgraupes@u-paris10.fr>
 *          Sylvain Loiseau <sylvain.loiseau@univ-paris13.fr>
-* (c) Copyright: 2011-2012
+* Copyright (c) 2011-2016 
 * All rights reserved.
 * ===========================================================================
 */
 	
 #include "rcqp.h"
+
+static Rboolean sPathInitialized = FALSE;
+
+#define RCQP_ATT_HASH_SIZE 16384
+
+#define RCQ_CHECK_INITIALIZED 	if (!sPathInitialized) { \
+		error("the path registry has not been initialized.\nSee ?cqi_setRegistry for more info on how to set the registry."); \
+	} 
+
+
+/* 
+ * ------------------------------------------------------------------------
+ * 
+ * "void rcqp_start_cwb()" --
+ * 
+ * 
+ * 
+ * ------------------------------------------------------------------------
+ */
+void rcqp_start_cwb()
+{
+	int			ac = 1;
+	char *		av[1];
+
+	if (sPathInitialized == TRUE) {
+		error("the cwb library has already been initialized");
+	} 
+	sPathInitialized = TRUE;
+	av[0] = "rcqp";
+	which_app = cqp;
+	silent = 1; 
+	paging = 0;
+	autoshow = 0;
+	auto_save = 0;
+	server_log = 0;
+	enable_macros = 0;
+
+	initialize_cqp(ac, av);
+	make_attribute_hash(RCQP_ATT_HASH_SIZE);
+}
+
+
+/* 
+ * ------------------------------------------------------------------------
+ * 
+ * "rcqpCmd_getRegistry()" --
+ * 
+ * 
+ * 
+ * ------------------------------------------------------------------------
+ */
+SEXP rcqpCmd_getRegistry()
+{
+	SEXP		result = R_NilValue;
+	char *		regStr;
+	
+	regStr = cl_standard_registry();
+	if (regStr != NULL) {
+		result = PROTECT(allocVector(STRSXP, 1));
+		SET_STRING_ELT(result, 0, mkChar(regStr));
+		UNPROTECT(1);
+	} 
+	
+	return result;
+}
+
+	
+
+/* 
+ * ------------------------------------------------------------------------
+ * 
+ * "rcqpCmd_setRegistry(SEXP inPath)" --
+ * 
+ * 
+ * 
+ * ------------------------------------------------------------------------
+ */
+SEXP rcqpCmd_setRegistry(SEXP inPath)
+{
+	SEXP		result = R_NilValue;
+	char *		regStr;
+	
+	if (sPathInitialized == TRUE) {
+		error("the path registry has already been initialized");
+	} 
+	regStr = (char*)CHAR(STRING_ELT(inPath,0));
+	if( access(regStr, F_OK) != -1 ) {
+		// Path exists
+		setenv("CORPUS_REGISTRY",regStr,1);		
+		rcqp_start_cwb();
+	} else {
+		error("%s: no such file", regStr);
+	}
+	
+	return result;
+}
+
+	
 
 /* 
  * ------------------------------------------------------------------------
@@ -25,6 +123,8 @@ SEXP rcqpCmd_list_corpora()
 	SEXP			result = R_NilValue;
 	CorpusList *	cl;
 	int				i = 0, n = 0;
+	
+	RCQ_CHECK_INITIALIZED
 	
 	/* First count corpora */
 	for (cl = FirstCorpusFromList(); cl != NULL; cl = NextCorpusFromList(cl)) {
@@ -63,6 +163,8 @@ SEXP rcqpCmd_full_name(SEXP inCorpus)
 	char *			c;
 	CorpusList *	cl;
 	
+	RCQ_CHECK_INITIALIZED
+
 	if (!isString(inCorpus) || length(inCorpus) != 1) error("invalid corpus name");
 	PROTECT(inCorpus);
 
@@ -98,6 +200,10 @@ SEXP rcqpCmd_charset(SEXP inCorpus)
 {
 	SEXP			result = R_NilValue;
 	
+	error("feature not yet implemented in CQP");
+
+	RCQ_CHECK_INITIALIZED
+
 	if (!isString(inCorpus) || length(inCorpus) != 1) error("invalid corpus name");
 
 	result = PROTECT(allocVector(STRSXP, 1));
@@ -122,6 +228,9 @@ SEXP rcqpCmd_charset(SEXP inCorpus)
 SEXP rcqpCmd_properties(SEXP inCorpus)
 {
 	error("feature not yet implemented in CQP");
+
+	RCQ_CHECK_INITIALIZED
+
 	return R_NilValue;
 }
 
@@ -144,6 +253,8 @@ SEXP rcqpCmd_attributes(SEXP inCorpus, SEXP inType)
 	Attribute *		a;
 	int				i = 0, n = 0, type;
 	
+	RCQ_CHECK_INITIALIZED
+
 	if (!isString(inCorpus) || length(inCorpus) != 1) error("invalid corpus name");
 	PROTECT(inCorpus);
 
@@ -195,6 +306,8 @@ SEXP rcqpCmd_attribute_size(SEXP inAttribute)
 	int				size;
 	int				found = 0;
 	
+	RCQ_CHECK_INITIALIZED
+
 	if (!isString(inAttribute) || length(inAttribute) != 1) error("argument 'attribute' must be a string");
 	PROTECT(inAttribute);
 
@@ -264,6 +377,8 @@ SEXP rcqpCmd_structural_attribute_has_values(SEXP inAttribute)
 	Attribute *		attribute;
 	
 	
+	RCQ_CHECK_INITIALIZED
+
 	/* rcqp_initialize(); */
 	if (!isString(inAttribute) || length(inAttribute) != 1) error("argument 'attribute' must be a string");
 	PROTECT(inAttribute);
@@ -300,6 +415,8 @@ SEXP rcqpCmd_corpus_info(SEXP inCorpus)
 	char *			c;
 	CorpusList *	cl;
 	
+	RCQ_CHECK_INITIALIZED
+
 	if (!isString(inCorpus) || length(inCorpus) != 1) error("invalid corpus name");
 	PROTECT(inCorpus);
 
@@ -335,6 +452,8 @@ SEXP rcqpCmd_lexicon_size(SEXP inAttribute)
 	Attribute *		attribute;
 	int 			size;
 	
+	RCQ_CHECK_INITIALIZED
+
 	if (!isString(inAttribute) || length(inAttribute) != 1) error("argument 'attribute' must be a string");
 	PROTECT(inAttribute);
 
@@ -380,6 +499,8 @@ SEXP rcqpCmd_str2id(SEXP inAttribute, SEXP inStrs)
 	char 			*a, *str;
 	Attribute *		attribute;
 	
+	RCQ_CHECK_INITIALIZED
+
 	if (!isString(inAttribute) || length(inAttribute) != 1) error("argument 'attribute' must be a string");
 	PROTECT(inAttribute);
 	if (!isString(inStrs)) error("argument 'strs' must be a vector of strings");
@@ -429,6 +550,8 @@ SEXP rcqpCmd_id2str(SEXP inAttribute, SEXP inIds)
 	char 			*a, *str;
 	Attribute *		attribute;
 	
+	RCQ_CHECK_INITIALIZED
+
 	if (!isString(inAttribute) || length(inAttribute) != 1) error("argument 'attribute' must be a string");
 	PROTECT(inAttribute);
 	if (!isVector(inIds)) error("argument 'ids' must be a vector of integers");
@@ -478,6 +601,8 @@ SEXP rcqpCmd_id2freq(SEXP inAttribute, SEXP inIds)
 	char 			*a;
 	Attribute *		attribute;
 	
+	RCQ_CHECK_INITIALIZED
+
 	if (!isString(inAttribute) || length(inAttribute) != 1) error("argument 'attribute' must be a string");
 	PROTECT(inAttribute);
 	if (!isVector(inIds)) error("argument 'ids' must be a vector of integers");
@@ -527,6 +652,8 @@ SEXP rcqpCmd_id2cpos(SEXP inAttribute, SEXP inId)
 	char 			*a;
 	Attribute *		attribute;
 	
+	RCQ_CHECK_INITIALIZED
+
 	if (!isString(inAttribute) || length(inAttribute) != 1) error("argument 'attribute' must be a string");
 	PROTECT(inAttribute);
 	if (!isVector(inId) || length(inId) != 1) error("argument 'id' must be an integer");
@@ -578,6 +705,8 @@ SEXP rcqpCmd_cpos2id(SEXP inAttribute, SEXP inCpos)
 	char *			a;
 	Attribute *		attribute;
 	
+	RCQ_CHECK_INITIALIZED
+
 	if (!isString(inAttribute) || length(inAttribute) != 1) error("argument 'attribute' must be a string");
 	PROTECT(inAttribute);
 	if (!isVector(inCpos)) error("argument 'cpos' must be a vector of integers");
@@ -626,6 +755,8 @@ SEXP rcqpCmd_cpos2str(SEXP inAttribute, SEXP inCpos)
 	char 			*a, *str;
 	Attribute *		attribute;
 	
+	RCQ_CHECK_INITIALIZED
+
 	if (!isString(inAttribute) || length(inAttribute) != 1) error("argument 'attribute' must be a string");
 	PROTECT(inAttribute);
 	if (!isVector(inCpos)) error("argument 'cpos' must be a vector of integers");
@@ -675,6 +806,8 @@ SEXP rcqpCmd_cpos2struc(SEXP inAttribute, SEXP inCpos)
 	char *			a;
 	Attribute *		attribute;
 	
+	RCQ_CHECK_INITIALIZED
+
 	if (!isString(inAttribute) || length(inAttribute) != 1) error("argument 'attribute' must be a string");
 	PROTECT(inAttribute);
 	if (!isVector(inCpos)) error("argument 'cpos' must be a vector of integers");
@@ -723,6 +856,8 @@ SEXP rcqpCmd_cpos2lbound(SEXP inAttribute, SEXP inCpos)
 	char *			a;
 	Attribute *		attribute;
 	
+	RCQ_CHECK_INITIALIZED
+
 	if (!isString(inAttribute) || length(inAttribute) != 1) error("argument 'attribute' must be a string");
 	PROTECT(inAttribute);
 	if (!isVector(inCpos)) error("argument 'cpos' must be a vector of integers");
@@ -779,6 +914,8 @@ SEXP rcqpCmd_cpos2rbound(SEXP inAttribute, SEXP inCpos)
 	char *			a;
 	Attribute *		attribute;
 	
+	RCQ_CHECK_INITIALIZED
+
 	if (!isString(inAttribute) || length(inAttribute) != 1) error("argument 'attribute' must be a string");
 	PROTECT(inAttribute);
 	if (!isVector(inCpos)) error("argument 'cpos' must be a vector of integers");
@@ -834,6 +971,8 @@ SEXP rcqpCmd_alg2cpos(SEXP inAttribute, SEXP inAlg)
 	char *			a;
 	Attribute *		attribute;
 	
+	RCQ_CHECK_INITIALIZED
+
 	if (!isString(inAttribute) || length(inAttribute) != 1) error("argument 'attribute' must be a string");
 	if (!isVector(inAlg) || length(inAlg) != 1) error("argument 'alg' must be an integer");
 	PROTECT(inAttribute);
@@ -887,6 +1026,8 @@ SEXP rcqpCmd_cpos2alg(SEXP inAttribute, SEXP inCpos)
 	char *			a;
 	Attribute *		attribute;
 	
+	RCQ_CHECK_INITIALIZED
+
 	if (!isString(inAttribute) || length(inAttribute) != 1) error("argument 'attribute' must be a string");
 	PROTECT(inAttribute);
 	if (!isVector(inCpos)) error("argument 'cpos' must be a vector of integers");
@@ -934,6 +1075,8 @@ SEXP rcqpCmd_struc2cpos(SEXP inAttribute, SEXP inStruc)
 	char *			a;
 	Attribute *		attribute;
 	
+	RCQ_CHECK_INITIALIZED
+
 	if (!isString(inAttribute) || length(inAttribute) != 1) error("argument 'attribute' must be a string");
 	PROTECT(inAttribute);
 	if (!isVector(inStruc) || length(inStruc) != 1) error("argument 'struc' must be an integer");
@@ -981,6 +1124,8 @@ SEXP rcqpCmd_struc2str(SEXP inAttribute, SEXP inIds)
 	char 			*a, *str;
 	Attribute *		attribute;
 	
+	RCQ_CHECK_INITIALIZED
+
 	if (!isString(inAttribute) || length(inAttribute) != 1) error("argument 'attribute' must be a string");
 	PROTECT(inAttribute);
 	if (!isVector(inIds)) error("argument 'ids' must be a vector of integers");
@@ -1026,6 +1171,10 @@ SEXP rcqpCmd_idlist2cpos(SEXP inAttribute, SEXP inIds)
 {
 	SEXP			result = R_NilValue;
 	
+	error("feature not yet implemented in CQP");
+
+	RCQ_CHECK_INITIALIZED
+
 	return result;
 }
 
@@ -1048,6 +1197,8 @@ SEXP rcqpCmd_regex2id(SEXP inAttribute, SEXP inRegex)
 	char 			*a, *r;
 	Attribute *		attribute;
 	
+	RCQ_CHECK_INITIALIZED
+
 	if (!isString(inAttribute) || length(inAttribute) != 1) error("argument 'attribute' must be a string");
 	PROTECT(inAttribute);
 	if (!isString(inRegex) || length(inRegex) != 1) error("argument 'regexp' must be a string");
@@ -1099,6 +1250,8 @@ SEXP rcqpCmd_cqp(SEXP inQuery)
 	SEXP			result = R_NilValue;
 	char			*query;
 	
+	RCQ_CHECK_INITIALIZED
+
 	if (!isString(inQuery) || length(inQuery) != 1) error("invalid query name");
 	
 	PROTECT(inQuery);
@@ -1136,6 +1289,8 @@ SEXP rcqpCmd_query(SEXP inMother, SEXP inChild, SEXP inQuery)
 	SEXP			result = R_NilValue;
 	char			*child, *mother, *query, *c, *sc;
 	
+	RCQ_CHECK_INITIALIZED
+
 	if (!isString(inMother) || length(inMother) != 1) error("invalid corpus name");
 	if (!isString(inChild) || length(inChild) != 1) error("invalid subcorpus name");
 	if (!isString(inQuery) || length(inQuery) != 1) error("invalid query name");
@@ -1209,6 +1364,8 @@ SEXP rcqpCmd_list_subcorpora(SEXP inCorpus)
 	CorpusList		*cl, *mother;
 	int				i = 0, n = 0;
 	
+	RCQ_CHECK_INITIALIZED
+
 	PROTECT(inCorpus);
 
 	corpus = (char*)CHAR(STRING_ELT(inCorpus,0));
@@ -1256,6 +1413,8 @@ SEXP rcqpCmd_subcorpus_size(SEXP inSubcorpus)
 	char *			subcorpus;
 	CorpusList *	cl;
 	
+	RCQ_CHECK_INITIALIZED
+
 	PROTECT(inSubcorpus);
 
 	subcorpus = (char*)CHAR(STRING_ELT(inSubcorpus,0));
@@ -1291,6 +1450,8 @@ SEXP rcqpCmd_dump_subcorpus(SEXP inSubcorpus, SEXP inFirst, SEXP inLast)
 	CorpusList *	cl;
 	int				i, first, last, nrows;
 	
+	RCQ_CHECK_INITIALIZED
+
 	if (!isString(inSubcorpus) || length(inSubcorpus) != 1) error("invalid subcorpus name");
 	
 	PROTECT(inSubcorpus);
@@ -1367,6 +1528,8 @@ SEXP rcqpCmd_drop_subcorpus(SEXP inSubcorpus)
 	char 			*c, *sc;
 	CorpusList *	cl;
 	
+	RCQ_CHECK_INITIALIZED
+
 	PROTECT(inSubcorpus);
 	
 	subcorpus = (char*)CHAR(STRING_ELT(inSubcorpus,0));
@@ -1420,6 +1583,8 @@ SEXP rcqpCmd_fdist1(SEXP inSubcorpus, SEXP inField1, SEXP inKey1, SEXP inCutoff,
 	Group *			table;
 	FieldType		fieldtype = NoField;
 	
+	RCQ_CHECK_INITIALIZED
+
 	PROTECT(inSubcorpus);
 	PROTECT(inField1);
 	PROTECT(inKey1);
@@ -1496,6 +1661,8 @@ SEXP rcqpCmd_fdist2(SEXP inSubcorpus, SEXP inField1, SEXP inKey1, SEXP inField2,
 	Group *			table;
 	FieldType		fieldtype1 = NoField;
 	FieldType		fieldtype2 = NoField;
+
+	RCQ_CHECK_INITIALIZED
 
 	PROTECT(inSubcorpus);
 	PROTECT(inField1);

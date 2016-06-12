@@ -14,9 +14,12 @@ Create a frequency table either with a corpus or with a subcorpus. With a corpus
 \usage{
 cqp_ftable(x, ...)
 
- \method{cqp_ftable}{cqp_corpus}(x, attribute1, attribute2, attribute1.use.id = FALSE, attribute2.use.id = FALSE, structural.attribute.unique.id = FALSE, subcorpus = NULL, ...)
+ \method{cqp_ftable}{cqp_corpus}(x, attribute1, attribute2, attribute1.use.id = FALSE, 
+        attribute2.use.id = FALSE, structural.attribute.unique.id = FALSE, 
+		subcorpus = NULL, ...)
  
- \method{cqp_ftable}{cqp_subcorpus}(x, anchor1, attribute1, anchor2, attribute2, cutoff = 0, ...)
+ \method{cqp_ftable}{cqp_subcorpus}(x, anchor1, attribute1, 
+        anchor2, attribute2, cutoff = 0, ...)
 }
 
 \arguments{

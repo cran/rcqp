@@ -8,39 +8,37 @@
 # All rights reserved.
 # ===========================================================================
 
-# ## 
-#  # ------------------------------------------------------------------------
-#  # 
-#  # "concordance" --
-#  # 
-#  # ------------------------------------------------------------------------
-#  ##
-# concordance <- function(corpus, query, left.context=10, right.context=10)
-# {
-# 	ans <- .Call("rcqpCmd_concordance", corpus, query, left.context, right.context, PACKAGE="rcqp")
-#     return(ans)
-# }
+
+## 
+ # ------------------------------------------------------------------------
+ # 
+ # "cqi_getRegistry()" --
+ # 
+ # Example:
+ #		cqi_setRegistry()
+ # 
+ # ------------------------------------------------------------------------
+ ##
+cqi_getRegistry <- function() {
+	ans <- .Call("rcqpCmd_getRegistry", PACKAGE="rcqp")
+    return(ans)
+}
 
 
 ## 
  # ------------------------------------------------------------------------
  # 
- # "cqi_cqp(mother, child, query)" --
+ # "cqi_setRegistry(path)" --
  # 
  # Example:
- #      cqi_query("DICKENS", "Aa", '[(pos="JJ") & (lemma="modern")];')
- #		cqi_cqp('set Aa keyword nearest [pos="NN"] within right 5 words from match;')
+ #		cqi_setRegistry("/opt/local/share/cwb/registry")
  # 
  # ------------------------------------------------------------------------
  ##
-# cqi_cqp <- function(query) {
-# # 	if (nchar(child) == 0) {
-# # 
-# # 	} TODO check ;
-# 	.Call("rcqpCmd_cqp", query, PACKAGE="rcqp")
-#     return(invisible())
-# }
-
+cqi_setRegistry <- function(path) {
+	.Call("rcqpCmd_setRegistry", path, PACKAGE="rcqp")
+    return(invisible())
+}
 
 
 ## 
@@ -217,37 +215,6 @@ cqi_fdist2 <- function(subcorpus, field1, key1, field2, key2, cutoff=0) {
 	ans <- .Call("rcqpCmd_fdist2", subcorpus, field1, key1, field2, key2, as.integer(cutoff), PACKAGE="rcqp")
     return(ans)
 }
-
-
-# ## 
-#  # ------------------------------------------------------------------------
-#  # 
-#  # "cqi_charset(corpus)" --
-#  # 
-#  # Currently always returns "latin1".
-#  # 
-#  # ------------------------------------------------------------------------
-#  ##
-# cqi_charset <- function(corpus) {
-# 	ans <- .Call("rcqpCmd_charset", corpus, PACKAGE="rcqp")
-#     return(ans)
-# }
-
-
-# ## 
-#  # ------------------------------------------------------------------------
-#  # 
-#  # "cqi_properties(corpus)" --
-#  # 
-#  # Example:
-#  # 
-#  # 
-#  # ------------------------------------------------------------------------
-#  ##
-# cqi_properties <- function(corpus) {
-# 	ans <- .Call("rcqpCmd_properties", corpus, PACKAGE="rcqp")
-#     return(ans)
-# }
 
 
 ## 
@@ -576,6 +543,71 @@ cqi_struc2str <- function(attribute, ids) {
     return(ans)
 }
 
+
+
+# ## 
+#  # ------------------------------------------------------------------------
+#  # 
+#  # "concordance" --
+#  # 
+#  # ------------------------------------------------------------------------
+#  ##
+# concordance <- function(corpus, query, left.context=10, right.context=10)
+# {
+# 	ans <- .Call("rcqpCmd_concordance", corpus, query, left.context, right.context, PACKAGE="rcqp")
+#     return(ans)
+# }
+
+
+## 
+ # ------------------------------------------------------------------------
+ # 
+ # "cqi_cqp(mother, child, query)" --
+ # 
+ # Example:
+ #      cqi_query("DICKENS", "Aa", '[(pos="JJ") & (lemma="modern")];')
+ #		cqi_cqp('set Aa keyword nearest [pos="NN"] within right 5 words from match;')
+ # 
+ # ------------------------------------------------------------------------
+ ##
+# cqi_cqp <- function(query) {
+# # 	if (nchar(child) == 0) {
+# # 
+# # 	} TODO check ;
+# 	.Call("rcqpCmd_cqp", query, PACKAGE="rcqp")
+#     return(invisible())
+# }
+
+
+# ## 
+#  # ------------------------------------------------------------------------
+#  # 
+#  # "cqi_charset(corpus)" --
+#  # 
+#  # Currently always returns "latin1".
+#  # 
+#  # ------------------------------------------------------------------------
+#  ##
+# cqi_charset <- function(corpus) {
+# 	ans <- .Call("rcqpCmd_charset", corpus, PACKAGE="rcqp")
+#     return(ans)
+# }
+
+
+# ## 
+#  # ------------------------------------------------------------------------
+#  # 
+#  # "cqi_properties(corpus)" --
+#  # 
+#  # Example:
+#  # 
+#  # 
+#  # ------------------------------------------------------------------------
+#  ##
+# cqi_properties <- function(corpus) {
+# 	ans <- .Call("rcqpCmd_properties", corpus, PACKAGE="rcqp")
+#     return(ans)
+# }
 
 
 

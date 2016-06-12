@@ -8,9 +8,9 @@
   \tabular{ll}{
     Package: \tab rcqp\cr
     Type: \tab Package\cr
-    Version: \tab 0.1\cr
-    Date: \tab 2012-01-20\cr
-    License: \tab  GPL (>= 2) \cr
+    Version: \tab \Sexpr[stage=render]{library(utils);packageVersion("rcqp")}\cr
+    Date: \tab \Sexpr[stage=build]{format(Sys.time(),"\%Y-\%m-\%d")}\cr
+    License: \tab \Sexpr[stage=build]{library(utils);packageDescription("rcqp")$License} \cr
   }
 }
 

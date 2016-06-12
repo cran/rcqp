@@ -1,10 +1,10 @@
 # ===========================================================================
 # File: "s3.R"
 #                        Created: 2012-01-23 07:50:09
-#              Last modification: 2012-01-23 07:50:09
+#              Last modification: 2016-06-07 14:51:28
 # Authors: Bernard Desgraupes <bernard.desgraupes@u-paris10.fr>
 #          Sylvain Loiseau <sylvain.loiseau@univ-paris13.fr>
-# (c) Copyright: 2011-2012
+# Copyright (c) 2011-2016 
 # All rights reserved.
 # ===========================================================================
 
@@ -26,8 +26,6 @@
 ###########################################################################
 # S3 generic methods
 ###########################################################################
-
-
 
 size <- function (x) UseMethod("size");
 cqp_flist <- function(x, ...) UseMethod("cqp_flist");

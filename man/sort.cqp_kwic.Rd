@@ -8,7 +8,8 @@ Sort a kwic list
 Sort a kwic list with respect to an anchor and a positional attribute.
 }
 \usage{
- \method{sort}{cqp_kwic}(x, decreasing = FALSE, sort.anchor = "match", sort.attribute = "word", sort.offset = 0, ...)
+ \method{sort}{cqp_kwic}(x, decreasing = FALSE, sort.anchor = "match", 
+        sort.attribute = "word", sort.offset = 0, ...)
 }
 
 \arguments{

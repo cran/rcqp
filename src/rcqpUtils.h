@@ -1,10 +1,10 @@
 /* ===========================================================================
  * File: "rcqpUtils.h"
  *                        Created: 2012-01-13 18:49:02
- *              Last modification: 2012-01-19 12:02:03
+ *              Last modification: 2016-06-10 14:27:17
  * Authors: Bernard Desgraupes <bernard.desgraupes@u-paris10.fr>
  *          Sylvain Loiseau <sylvain.loiseau@univ-paris13.fr>
- * (c) Copyright: 2011-2012
+ * Copyright (c) 2011-2016 
  * All rights reserved.
  * ===========================================================================
  */
@@ -31,5 +31,8 @@ int rcqp_get_attr_type(SEXP inType);
 FieldType rcqp_get_field_type(SEXP inField);
 
 void rcqp_send_error();
+
+void rcqp_print_R_message(char* inMsg);
+
 
 #endif  /* RCQP_UTILS_H */

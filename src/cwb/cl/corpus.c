@@ -112,7 +112,7 @@ Corpus *loaded_corpora = NULL;
  *
  * @see cl_standard_registry
  * TODO: would this be better as a static variable WITHIN that function?
- * That way there is no change of anyone acessing the regdir variable
+ * That way there is no chance of anyone accessing the regdir variable
  * except via that function...
  *
  */
@@ -128,16 +128,35 @@ static char *regdir = NULL;
  * @see     REGISTRY_ENVVAR
  * @see     REGISTRY_DEFAULT_PATH
  */
+
+// // Modified for rcqp (bd 2016-06-09)
 char *
 cl_standard_registry()
 {
-  if (regdir == NULL)
-    regdir = getenv(REGISTRY_ENVVAR);
-  if (regdir == NULL)
-    regdir = REGISTRY_DEFAULT_PATH;
-  return regdir;
+	if (regdir == NULL) {
+		regdir = getenv(REGISTRY_ENVVAR);
+	}
+	if (regdir == NULL) {
+		regdir = REGISTRY_DEFAULT_PATH;
+	}
+	if (regdir != NULL && access(regdir, F_OK) == -1 ) {
+		// File does not exist
+		regdir = NULL;
+	} 
+	
+	return regdir;
 }
 
+// // Original definition
+// char *
+// cl_standard_registry()
+// {
+//   if (regdir == NULL)
+//     regdir = getenv(REGISTRY_ENVVAR);
+//   if (regdir == NULL)
+//     regdir = REGISTRY_DEFAULT_PATH;
+//   return regdir;
+// }
 
 
 

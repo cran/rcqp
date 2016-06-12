@@ -23,7 +23,10 @@ printed... as expected.
 
  \method{print}{cqp_subcorpus}(x, positional.attribute = "word", from = 0, to = 10, ...)
 
- \method{print}{cqp_kwic}(x, from = 0, to = min(20, nrow(x)-1), print_tokens = function(x, cpos) cqi_cpos2str(paste(attr(x, "parent.cqp_corpus.name"), "word", sep = "."), cpos), left.separator = " <<", right.separator = ">> ", ...)
+ \method{print}{cqp_kwic}(x, from = 0, to = min(20, nrow(x)-1), 
+        print_tokens = function(x, cpos) cqi_cpos2str(
+		paste(attr(x, "parent.cqp_corpus.name"),"word", sep = "."), cpos), 
+		left.separator = " <<", right.separator = ">> ", ...)
 
  \method{print}{cqp_attr}(x, ...)
 

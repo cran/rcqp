@@ -19,7 +19,8 @@ cqp_flist(x, ...)
  
  \method{cqp_flist}{cqp_corpus}(x, attribute, cutoff = 0, ...)
  
- \method{cqp_flist}{cqp_subcorpus}(x, anchor, attribute, left.context = 0, right.context = 0, cutoff = 0, offset = 0, ...)
+ \method{cqp_flist}{cqp_subcorpus}(x, anchor, attribute, left.context = 0, 
+        right.context = 0, cutoff = 0, offset = 0, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

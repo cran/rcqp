@@ -1,7 +1,7 @@
 # ===========================================================================
 # File: "Makefile.in"
 #                        Created: 2012-05-10 18:55:47
-#              Last modification: 2012-05-11 11:05:51
+#              Last modification: 2016-06-07 14:36:15
 # Authors: Bernard Desgraupes <bernard.desgraupes@u-paris10.fr>
 #          Sylvain Loiseau <sylvain.loiseau@univ-paris13.fr>
 # This is part of the R package 'rcqp'.
@@ -29,7 +29,7 @@ PKG_CFLAGS=@CFLAGS@ @RCQP_PCRE_CFLAGS@ @RCQP_GLIB_CFLAGS@ ${RCQP_REGISTRY_DEFAUL
 PKG_LIBS=@LDFLAGS@ @LIBS@ @RCQP_PCRE_LFLAGS@ @RCQP_GLIB_LFLAGS@
 
 #  
-#  => de toute faon il y a la production de fichier avec dump
+#  => anyway files are produced with dump
 # 
 #define exit(x) rcqp_receive_error(x)
 #define fprintf(x, y) Rprintf(y)

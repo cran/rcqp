@@ -1,18 +1,16 @@
 /* ===========================================================================
 * File: "rcqpUtils.c"
 *                        Created: 2012-01-13 18:49:02
-*              Last modification: 2012-01-19 12:02:10
+*              Last modification: 2016-06-10 14:27:21
 * Authors: Bernard Desgraupes <bernard.desgraupes@u-paris10.fr>
 *          Sylvain Loiseau <sylvain.loiseau@univ-paris13.fr>
-* (c) Copyright: 2011-2012
+* Copyright (c) 2011-2016 
 * All rights reserved.
 * ===========================================================================
 */
 	
 #include "rcqp.h"
 
-
-#define RCQP_ATT_HASH_SIZE 16384
 
 /* Needed for cross-compilation (mingw) */
 int yydebug = 0;
@@ -30,33 +28,36 @@ void
 R_init_rcqp(DllInfo * info)
 {
 	char		*envregdir, *stdregdir;
-	int			ac = 1;
-	char *		av[1];
 	
-	envregdir = getenv("CORPUS_REGISTRY");
+//	envregdir = getenv("CORPUS_REGISTRY");
 	stdregdir= cl_standard_registry();
 	
-	if (envregdir == NULL) {
-		Rprintf("The environment variable CORPUS_REGISTRY is not defined.\n");
-		Rprintf("Using default registry '%s'.\n", stdregdir);
-		Rprintf("See ?cqp_registry for more info on how to set the registry.\n");
+	if (stdregdir == NULL) {
+		rcqp_print_R_message("The registry directory is not defined.");
+		rcqp_print_R_message("See ?cqi_setRegistry for more info on how to set the registry.");
 	} else {
-		Rprintf("Using registry '%s'.\n", envregdir);
+		rcqp_start_cwb();
 	}
-	
-	av[0] = "rcqp";
-	which_app = cqp;
-	silent = 1; 
-	paging = 0;
-	autoshow = 0;
-	auto_save = 0;
-	server_log = 0;
-	enable_macros = 0;
-
-	initialize_cqp(ac, av);
-	make_attribute_hash(RCQP_ATT_HASH_SIZE);
 }
 
+
+/* 
+ * ------------------------------------------------------------------------
+ * 
+ * "rcqp_print_R_message()" --
+ * 
+ * This function invokes the R proc message() from the C code.
+ * 
+ * ------------------------------------------------------------------------
+ */
+void
+rcqp_print_R_message(char* inMsg)
+{
+	SEXP	expr;	
+	PROTECT(expr = lang2(install("message"), mkString(inMsg)));
+	eval(expr, R_GlobalEnv);
+	UNPROTECT(1);
+}
 
 
 /* 
