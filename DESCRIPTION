@@ -1,8 +1,8 @@
 Package: rcqp
 Type: Package
 Title: Interface to the Corpus Query Protocol
-Version: 0.4
-Date: 2016-06-10
+Version: 0.5
+Date: 2018-02-23
 Author: Bernard Desgraupes <bernard.desgraupes@u-paris10.fr>, Sylvain
         Loiseau <sylvain.loiseau@univ-paris13.fr>
 Maintainer: Bernard Desgraupes <bernard.desgraupes@u-paris10.fr>
@@ -13,12 +13,12 @@ Description: Implements Corpus Query Protocol functions based on the
         (LGPL).
 License: GPL-2 | file LICENCE
 LazyLoad: yes
-URL: http://www.r-project.org
+URL: https://www.r-project.org
 Collate: main.R zzz.R s3.R
 Encoding: latin1
 SystemRequirements: GNU make, pcre (>= 7), glib2 (>= 2)
 OS_type: unix
 NeedsCompilation: yes
-Packaged: 2016-06-10 13:36:24 UTC; bernardo
+Packaged: 2018-03-07 16:02:47 UTC; bernardo
 Repository: CRAN
-Date/Publication: 2016-06-12 19:08:49
+Date/Publication: 2018-03-12 15:58:41 UTC

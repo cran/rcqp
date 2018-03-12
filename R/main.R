@@ -1,10 +1,10 @@
 # ===========================================================================
 # File: "main.R"
 #                        Created: 2011-11-24 12:53:46
-#              Last modification: 2012-01-17 15:18:10
+#              Last modification: 2018-03-07 16:38:16
 # Authors: Bernard Desgraupes <bernard.desgraupes@u-paris10.fr>
 #          Sylvain Loiseau <sylvain.loiseau@univ-paris13.fr>
-# (c) Copyright: 2011-2012
+# Copyright (c) 2011-2018 
 # All rights reserved.
 # ===========================================================================
 
@@ -20,7 +20,7 @@
  # ------------------------------------------------------------------------
  ##
 cqi_getRegistry <- function() {
-	ans <- .Call("rcqpCmd_getRegistry", PACKAGE="rcqp")
+	ans <- .Call(rcqpCmd_getRegistry)
     return(ans)
 }
 
@@ -36,7 +36,7 @@ cqi_getRegistry <- function() {
  # ------------------------------------------------------------------------
  ##
 cqi_setRegistry <- function(path) {
-	.Call("rcqpCmd_setRegistry", path, PACKAGE="rcqp")
+	.Call(rcqpCmd_setRegistry, path)
     return(invisible())
 }
 
@@ -61,7 +61,7 @@ cqi_query <- function(mother, child, query) {
 			"letter and can contain both uppercase and lowercase",
 			"letters, underscores, dashes and digits."));
 	}
-	.Call("rcqpCmd_query", mother, child, query, PACKAGE="rcqp")
+	.Call(rcqpCmd_query, mother, child, query)
     return(invisible())
 }
 
@@ -77,7 +77,7 @@ cqi_query <- function(mother, child, query) {
  # ------------------------------------------------------------------------
  ##
 cqi_list_corpora <- function() {
-	ans <- .Call("rcqpCmd_list_corpora", PACKAGE="rcqp")
+	ans <- .Call(rcqpCmd_list_corpora)
     return(ans)
 } 
 
@@ -94,7 +94,7 @@ cqi_list_corpora <- function() {
  # ------------------------------------------------------------------------
  ##
 cqi_list_subcorpora <- function(corpus) {
-	ans <- .Call("rcqpCmd_list_subcorpora", corpus, PACKAGE="rcqp")
+	ans <- .Call(rcqpCmd_list_subcorpora, corpus)
     return(ans)
 }
 
@@ -110,7 +110,7 @@ cqi_list_subcorpora <- function(corpus) {
  # ------------------------------------------------------------------------
  ##
 cqi_full_name <- function(corpus) {
-	ans <- .Call("rcqpCmd_full_name", corpus, PACKAGE="rcqp")
+	ans <- .Call(rcqpCmd_full_name, corpus)
     return(ans)
 }
 
@@ -126,7 +126,7 @@ cqi_full_name <- function(corpus) {
  # ------------------------------------------------------------------------
  ##
 cqi_corpus_info <- function(corpus) {
-	ans <- .Call("rcqpCmd_corpus_info", corpus, PACKAGE="rcqp")
+	ans <- .Call(rcqpCmd_corpus_info, corpus)
     return(invisible())
 }
 
@@ -142,7 +142,7 @@ cqi_corpus_info <- function(corpus) {
  # ------------------------------------------------------------------------
  ##
 cqi_subcorpus_size <- function(subcorpus) {
-	ans <- .Call("rcqpCmd_subcorpus_size", subcorpus, PACKAGE="rcqp")
+	ans <- .Call(rcqpCmd_subcorpus_size, subcorpus)
     return(ans)
 }
 
@@ -156,7 +156,7 @@ cqi_subcorpus_size <- function(subcorpus) {
  # ------------------------------------------------------------------------
  ##
 cqi_dump_subcorpus <- function(subcorpus, first=0, last=cqi_subcorpus_size(subcorpus)-1) {
-	ans <- .Call("rcqpCmd_dump_subcorpus", subcorpus, first, last, PACKAGE="rcqp")
+	ans <- .Call(rcqpCmd_dump_subcorpus, subcorpus, first, last)
     return(ans)
 }
 
@@ -172,7 +172,7 @@ cqi_dump_subcorpus <- function(subcorpus, first=0, last=cqi_subcorpus_size(subco
  # ------------------------------------------------------------------------
  ##
 cqi_drop_subcorpus <- function(subcorpus) {
-	.Call("rcqpCmd_drop_subcorpus", subcorpus, PACKAGE="rcqp")
+	.Call(rcqpCmd_drop_subcorpus, subcorpus)
     return(invisible())
 }
 
@@ -194,7 +194,7 @@ cqi_drop_subcorpus <- function(subcorpus) {
  # ------------------------------------------------------------------------
  ##
 cqi_fdist1 <- function(subcorpus, field1, key1, cutoff=0, offset=0) {
-	ans <- .Call("rcqpCmd_fdist1", subcorpus, field1, key1, as.integer(cutoff), as.integer(offset), PACKAGE="rcqp")
+	ans <- .Call(rcqpCmd_fdist1, subcorpus, field1, key1, as.integer(cutoff), as.integer(offset))
     return(ans)
 }
 
@@ -212,7 +212,7 @@ cqi_fdist1 <- function(subcorpus, field1, key1, cutoff=0, offset=0) {
  # ------------------------------------------------------------------------
  ##
 cqi_fdist2 <- function(subcorpus, field1, key1, field2, key2, cutoff=0) {
-	ans <- .Call("rcqpCmd_fdist2", subcorpus, field1, key1, field2, key2, as.integer(cutoff), PACKAGE="rcqp")
+	ans <- .Call(rcqpCmd_fdist2, subcorpus, field1, key1, field2, key2, as.integer(cutoff))
     return(ans)
 }
 
@@ -235,7 +235,7 @@ cqi_fdist2 <- function(subcorpus, field1, key1, field2, key2, cutoff=0) {
  # ------------------------------------------------------------------------
  ##
 cqi_attributes <- function(corpus, type) {
-	ans <- .Call("rcqpCmd_attributes", corpus, type, PACKAGE="rcqp")
+	ans <- .Call(rcqpCmd_attributes, corpus, type)
     return(ans)
 }
 
@@ -256,7 +256,7 @@ cqi_attributes <- function(corpus, type) {
  # ------------------------------------------------------------------------
  ##
 cqi_attribute_size <- function(attribute) {
-	ans <- .Call("rcqpCmd_attribute_size", attribute, PACKAGE="rcqp")
+	ans <- .Call(rcqpCmd_attribute_size, attribute)
     return(ans)
 }
 
@@ -276,7 +276,7 @@ cqi_attribute_size <- function(attribute) {
  # ------------------------------------------------------------------------
  ##
 cqi_structural_attribute_has_values <- function(attribute) {
-	ans <- .Call("rcqpCmd_structural_attribute_has_values", attribute, PACKAGE="rcqp")
+	ans <- .Call(rcqpCmd_structural_attribute_has_values, attribute)
     return(ans)
 }
 
@@ -292,7 +292,7 @@ cqi_structural_attribute_has_values <- function(attribute) {
  # ------------------------------------------------------------------------
  ##
 cqi_lexicon_size <- function(attribute) {
-	ans <- .Call("rcqpCmd_lexicon_size", attribute, PACKAGE="rcqp")
+	ans <- .Call(rcqpCmd_lexicon_size, attribute)
     return(ans)
 }
 
@@ -308,7 +308,7 @@ cqi_lexicon_size <- function(attribute) {
  # ------------------------------------------------------------------------
  ##
 cqi_str2id <- function(attribute, strs) {
-	ans <- .Call("rcqpCmd_str2id", attribute, strs, PACKAGE="rcqp")
+	ans <- .Call(rcqpCmd_str2id, attribute, strs)
     return(ans)
 }
 
@@ -324,7 +324,7 @@ cqi_str2id <- function(attribute, strs) {
  # ------------------------------------------------------------------------
  ##
 cqi_id2str <- function(attribute, ids) {
-	ans <- .Call("rcqpCmd_id2str", attribute, as.integer(ids), PACKAGE="rcqp")
+	ans <- .Call(rcqpCmd_id2str, attribute, as.integer(ids))
     return(ans)
 }
 
@@ -340,7 +340,7 @@ cqi_id2str <- function(attribute, ids) {
  # ------------------------------------------------------------------------
  ##
 cqi_id2freq <- function(attribute, ids) {
-	ans <- .Call("rcqpCmd_id2freq", attribute, as.integer(ids), PACKAGE="rcqp")
+	ans <- .Call(rcqpCmd_id2freq, attribute, as.integer(ids))
     return(ans)
 }
 
@@ -360,7 +360,7 @@ cqi_id2freq <- function(attribute, ids) {
  # ------------------------------------------------------------------------
  ##
 cqi_cpos2id <- function(attribute, cpos) {
-	ans <- .Call("rcqpCmd_cpos2id", attribute, as.integer(cpos), PACKAGE="rcqp")
+	ans <- .Call(rcqpCmd_cpos2id, attribute, as.integer(cpos))
     return(ans)
 }
 
@@ -376,7 +376,7 @@ cqi_cpos2id <- function(attribute, cpos) {
  # ------------------------------------------------------------------------
  ##
 cqi_cpos2str <- function(attribute, cpos) {
-	ans <- .Call("rcqpCmd_cpos2str", attribute, as.integer(cpos), PACKAGE="rcqp")
+	ans <- .Call(rcqpCmd_cpos2str, attribute, as.integer(cpos))
     return(ans)
 }
 
@@ -392,7 +392,7 @@ cqi_cpos2str <- function(attribute, cpos) {
  # ------------------------------------------------------------------------
  ##
 cqi_cpos2struc <- function(attribute, cpos) {
-	ans <- .Call("rcqpCmd_cpos2struc", attribute, as.integer(cpos), PACKAGE="rcqp")
+	ans <- .Call(rcqpCmd_cpos2struc, attribute, as.integer(cpos))
     return(ans)
 }
 
@@ -408,7 +408,7 @@ cqi_cpos2struc <- function(attribute, cpos) {
  # ------------------------------------------------------------------------
  ##
 cqi_cpos2lbound <- function(attribute, cpos) {
-	ans <- .Call("rcqpCmd_cpos2lbound", attribute, as.integer(cpos), PACKAGE="rcqp")
+	ans <- .Call(rcqpCmd_cpos2lbound, attribute, as.integer(cpos))
     return(ans)
 }
 
@@ -424,7 +424,7 @@ cqi_cpos2lbound <- function(attribute, cpos) {
  # ------------------------------------------------------------------------
  ##
 cqi_cpos2rbound <- function(attribute, cpos) {
-	ans <- .Call("rcqpCmd_cpos2rbound", attribute, as.integer(cpos), PACKAGE="rcqp")
+	ans <- .Call(rcqpCmd_cpos2rbound, attribute, as.integer(cpos))
     return(ans)
 }
 
@@ -443,7 +443,7 @@ cqi_cpos2rbound <- function(attribute, cpos) {
  # ------------------------------------------------------------------------
  ##
 cqi_alg2cpos <- function(attribute, alg) {
-	ans <- .Call("rcqpCmd_alg2cpos", attribute, as.integer(alg), PACKAGE="rcqp")
+	ans <- .Call(rcqpCmd_alg2cpos, attribute, as.integer(alg))
     return(ans)
 }
 
@@ -459,7 +459,7 @@ cqi_alg2cpos <- function(attribute, alg) {
  # ------------------------------------------------------------------------
  ##
 cqi_cpos2alg <- function(attribute, cpos) {
-	ans <- .Call("rcqpCmd_cpos2alg", attribute, as.integer(cpos), PACKAGE="rcqp")
+	ans <- .Call(rcqpCmd_cpos2alg, attribute, as.integer(cpos))
     return(ans)
 }
 
@@ -475,7 +475,7 @@ cqi_cpos2alg <- function(attribute, cpos) {
  # ------------------------------------------------------------------------
  ##
 cqi_id2cpos <- function(attribute, id) {
-	ans <- .Call("rcqpCmd_id2cpos", attribute, as.integer(id), PACKAGE="rcqp")
+	ans <- .Call(rcqpCmd_id2cpos, attribute, as.integer(id))
     return(ans)
 }
 
@@ -491,7 +491,7 @@ cqi_id2cpos <- function(attribute, id) {
 #  # ------------------------------------------------------------------------
 #  ##
 # cqi_idlist2cpos <- function(attribute, ids) {
-# 	ans <- .Call("rcqpCmd_idlist2cpos", attribute, as.integer(ids), PACKAGE="rcqp")
+# 	ans <- .Call(rcqpCmd_idlist2cpos, attribute, as.integer(ids))
 #     return(ans)
 # }
 
@@ -507,7 +507,7 @@ cqi_id2cpos <- function(attribute, id) {
  # ------------------------------------------------------------------------
  ##
 cqi_regex2id <- function(attribute, regex) {
-	ans <- .Call("rcqpCmd_regex2id", attribute, regex, PACKAGE="rcqp")
+	ans <- .Call(rcqpCmd_regex2id, attribute, regex)
     return(ans)
 }
 
@@ -523,7 +523,7 @@ cqi_regex2id <- function(attribute, regex) {
  # ------------------------------------------------------------------------
  ##
 cqi_struc2cpos <- function(attribute, struc) {
-	ans <- .Call("rcqpCmd_struc2cpos", attribute, as.integer(struc), PACKAGE="rcqp")
+	ans <- .Call(rcqpCmd_struc2cpos, attribute, as.integer(struc))
     return(ans)
 }
 
@@ -539,7 +539,7 @@ cqi_struc2cpos <- function(attribute, struc) {
  # ------------------------------------------------------------------------
  ##
 cqi_struc2str <- function(attribute, ids) {
-	ans <- .Call("rcqpCmd_struc2str", attribute, as.integer(ids), PACKAGE="rcqp")
+	ans <- .Call(rcqpCmd_struc2str, attribute, as.integer(ids))
     return(ans)
 }
 
@@ -554,7 +554,7 @@ cqi_struc2str <- function(attribute, ids) {
 #  ##
 # concordance <- function(corpus, query, left.context=10, right.context=10)
 # {
-# 	ans <- .Call("rcqpCmd_concordance", corpus, query, left.context, right.context, PACKAGE="rcqp")
+# 	ans <- .Call(rcqpCmd_concordance, corpus, query, left.context, right.context)
 #     return(ans)
 # }
 
@@ -574,7 +574,7 @@ cqi_struc2str <- function(attribute, ids) {
 # # 	if (nchar(child) == 0) {
 # # 
 # # 	} TODO check ;
-# 	.Call("rcqpCmd_cqp", query, PACKAGE="rcqp")
+# 	.Call(rcqpCmd_cqp, query)
 #     return(invisible())
 # }
 
@@ -589,7 +589,7 @@ cqi_struc2str <- function(attribute, ids) {
 #  # ------------------------------------------------------------------------
 #  ##
 # cqi_charset <- function(corpus) {
-# 	ans <- .Call("rcqpCmd_charset", corpus, PACKAGE="rcqp")
+# 	ans <- .Call(rcqpCmd_charset, corpus)
 #     return(ans)
 # }
 
@@ -605,7 +605,7 @@ cqi_struc2str <- function(attribute, ids) {
 #  # ------------------------------------------------------------------------
 #  ##
 # cqi_properties <- function(corpus) {
-# 	ans <- .Call("rcqpCmd_properties", corpus, PACKAGE="rcqp")
+# 	ans <- .Call(rcqpCmd_properties, corpus)
 #     return(ans)
 # }
 

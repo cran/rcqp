@@ -1,3 +1,7 @@
+# Refer to all C/Fortran routines by their name (rather than strings)
+# See R_registerRoutines in R_init_rcqp()
+useDynLib(rcqp, .registration = TRUE)
+
 export(
 	"cqi_getRegistry",
 	"cqi_setRegistry",
@@ -88,6 +92,8 @@ export(
 importFrom("plyr","count")
 importFrom("utils","write.table")
 
+S3method("[[", cqp_corpus)
+S3method("$", cqp_corpus)
 S3method(cqp_flist,cqp_attr)
 S3method(cqp_flist,cqp_corpus)
 S3method(cqp_flist,cqp_subcorpus)

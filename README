@@ -1,5 +1,4 @@
 
-
 The rcqp package is an extension for the open source statistical software
 R. It is an implementation in R of the Corpus Query Protocol which lets you
 execute queries and perform statistical tasks over large text corpora with
@@ -27,13 +26,13 @@ Authors
 
 	Sylvain Loiseau <sylvain.loiseau@univ-paris13.fr>
 	University Paris-13 Villetaneuse
-	Laboratoire Lexiques, Dictionnaires, Informatique
+	UMR 8202 Sedyl
 
 
 Project's Home Page
 ===================
-	The project is hosted by RForge at
-		https://r-forge.r-project.org/projects/rcwb/
+	The project is hosted by SourceForge at
+		http://sourceforge.net/projects/rcqp
 
 
 License
@@ -41,7 +40,8 @@ License
 rcqp is a free software conforming to a GPL>=2 license. See the file LICENSE 
 for details.
 
-    rcqp version 1.0, Copyright (C) 2012 Bernard Desgraupes & Sylvain Loiseau
+    Copyright (c) 2012-2016 Bernard Desgraupes & Sylvain Loiseau
+	All rights reserved
     rcqp comes with ABSOLUTELY NO WARRANTY.
     This is free software, and you are welcome to redistribute it
     under certain conditions as stated in the license terms.

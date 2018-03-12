@@ -12,11 +12,11 @@
 # table.cqp_attr
 
 # c[ 1, ] # le premier token
-# c[ text_date == "1997", ] # les rŽgions "textes_date" avec la valeur 1997
-# c[ text_date == "1997", word ] # pourrait tre une expression pratique pour avoir une liste de vecteurs (un par rŽgion sŽlectionnŽe) contenant les formes flŽchies.
-# c[ query(' [lemma="interesting"] [] "in" ' ) , ] # pour utiliser la requte cqp
+# c[ text_date == "1997", ] # les rÃ©gions "textes_date" avec la valeur 1997
+# c[ text_date == "1997", word ] # pourrait Ãªtre une expression pratique pour avoir une liste de vecteurs (un par rÃ©gion sÃ©lectionnÃ©e) contenant les formes flÃ©chies.
+# c[ query(' [lemma="interesting"] [] "in" ' ) , ] # pour utiliser la requÃªte cqp
 
-# Indexer les sous-corpus diffŽremment ; pouvoir s'interroger sur les rŽgions dans un sous-corpus...
+# Indexer les sous-corpus diffÃ©remment ; pouvoir s'interroger sur les rÃ©gions dans un sous-corpus...
 # sc[ "pos" ] # => liste de vecteurs ?
 
 # Ou bien distinguer l'indexation du corpus => liste de vecteur ; la fonction query => un objet cqp_subcorpus ?
@@ -46,7 +46,7 @@ region_sizes <- function (attribute) UseMethod("tokens");
 
 
 
-# crŽation d'un sous-corpus
+# crÃ©ation d'un sous-corpus
 `[.cqp_corpus` <- function(i, j, k, ...) {
 #	.create_cqp_attr(i, j);
 #	.cqp_corpus2matrix <- function(x, from, to, use_value=use_value) {	
@@ -1144,3 +1144,4 @@ print.cqp_kwic <- function(x,
 		cat(paste(i, "\n", sep=""));
 	}
 }
+

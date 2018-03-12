@@ -1,7 +1,7 @@
 /* ===========================================================================
 * File: "rcqpUtils.c"
 *                        Created: 2012-01-13 18:49:02
-*              Last modification: 2016-06-10 14:27:21
+*              Last modification: 2016-06-10 15:42:46
 * Authors: Bernard Desgraupes <bernard.desgraupes@u-paris10.fr>
 *          Sylvain Loiseau <sylvain.loiseau@univ-paris13.fr>
 * Copyright (c) 2011-2016 
@@ -10,7 +10,41 @@
 */
 	
 #include "rcqp.h"
+#define CALLDEF(name, n)  {#name, (DL_FUNC) &name, n}
 
+static const R_CallMethodDef CallEntries[] = {
+	{"rcqpCmd_alg2cpos", (DL_FUNC) &rcqpCmd_alg2cpos, 2},
+	{"rcqpCmd_attribute_size", (DL_FUNC) &rcqpCmd_attribute_size, 1},
+	{"rcqpCmd_attributes", (DL_FUNC) &rcqpCmd_attributes, 2},
+	{"rcqpCmd_corpus_info", (DL_FUNC) &rcqpCmd_corpus_info, 1},
+	{"rcqpCmd_cpos2alg", (DL_FUNC) &rcqpCmd_cpos2alg, 2},
+	{"rcqpCmd_cpos2id", (DL_FUNC) &rcqpCmd_cpos2id, 2},
+	{"rcqpCmd_cpos2lbound", (DL_FUNC) &rcqpCmd_cpos2lbound, 2},
+	{"rcqpCmd_cpos2rbound", (DL_FUNC) &rcqpCmd_cpos2rbound, 2},
+	{"rcqpCmd_cpos2str", (DL_FUNC) &rcqpCmd_cpos2str, 2},
+	{"rcqpCmd_cpos2struc", (DL_FUNC) &rcqpCmd_cpos2struc, 2},
+	{"rcqpCmd_drop_subcorpus", (DL_FUNC) &rcqpCmd_drop_subcorpus, 1},
+	{"rcqpCmd_dump_subcorpus", (DL_FUNC) &rcqpCmd_dump_subcorpus, 3},
+	{"rcqpCmd_fdist1", (DL_FUNC) &rcqpCmd_fdist1, 5},
+	{"rcqpCmd_fdist2", (DL_FUNC) &rcqpCmd_fdist2, 6},
+	{"rcqpCmd_full_name", (DL_FUNC) &rcqpCmd_full_name, 1},
+	{"rcqpCmd_getRegistry", (DL_FUNC) &rcqpCmd_getRegistry, 0},
+	{"rcqpCmd_id2cpos", (DL_FUNC) &rcqpCmd_id2cpos, 2},
+	{"rcqpCmd_id2freq", (DL_FUNC) &rcqpCmd_id2freq, 2},
+	{"rcqpCmd_id2str", (DL_FUNC) &rcqpCmd_id2str, 2},
+	{"rcqpCmd_lexicon_size", (DL_FUNC) &rcqpCmd_lexicon_size, 1},
+	{"rcqpCmd_list_corpora", (DL_FUNC) &rcqpCmd_list_corpora, 0},
+	{"rcqpCmd_list_subcorpora", (DL_FUNC) &rcqpCmd_list_subcorpora, 1},
+	{"rcqpCmd_query", (DL_FUNC) &rcqpCmd_query, 3},
+	{"rcqpCmd_regex2id", (DL_FUNC) &rcqpCmd_regex2id, 2},
+	{"rcqpCmd_setRegistry", (DL_FUNC) &rcqpCmd_setRegistry, 1},
+	{"rcqpCmd_str2id", (DL_FUNC) &rcqpCmd_str2id, 2},
+	{"rcqpCmd_struc2cpos", (DL_FUNC) &rcqpCmd_struc2cpos, 2},
+	{"rcqpCmd_struc2str", (DL_FUNC) &rcqpCmd_struc2str, 2},
+	{"rcqpCmd_structural_attribute_has_values", (DL_FUNC) &rcqpCmd_structural_attribute_has_values, 1},
+	{"rcqpCmd_subcorpus_size", (DL_FUNC) &rcqpCmd_subcorpus_size, 1},
+    {NULL, NULL, 0}
+};
 
 /* Needed for cross-compilation (mingw) */
 int yydebug = 0;
@@ -27,12 +61,12 @@ int yydebug = 0;
 void
 R_init_rcqp(DllInfo * info)
 {
-	char		*envregdir, *stdregdir;
-	
-//	envregdir = getenv("CORPUS_REGISTRY");
-	stdregdir= cl_standard_registry();
-	
-	if (stdregdir == NULL) {
+	char *	stdregdir = cl_standard_registry();	
+    R_registerRoutines(info, NULL, CallEntries, NULL, NULL);
+    R_useDynamicSymbols(info, FALSE);
+    R_forceSymbols(info, TRUE);
+   
+    if (stdregdir == NULL) {
 		rcqp_print_R_message("The registry directory is not defined.");
 		rcqp_print_R_message("See ?cqi_setRegistry for more info on how to set the registry.");
 	} else {

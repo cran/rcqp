@@ -53,7 +53,7 @@ AC_PROG_YACC()
 
 # Support the MacPorts location
 LDFLAGS="$LDFLAGS -L/opt/local/lib"
-
+CFLAGS=
 
 
 

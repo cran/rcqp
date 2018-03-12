@@ -2860,7 +2860,7 @@ test -n "$YACC" || YACC="yacc"
 
 # Support the MacPorts location
 LDFLAGS="$LDFLAGS -L/opt/local/lib"
-
+CFLAGS=
 
 
 

@@ -4,27 +4,28 @@ Foundation; either version 2 or 3 of the License (at your option).
 
 This program is distributed in the hope that it will be useful, but WITHOUT ANY
 WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 A copy of the GNU General Public License is available at
-http://www.r-project.org/Licenses/ .  A copy of version 2 is included in the
-sources as file COPYING.
+http://www.r-project.org/Licenses/. 
 
 Dependencies:
 
 1/ Binaries of this program includes the following third party component:
 
-- CWB (of which this program is basically a wrapper for R), GPL Licence, http://cwb.sourceforge.net/
+	- CWB (of which this program is basically a wrapper for R), GPL Licence,
+      http://cwb.sourceforge.net/
 
-1/ Binaries of this program may include components (through dynamic linking) or
+2/ Binaries of this program may include components (through dynamic linking) or
 totality (on Windows) of the following third party pieces of software:
 
-- PCRE, BSD Licence, http://www.pcre.org According to terms of BSD Licence this
-  licence is reproduced bellow.
-- GLIB2, LGPL Licence, http://www.gtk.org/download.html
+	- PCRE, BSD Licence, http://www.pcre.org According to terms of BSD Licence this
+	  licence is reproduced bellow.
 
-2/ The source code of this program includes a copy of the source code of the CWB
-  program, version +/- 3.0
+	- GLIB2, LGPL Licence, http://www.gtk.org/download.html
+
+3/ The source code of this program includes a copy of the source code of the CWB
+  program, version +/- 3.0, GPL Licence
 
 
 

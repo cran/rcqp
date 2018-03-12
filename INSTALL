@@ -43,11 +43,15 @@ Download
 ========
 
 The source code of the rcqp package is placed in a Subversion repository at
-RForge. In order to retrieve the source files, you need a Subversion
-client. If the command line client is installed on your machine, just type
-the following instruction from a Terminal window :
-    svn checkout svn://scm.r-forge.r-project.org/svnroot/rcwb/pkg/rcqp
+SourceForge. 
 
+Released versions are found at the following address:
+	http://sourceforge.net/projects/rcqp/files/
+
+In order to retrieve the most recent source files, you need a
+Subversion client. If the command line client is installed on your machine,
+just type the following instruction from a Terminal window:
+    svn checkout http://svn.code.sf.net/p/rcqp/code/Current rcqp
 
 
 Configuration
@@ -56,7 +60,7 @@ Configuration
 You can specify platform-specific and site-specific settings on the
 ./configure command line using the RCQP_PLATFORM and RCQP_SITE variables.
 Their default values are 'linux' and 'standard' respectively. The possible
-values are the names mentionned in the commentys at the top of the the file
+values are the names mentionned in the comments at the top of the file
 cwb/configRcqp.mk.
 
 For cross-compilation for Windows, you should use mingw
@@ -68,9 +72,14 @@ More details on cross-compilation below.
 Building and installing with R on a Unix-like system
 ====================================================
 
-From the directory containing the source code, i-e the directory containing
-the rcqp/ directory, execute the following command:
-	R CMD install rcqp
+If you build the extension from a released version, say rcqp_0.4.tar.gz,
+type the following command from a terminal window:
+	R CMD INSTALL rcqp_0.4.tar.gz
+
+If you want to build the latest source code found in the Subversion
+repository, from the directory containing the rcqp/ working copy, execute
+the following command:
+	R CMD INSTALL rcqp
 
 R will automatically find the configure script, run it, execute the make 
 command and finally install the package in the appropriate location.
@@ -92,12 +101,14 @@ Help is also available through the usual mechanism. For instance, start with:
 Cross-compilation for Windows
 =============================
 
-The rcqp dynamic library can be compiled for Windows via cross-compilation
-on a Unix-like system. To do this, you need a cross-compiler. For instance,
-in order to cross-compile on a Mac OS X machine, you can use the
-i386-mingw32-gcc compiler which can be installed using MacPorts 
-(http://www.macports.org/). If MacPorts is installed on your machine, the 
-instruction is:
+Although we do not support Windows, the rcqp dynamic library can be
+compiled for Windows via cross-compilation on a Unix-like system. For the
+adventurous, here is some guidance about this process.
+
+To do this, you need a cross-compiler. For instance, in order to
+cross-compile on a Mac OS X machine, you can use the i386-mingw32-gcc
+compiler which can be installed using MacPorts (http://www.macports.org/).
+If MacPorts is installed on your machine, the instruction is:
 	sudo port -v install i386-mingw32-gcc
 
 The configuration script needs to know about the following variables:
@@ -118,8 +129,8 @@ compiler. Finally you also need to get the R.dll library for Windows used
 by R. Alternatively you can find prebuilt binaires on the internet, like
 http://ftp.gnome.org/pub/gnome/binaries/win32/glib/2.28/glib-dev_2.28.8-1_win32.zip
 
-These external libraries should be located in some directory on your 
-machine. This directory contains the usual bin, include, lib 
+These external libraries should be located in some directory on your
+machine. This directory contains the usual bin, include, lib
 subdirectories.
 
 You specify the path to this directory in a variable named CROSS_COMPILATION_DIR
@@ -145,10 +156,6 @@ src/ subdirectory and execute the following instructions
 If everything goes right you should have at the end a rcqp.dll library in the
 CROSS_COMPILATION_DIR subdirectory.
 
-Troubleshooting
-===============
-
-In case of problems, please contact one of the authors of the rcqp project.
 
 
 

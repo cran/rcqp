@@ -122,42 +122,77 @@ print_corpus_info_header(CorpusList *cl,
  *                        this will be set to "".
  * @return                A stream (FILE *) to the opened temporary file, or NULL
  *                        if unsuccessful.
+ *
+ * OLD NOTE (we don't use tempnam anymore, see below)
+ * Note there is a potential problem using tempnam rather than tmpfile () or mkstemp () if there
+ * is more than one copy of cqp running and they both call this function at the same time.
+ * A race condition could result where copy#2 gets the same name as copy#1 by calling tempnam()
+ * after copy#1 calls it but before copy#1 opens the file.
+ *
+ * For this reason, the process ID is used to make the filename unique to this process.
+ * But we then need to try to open the file for read to check whether it exists (because
+ * tempnam() doesn't guarantee that the filename will still not exist once we add an
+ * arbitrary numerical prefix!)
+ *
  */
 FILE *
 open_temporary_file(char *tmp_name_buffer)
 {
-  char *intermed_buffer;
-  FILE *fd = NULL;
-
-  assert((tmp_name_buffer != NULL) && "Invalid NULL argument in open_temporary_file().");
-
-  /* note there is a potential problem using tempnam rather than tmpfile () or mkstemp () if there
-   * is more than one copy of cqp running and they both call this function at the same time.
-   * A race condition could result where copy#2 gets the same name as copy#1 by calling tempnam()
-   * after copy#1 calls it but before copy#1 opens the file.
-   *
-   * For this reason, the process ID is used to make the filename unique to this process.
-   * But we then need to try to open the file for read to check whether it exists (because
-   * tempnam() doesn't guarantee that the filename will still not exist once we add an
-   * arbitrary numerical prefix!)
-   */
-  do {
-    if (fd)
-      fclose(fd);
-    intermed_buffer = tempnam(TEMPDIR_PATH, "cqpt."); /* we need to catch the pointer in order to free it below */
-    sprintf(tmp_name_buffer, "%d.%s", (int)getpid(), intermed_buffer);
-    cl_free(intermed_buffer);
-  } while (NULL != (fd = fopen(tmp_name_buffer, "r")));
-
-  fd = fopen(tmp_name_buffer, "w");
-
-  if (fd)
-    return fd;
-  else {
-    perror("open_temporary_file(): can't create temporary file");
-    return NULL;
-  }
+	char		template[] = "/tmp/cqpt.XXXXXX";
+	int			fdesc;
+	FILE *		fstream = NULL;
+	
+	// (bd 2018-02-23) Replaced tempnam by mkstemp as per request from
+	// CRAN. Open a file descriptor using mkstemp and get an associated
+	// file stream (FILE*) using fdopen().
+	fdesc = mkstemp(template);
+	fstream = fdopen(fdesc, "w+");
+	
+	if (fstream)
+		return fstream;
+	else {
+		perror("open_temporary_file(): can't create temporary file");
+		return NULL;
+	}
 }
+
+// // Previous definition
+// // -------------------
+// FILE *
+// open_temporary_file(char *tmp_name_buffer)
+// {
+//   char *intermed_buffer;
+//   FILE *fd = NULL;
+// 
+//   assert((tmp_name_buffer != NULL) && "Invalid NULL argument in open_temporary_file().");
+// 
+//   /* note there is a potential problem using tempnam rather than tmpfile () or mkstemp () if there
+//    * is more than one copy of cqp running and they both call this function at the same time.
+//    * A race condition could result where copy#2 gets the same name as copy#1 by calling tempnam()
+//    * after copy#1 calls it but before copy#1 opens the file.
+//    *
+//    * For this reason, the process ID is used to make the filename unique to this process.
+//    * But we then need to try to open the file for read to check whether it exists (because
+//    * tempnam() doesn't guarantee that the filename will still not exist once we add an
+//    * arbitrary numerical prefix!)
+//    */
+//   do {
+//     if (fd)
+//       fclose(fd);
+//     intermed_buffer = tempnam(TEMPDIR_PATH, "cqpt."); /* we need to catch the pointer in order to free it below */
+//     sprintf(tmp_name_buffer, "%d.%s", (int)getpid(), intermed_buffer);
+//     cl_free(intermed_buffer);
+//   } while (NULL != (fd = fopen(tmp_name_buffer, "r")));
+// 
+//   fd = fopen(tmp_name_buffer, "w");
+// 
+//   if (fd)
+//     return fd;
+//   else {
+//     perror("open_temporary_file(): can't create temporary file");
+//     return NULL;
+//   }
+// }
 
 /**
  * This function is a wrapper round fopen() which provides checks for
@@ -772,7 +807,7 @@ append_tabulation_item(TabulationItem item) {
 
 int
 pt_get_anchor_cpos(CorpusList *cl, int n, FieldType anchor, int offset) {
-  int real_n, cpos;
+  int real_n, cpos = -1;
 
   real_n = (cl->sortidx) ? cl->sortidx[n] : n; /* get anchor for n-th match */
   switch (anchor) {

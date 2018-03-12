@@ -1,7 +1,7 @@
 /* ===========================================================================
  * File: "rcqpCommands.h"
  *                        Created: 2012-01-13 18:49:02
- *              Last modification: 2016-06-09 14:03:28
+ *              Last modification: 2018-03-07 16:50:57
  * Authors: Bernard Desgraupes <bernard.desgraupes@u-paris10.fr>
  *          Sylvain Loiseau <sylvain.loiseau@univ-paris13.fr>
  * ===========================================================================
@@ -20,6 +20,8 @@
 
 void rcqp_start_cwb();
 
+SEXP rcqpCmd_alg2cpos(SEXP inAttribute, SEXP inAlg);
+SEXP rcqpCmd_getRegistry();
 SEXP rcqpCmd_setRegistry(SEXP inPath);
 SEXP rcqpCmd_attribute_size(SEXP inAttribute);
 SEXP rcqpCmd_attributes(SEXP inCorpus, SEXP inType);
